@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitepress'
-import { generateSidebar } from './theme/utils/sidebar'
 
 export default defineConfig({
   // 基础配置
@@ -9,8 +8,8 @@ export default defineConfig({
   description: '从算法到 Agent，系统掌握人工智能工程架构',
   
   // 目录配置
-  srcDir: './docs',
-  outDir: '../dist',
+  srcDir: 'docs',
+  outDir: 'dist',
   cleanUrls: true,
   lastUpdated: true,
   
@@ -56,12 +55,34 @@ export default defineConfig({
     
     // 侧边栏
     sidebar: {
-      '/guide/': generateSidebar('guide'),
-      '/models/': generateSidebar('models'),
-      '/engineering/': generateSidebar('engineering'),
-      '/agent/': generateSidebar('agent'),
-      '/application/': generateSidebar('application'),
-      '/resources/': generateSidebar('resources')
+      '/guide/': [
+        { text: '示例文章', link: '/guide/example-article/' }
+      ],
+      '/models/': [
+        { text: 'Python基础教程', link: '/models/python-basics/' },
+        { text: '第1期：环境搭建', link: '/models/python-basics/lesson-01/' },
+        { text: '第2期：数据类型', link: '/models/python-basics/lesson-02/' },
+        { text: '第3期：控制流', link: '/models/python-basics/lesson-03/' },
+        { text: '第4期：面向对象', link: '/models/python-basics/lesson-04/' },
+        { text: '第5期：文件操作', link: '/models/python-basics/lesson-05/' }
+      ],
+      '/engineering/': [
+        { text: '推理优化', link: '/engineering/inference/' },
+        { text: '服务架构', link: '/engineering/architecture/' },
+        { text: '可观测性', link: '/engineering/observability/' }
+      ],
+      '/agent/': [
+        { text: '架构设计', link: '/agent/architecture/' },
+        { text: '开发框架', link: '/agent/frameworks/' },
+        { text: '工程实践', link: '/agent/engineering/' },
+        { text: '垂直案例', link: '/agent/cases/' }
+      ],
+      '/application/': [
+        { text: '示例应用', link: '/application/example/' }
+      ],
+      '/resources/': [
+        { text: '学习资源', link: '/resources/' }
+      ]
     },
     
     // 社交链接
