@@ -1,0 +1,37 @@
+{
+  "name": "ai-guide",
+  "version": "1.0.0",
+  "description": "AI Guide - 人工智能全栈知识体系",
+  "type": "module",
+  "scripts": {
+    "dev": "vitepress dev docs",
+    "build": "vitepress build docs",
+    "preview": "vitepress preview docs",
+    "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.3",
+    "markdown-it-mathjax3": "^4.3.2",
+    "markdown-it-mermaid": "^0.2.5",
+    "vue": "^3.4.0"
+  },
+  "devDependencies": {
+    "@iconify/vue": "^4.1.1",
+    "@types/node": "^20.10.6",
+    "algoliasearch": "^4.23.3",
+    "autoprefixer": "^10.4.16",
+    "eslint": "^8.56.0",
+    "eslint-plugin-vue": "^9.20.1",
+    "mermaid": "^10.6.1",
+    "postcss": "^8.4.32",
+    "tailwindcss": "^3.4.0",
+    "typescript": "^5.3.3",
+    "unocss": "^0.58.5",
+    "vite": "^5.0.12",
+    "vitepress": "^1.0.0-rc.39",
+    "vue-router": "^4.2.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

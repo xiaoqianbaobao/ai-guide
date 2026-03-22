@@ -1,0 +1,55 @@
+/* 自定义样式覆盖 */
+.VPContent {
+  font-family: var(--vp-font-family-base);
+  line-height: 1.7;
+}
+
+/* 代码块增强 */
+.VPDoc code {
+  font-family: var(--vp-font-family-mono);
+  font-size: 0.875em;
+  background: var(--vp-c-bg-soft);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
+  color: var(--vp-c-brand-1);
+}
+
+/* 代码块容器 */
+.VPDoc pre {
+  background: #1e1e1e;
+  border-radius: var(--vp-border-radius);
+  padding: 1.5rem;
+  overflow-x: auto;
+  margin: 1.5rem 0;
+}
+
+.VPDoc pre code {
+  background: transparent;
+  padding: 0;
+  color: #d4d4d4;
+}
+
+/* 侧边栏样式优化 */
+.VPSidebar {
+  font-size: 0.9rem;
+}
+
+.VPSidebarItem a {
+  transition: color var(--vp-transition-duration);
+}
+
+.VPSidebarItem a:hover {
+  color: var(--vp-c-brand-1);
+}
+
+/* 导航栏样式优化 */
+.VPNavBarTitle {
+  font-weight: 600;
+}
+
+/* 响应式优化 */
+@media (max-width: 768px) {
+  .VPDoc {
+    padding: 2rem 1.5rem;
+  }
+}
