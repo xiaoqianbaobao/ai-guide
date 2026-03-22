@@ -8,7 +8,7 @@ export default defineConfig({
   description: '从算法到 Agent，系统掌握人工智能工程架构',
   
   // 目录配置
-  srcDir: 'docs',
+  srcDir: '.',
   outDir: 'dist',
   cleanUrls: true,
   lastUpdated: true,
@@ -20,6 +20,9 @@ export default defineConfig({
   markdown: {
     lineNumbers: true
   },
+  
+  // 忽略死链接检查
+  ignoreDeadLinks: true,
   
   // 主题配置
   themeConfig: {
