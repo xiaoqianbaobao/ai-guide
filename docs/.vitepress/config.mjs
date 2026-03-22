@@ -29,7 +29,7 @@ export default defineConfig({
     
     // 导航栏
     nav: [
-      { text: '基础', link: '/guide/' },
+      { text: '指南', link: '/guide/' },
       { text: '模型', link: '/models/' },
       {
         text: '工程',
@@ -59,12 +59,17 @@ export default defineConfig({
         { text: '示例文章', link: '/guide/example-article/' }
       ],
       '/models/': [
-        { text: 'Python基础教程', link: '/models/python-basics/' },
-        { text: '第1期：环境搭建', link: '/models/python-basics/lesson-01/' },
-        { text: '第2期：数据类型', link: '/models/python-basics/lesson-02/' },
-        { text: '第3期：控制流', link: '/models/python-basics/lesson-03/' },
-        { text: '第4期：面向对象', link: '/models/python-basics/lesson-04/' },
-        { text: '第5期：文件操作', link: '/models/python-basics/lesson-05/' }
+        {
+          text: 'Python基础教程',
+          items: [
+            { text: 'Python基础教程', link: '/models/python-basics/' },
+            { text: '第1期：环境搭建', link: '/models/python-basics/lesson-01/' },
+            { text: '第2期：数据类型', link: '/models/python-basics/lesson-02/' },
+            { text: '第3期：控制流', link: '/models/python-basics/lesson-03/' },
+            { text: '第4期：面向对象', link: '/models/python-basics/lesson-04/' },
+            { text: '第5期：文件操作', link: '/models/python-basics/lesson-05/' }
+          ]
+        }
       ],
       '/engineering/': [
         { text: '推理优化', link: '/engineering/inference/' },
