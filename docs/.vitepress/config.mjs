@@ -30,10 +30,18 @@ export default defineConfig({
     logo: '/logo.svg',
     siteTitle: 'AI Guide',
     
-    // 导航栏
+    // 导航栏 - Kimi风格
     nav: [
       { text: '指南', link: '/guide/' },
-      { text: '模型', link: '/models/' },
+      {
+        text: '模型与算法',
+        items: [
+          { text: 'Python基础教程', link: '/models/python-basics/' },
+          { text: '机器学习', link: '/models/ml-basics/' },
+          { text: '深度学习', link: '/models/deep-learning/' },
+          { text: '大语言模型', link: '/models/llm-principles/' }
+        ]
+      },
       {
         text: '工程',
         items: [

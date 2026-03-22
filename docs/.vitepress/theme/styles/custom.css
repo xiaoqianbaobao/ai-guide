@@ -1,7 +1,7 @@
-/* 极简苹果风格 - 自定义样式覆盖 */
+/* Kimi风格 - 深色主题自定义样式 */
 .VPContent {
   font-family: var(--vp-font-family-base);
-  line-height: 1.6;
+  line-height: 1.7;
   color: var(--vp-c-text-1);
 }
 
@@ -11,144 +11,130 @@
   color: var(--vp-c-text-1);
 }
 
-/* 代码块 - 极简风格 */
+/* 代码块 - Kimi风格 */
 .VPDoc code {
   font-family: var(--vp-font-family-mono);
   font-size: 0.875em;
   background: var(--vp-c-bg-soft);
-  padding: 0.15em 0.3em;
-  border-radius: var(--vp-border-radius);
+  padding: 0.2em 0.4em;
+  border-radius: 4px;
   color: var(--vp-c-brand-1);
-  border: 1px solid var(--vp-c-bg-alt);
+  border: 1px solid var(--vp-c-brand-soft);
 }
 
 /* 代码块容器 */
 .VPDoc pre {
-  background: var(--vp-c-bg-alt);
-  border-radius: var(--vp-border-radius);
-  padding: 1.25rem;
+  background: var(--vp-c-bg-soft);
+  border: 1px solid var(--vp-c-brand-1);
+  border-radius: 8px;
+  padding: 1.5rem;
   overflow-x: auto;
   margin: 1.5rem 0;
-  border: 1px solid var(--vp-c-bg-soft);
 }
 
 .VPDoc pre code {
   background: transparent;
   padding: 0;
-  color: var(--vp-c-text-1);
+  color: inherit;
 }
 
-/* 侧边栏 - 极简风格 */
+/* 标题样式 */
+.VPDoc h1 {
+  font-weight: 600;
+  font-size: 2.5rem;
+  margin-bottom: 1rem;
+  color: var(--vp-c-brand-1);
+}
+
+.VPDoc h2 {
+  font-weight: 600;
+  font-size: 1.8rem;
+  margin-top: 2.5rem;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--vp-c-brand-soft);
+}
+
+.VPDoc h3 {
+  font-weight: 500;
+  font-size: 1.4rem;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+}
+
+/* 链接样式 */
+.VPDoc a {
+  color: var(--vp-c-brand-1);
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+
+.VPDoc a:hover {
+  color: var(--vp-c-brand-2);
+  text-decoration: underline;
+}
+
+/* 侧边栏样式 */
 .VPSidebar {
-  font-size: 0.875rem;
+  font-size: 0.95rem;
   background: var(--vp-c-bg-elv);
-  border-right: 1px solid var(--vp-c-bg-soft);
-}
-
-.VPSidebarItem {
-  border-left: 2px solid transparent;
-}
-
-.VPSidebarItem.is-active {
-  border-left-color: var(--vp-c-brand-1);
-  background: var(--vp-c-bg-soft);
+  border-right: 1px solid var(--vp-c-brand-soft);
 }
 
 .VPSidebarItem a {
-  color: var(--vp-c-text-2);
-  transition: all var(--vp-transition-duration) var(--vp-transition-timing);
+  transition: all 0.2s ease;
+  border-radius: 4px;
+  padding: 4px 8px;
+  margin: 2px 0;
 }
 
 .VPSidebarItem a:hover {
   color: var(--vp-c-brand-1);
+  background: var(--vp-c-brand-soft);
 }
 
-/* 导航栏 - 极简风格 */
+/* 导航栏样式 */
 .VPNavBar {
   background: var(--vp-c-bg-elv);
-  border-bottom: 1px solid var(--vp-c-bg-soft);
+  border-bottom: 1px solid var(--vp-c-brand-soft);
 }
 
 .VPNavBarTitle {
+  font-weight: 600;
+  font-size: 1.2rem;
+  color: var(--vp-c-brand-1);
+}
+
+/* 按钮样式 */
+.VPButton {
+  border-radius: 6px;
   font-weight: 500;
-  color: var(--vp-c-text-1);
+  transition: all 0.2s ease;
 }
 
-.VPNavBarTitle:hover {
-  color: var(--vp-c-brand-1);
+.VPButton:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--vp-shadow-2);
 }
 
-/* 搜索框 - 极简风格 */
-.VPNavBarSearch {
-  border: 1px solid var(--vp-c-bg-soft);
+/* 卡片样式 */
+.VPDoc .custom-block {
+  border-radius: 8px;
+  border: 1px solid var(--vp-c-brand-soft);
   background: var(--vp-c-bg-soft);
-}
-
-.VPNavBarSearch .DocSearch-Button {
-  border: none;
-  background: var(--vp-c-bg-soft);
-}
-
-/* 分页导航 - 极简风格 */
-.VPDocFooter {
-  border-top: 1px solid var(--vp-c-bg-soft);
-  background: var(--vp-c-bg);
-}
-
-.VPDocNav {
-  border-top: 1px solid var(--vp-c-bg-soft);
-}
-
-.VPDocNav .prev {
-  border-right: 1px solid var(--vp-c-bg-soft);
-}
-
-.VPDocNav .next {
-  border-left: 1px solid var(--vp-c-bg-soft);
-}
-
-.VPDocNav a {
-  color: var(--vp-c-text-2);
-  transition: color var(--vp-transition-duration) var(--vp-transition-timing);
-}
-
-.VPDocNav a:hover {
-  color: var(--vp-c-brand-1);
-}
-
-/* 暗黑模式切换按钮 - 极简风格 */
-.VPNavBar .VPSwitchAppearance {
-  background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-bg-soft);
-}
-
-.VPNavBar .VPSwitchAppearance:hover {
-  background: var(--vp-c-bg-alt);
 }
 
 /* 响应式优化 */
 @media (max-width: 768px) {
   .VPDoc {
-    padding: 1.5rem 1rem;
+    padding: 1.5rem;
   }
   
-  .VPSidebar {
-    padding: 1.5rem 1rem;
+  .VPDoc h1 {
+    font-size: 2rem;
   }
-}
-
-/* 极简图标样式 */
-.VPNavBar .VPSwitchAppearance svg {
-  width: 16px;
-  height: 16px;
-}
-
-/* 移除AI相关图标 */
-.VPNavBar .VPNavBarTitle .icon {
-  display: none;
-}
-
-/* 快速开始按钮 - 移除 */
-.VPHome .VPHomeFeatures {
-  display: none;
+  
+  .VPDoc h2 {
+    font-size: 1.5rem;
+  }
 }
