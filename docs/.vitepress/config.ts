@@ -14,6 +14,9 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   
+  // 子路径部署配置
+  base: process.env.NODE_ENV === 'production' ? '/ai-guide/' : '/',
+  
   // Markdown 配置
   markdown: {
     lineNumbers: true
@@ -98,7 +101,8 @@ export default defineConfig({
   // 构建后处理
   transformPageData(pageData) {
     // 添加 canonical URL
-    const canonicalUrl = `https://aiguide.dev/${pageData.relativePath}`
+    const baseUrl = process.env.NODE_ENV === 'production' ? 'https://csqread.top' : 'https://xiaoqianbaobao.github.io'
+    const canonicalUrl = `${baseUrl}${pageData.relativePath}`
       .replace(/index\.md$/, '')
       .replace(/\.md$/, '')
     
