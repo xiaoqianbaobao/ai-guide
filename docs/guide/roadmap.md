@@ -28,7 +28,7 @@ Python 基础
 - 能处理文本、文件、JSON 和命令行输入
 - 学会用函数、模块和类组织代码
 
-这一阶段对应 [Python 基础教程](/models/python-basics/)。
+这一阶段对应基础编程与脚本能力建设。
 
 它不是一门“通用语法课”而已，而是为后续 AI 学习做准备：
 
@@ -110,4 +110,4 @@ Python 基础
 
 1. [学习指南](./)
 2. [先修知识](./prerequisites)
-3. [Python 基础教程](/models/python-basics/)
+3. 先补脚本、文件和 JSON 处理等基础能力

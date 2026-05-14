@@ -10,7 +10,6 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 ## 当前站点结构
 
 - 学习指南：作为整套知识体系的入口页
-- 先修基础：保留面向 AI 学习者的 Python 基础教程
 - 序章：建立范式转移与 AI 原生开发者思维
 - 语言模型基础：解释 LLM、本质与上下文窗口
 - Agent 核心机制：覆盖 Tool Use、Context Engineering 等核心主题
@@ -27,9 +26,9 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 - 新增 `KnowledgeMap` 与 `ArticleHeader` 主题组件，增强知识定位与文章上下文信息
 - 新建了 `00-preface` 到 `06-eval-evolution` 的模块首页与首批关键文章
 - 已按 P0 优先级扩写首批核心正文，包括范式转移、LLM、本体 Agent、Tool Use、Context Engineering 与 Memory 四种形态
-- 保留并延续了 Python 基础教程，将其作为进入主线前的先修基础
+- 已将 Python 教程从首页、导航和主侧边栏中移除，不再作为站点主入口展示，但内容文件仍保留在仓库中
 - 保留阅读增强功能：侧边栏折叠、目录隐藏、专注阅读与状态记忆
-- 统一了主题样式，保持克制、偏教材型的文档站气质
+- 统一了主题样式，按 `prd.md` 的前端设计思路重做首页和模块入口，同时保留更适合阅读的文档站气质
 
 ## 本地开发
 

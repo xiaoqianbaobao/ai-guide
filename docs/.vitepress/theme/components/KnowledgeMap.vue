@@ -1,6 +1,6 @@
 <template>
   <div class="knowledge-map">
-    <div class="knowledge-map-label">知识地图</div>
+    <div class="knowledge-map-label">你现在在这里</div>
     <div class="knowledge-map-track">
       <template v-for="(item, index) in modules" :key="item.id">
         <a
@@ -13,7 +13,7 @@
           {{ item.name }}
         </a>
         <span v-if="index < modules.length - 1" class="knowledge-map-separator">
-          /
+          →
         </span>
       </template>
     </div>

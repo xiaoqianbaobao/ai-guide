@@ -29,7 +29,6 @@ export default defineConfig({
     siteTitle: 'AI Agent Guide',
     nav: [
       { text: '学习指南', link: '/guide/' },
-      { text: '先修基础', link: '/models/python-basics/' },
       { text: '序章', link: '/00-preface/' },
       {
         text: '模型基础',
@@ -124,7 +123,6 @@ export default defineConfig({
 function buildSidebar() {
   return {
     '/guide/': sidebarGuide(),
-    '/models/python-basics/': sidebarPythonBasics(),
     '/00-preface/': sidebarPreface(),
     '/01-llm-foundations/': sidebarLLM(),
     '/02-agent-core/': sidebarAgentCore(),
@@ -145,24 +143,6 @@ function sidebarGuide() {
         { text: '学习路线图', link: '/guide/roadmap/' },
         { text: '先修知识', link: '/guide/prerequisites/' },
         { text: '如何使用本知识库', link: '/guide/how-to-learn/' }
-      ]
-    }
-  ]
-}
-
-function sidebarPythonBasics() {
-  return [
-    {
-      text: 'Python 基础教程',
-      collapsed: false,
-      items: [
-        { text: '课程首页', link: '/models/python-basics/' },
-        { text: '第1期：环境搭建', link: '/models/python-basics/lesson-01/' },
-        { text: '第2期：数据类型', link: '/models/python-basics/lesson-02/' },
-        { text: '第3期：控制流', link: '/models/python-basics/lesson-03/' },
-        { text: '第4期：面向对象', link: '/models/python-basics/lesson-04/' },
-        { text: '第5期：文件操作', link: '/models/python-basics/lesson-05/' },
-        { text: 'Python 之后学什么', link: '/models/python-basics/next-steps/' }
       ]
     }
   ]

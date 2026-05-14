@@ -91,4 +91,4 @@ description: 推荐的阅读方式、实践节奏与学习建议
 如果你准备正式开始，建议接着读：
 
 1. [先修知识](./prerequisites)
-2. [Python 基础教程](/models/python-basics/)
+2. 补齐基础编程与脚本能力

@@ -9,7 +9,7 @@
       <span
         v-for="tag in tags"
         :key="tag"
-        class="article-tag"
+        :class="['article-tag', resolveTagClass(tag)]"
       >
         {{ tag }}
       </span>
@@ -21,11 +21,19 @@
 </template>
 
 <script setup lang="ts">
-defineProps<{
+const props = defineProps<{
   module: string
   tags?: string[]
   readingTime?: string
   prerequisite?: string
   summary?: string
 }>()
+
+function resolveTagClass(tag: string) {
+  if (tag.includes('原理')) return 'is-principle'
+  if (tag.includes('核心')) return 'is-core'
+  if (tag.includes('实战')) return 'is-practice'
+  if (tag.includes('工程')) return 'is-engineering'
+  return 'is-default'
+}
 </script>
