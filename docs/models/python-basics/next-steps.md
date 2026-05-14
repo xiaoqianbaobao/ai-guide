@@ -97,6 +97,6 @@ Python 基础
 
 你可以从这里继续：
 
-1. [模型与算法](/models/)
+1. [语言模型基础](/01-llm-foundations/)
 2. [学习路线图](/guide/roadmap/)
 3. 工程与 Agent 相关模块

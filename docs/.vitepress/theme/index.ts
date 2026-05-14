@@ -6,7 +6,9 @@ import './styles/custom.css'
 
 // 导入自定义组件
 import AgentFlow from './components/AgentFlow.vue'
+import ArticleHeader from './components/ArticleHeader.vue'
 import CodeDemo from './components/CodeDemo.vue'
+import KnowledgeMap from './components/KnowledgeMap.vue'
 import Quiz from './components/Quiz.vue'
 import ResourceCard from './components/ResourceCard.vue'
 import PaginationNav from './components/PaginationNav.vue'
@@ -26,7 +28,9 @@ export default {
   enhanceApp({ app, router, siteData }) {
     // 注册全局组件
     app.component('AgentFlow', AgentFlow)
+    app.component('ArticleHeader', ArticleHeader)
     app.component('CodeDemo', CodeDemo)
+    app.component('KnowledgeMap', KnowledgeMap)
     app.component('Quiz', Quiz)
     app.component('ResourceCard', ResourceCard)
     app.component('PaginationNav', PaginationNav)

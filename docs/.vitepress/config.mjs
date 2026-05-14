@@ -5,167 +5,100 @@ const publishedOrigin = 'https://xiaoqianbaobao.github.io'
 const isProduction = process.env.NODE_ENV === 'production'
 
 export default defineConfig({
-  // 基础配置
   lang: 'zh-CN',
-  title: 'AI Guide',
-  titleTemplate: ':title | AI 全栈知识体系',
-  description: '从算法到 Agent，系统掌握人工智能工程架构',
-  
-  // 目录配置
+  title: 'AI Agent Guide',
+  titleTemplate: ':title | AI Agent 全栈知识体系',
+  description: '从第一性原理到工程实战，系统掌握 AI Agent 开发',
   srcDir: '.',
   outDir: 'dist',
   cleanUrls: true,
   lastUpdated: true,
-  
-  // GitHub Pages 项目页在生产环境使用仓库子路径，本地开发保持根路径。
+  ignoreDeadLinks: true,
   base: isProduction ? repositoryBase : '/',
-  
-  // Markdown 配置
+  head: [
+    ['meta', { name: 'theme-color', content: '#f7f5f1' }],
+    ['meta', { property: 'og:type', content: 'website' }],
+    ['meta', { property: 'og:title', content: 'AI Agent 全栈知识体系' }],
+    ['meta', { property: 'og:description', content: '从第一性原理到工程实战，系统掌握 AI Agent 开发' }]
+  ],
   markdown: {
     lineNumbers: true
   },
-  
-  // 忽略死链接检查
-  ignoreDeadLinks: true,
-  
-  // 主题配置
   themeConfig: {
-    // Logo 和站点标题
     logo: '/logo.svg',
-    siteTitle: 'AI Guide',
-    
-    // 导航栏
+    siteTitle: 'AI Agent Guide',
     nav: [
-      { text: '指南', link: '/guide/' },
+      { text: '学习指南', link: '/guide/' },
+      { text: '先修基础', link: '/models/python-basics/' },
+      { text: '序章', link: '/00-preface/' },
       {
-        text: '模型与算法',
+        text: '模型基础',
         items: [
-          { text: 'Python基础教程', link: '/models/python-basics/' },
-          { text: '机器学习', link: '/models/ml-basics/' },
-          { text: '深度学习', link: '/models/deep-learning/' },
-          { text: '大语言模型', link: '/models/llm-principles/' }
+          { text: '语言模型基础', link: '/01-llm-foundations/' }
         ]
       },
       {
-        text: '工程',
+        text: 'Agent 系统',
         items: [
-          { text: '推理优化', link: '/engineering/inference/' },
-          { text: '服务架构', link: '/engineering/architecture/' },
-          { text: '可观测性', link: '/engineering/observability/' }
+          { text: 'Agent 核心机制', link: '/02-agent-core/' },
+          { text: 'Memory 体系', link: '/03-memory/' },
+          { text: '多 Agent 系统', link: '/04-multi-agent/' }
         ]
       },
       {
-        text: 'Agent',
-        activeMatch: '/agent/',
+        text: '工程实践',
         items: [
-          { text: '架构设计', link: '/agent/architecture/' },
-          { text: '开发框架', link: '/agent/frameworks/' },
-          { text: '工程实践', link: '/agent/engineering/' },
-          { text: '垂直案例', link: '/agent/cases/' }
+          { text: '工具与框架', link: '/05-tools-frameworks/' },
+          { text: '评估与进化', link: '/06-eval-evolution/' }
         ]
-      },
-      { text: '应用', link: '/application/' },
-      { text: '资源', link: '/resources/' }
+      }
     ],
-    
-    // 侧边栏
-    sidebar: {
-      '/guide/': [
-        {
-          text: '指南目录',
-          collapsed: false,
-          items: [
-            { text: '学习指南', link: '/guide/' },
-            { text: '学习路线图', link: '/guide/roadmap/' },
-            { text: '先修知识', link: '/guide/prerequisites/' },
-            { text: '如何使用本知识库', link: '/guide/how-to-learn/' }
-          ]
-        }
-      ],
-      '/models/': [
-        {
-          text: 'Python基础教程',
-          collapsed: false,
-          items: [
-            { text: 'Python基础教程', link: '/models/python-basics/' },
-            { text: '第1期：环境搭建', link: '/models/python-basics/lesson-01/' },
-            { text: '第2期：数据类型', link: '/models/python-basics/lesson-02/' },
-            { text: '第3期：控制流', link: '/models/python-basics/lesson-03/' },
-            { text: '第4期：面向对象', link: '/models/python-basics/lesson-04/' },
-            { text: '第5期：文件操作', link: '/models/python-basics/lesson-05/' },
-            { text: '学完后做什么', link: '/models/python-basics/next-steps/' }
-          ]
-        }
-      ],
-      '/engineering/': [
-        {
-          text: '工程主题',
-          collapsed: false,
-          items: [
-            { text: '推理优化', link: '/engineering/inference/' },
-            { text: '服务架构', link: '/engineering/architecture/' },
-            { text: '可观测性', link: '/engineering/observability/' }
-          ]
-        }
-      ],
-      '/agent/': [
-        {
-          text: 'Agent 主题',
-          collapsed: false,
-          items: [
-            { text: '架构设计', link: '/agent/architecture/' },
-            { text: '开发框架', link: '/agent/frameworks/' },
-            { text: '工程实践', link: '/agent/engineering/' },
-            { text: '垂直案例', link: '/agent/cases/' }
-          ]
-        }
-      ],
-      '/application/': [
-        {
-          text: '应用主题',
-          collapsed: false,
-          items: [
-            { text: '示例应用', link: '/application/example/' }
-          ]
-        }
-      ],
-      '/resources/': [
-        {
-          text: '资源导航',
-          collapsed: false,
-          items: [
-            { text: '学习资源', link: '/resources/' }
-          ]
-        }
-      ]
-    },
-    
-    // 社交链接
+    sidebar: buildSidebar(),
     socialLinks: [
       { icon: 'github', link: 'https://github.com/xiaoqianbaobao/ai-guide' }
     ],
-    
-    // 搜索（可选配置）
-    algolia: {
-      appId: 'YOUR_APP_ID',
-      apiKey: 'YOUR_SEARCH_API_KEY',
-      indexName: 'aiguide'
-    },
-    
-    // 编辑链接
     editLink: {
       pattern: 'https://github.com/xiaoqianbaobao/ai-guide/edit/main/docs/:path',
       text: '在 GitHub 上编辑此页'
     },
-    
-    // 页脚
+    docFooter: {
+      prev: '上一篇',
+      next: '下一篇'
+    },
+    outline: {
+      level: [2, 3],
+      label: '本文目录'
+    },
+    lastUpdatedText: '最后更新',
+    search: {
+      provider: 'local',
+      options: {
+        locales: {
+          root: {
+            translations: {
+              button: {
+                buttonText: '搜索文章',
+                buttonAriaLabel: '搜索文章'
+              },
+              modal: {
+                noResultsText: '没有找到相关结果',
+                resetButtonTitle: '清除搜索',
+                footer: {
+                  selectText: '选择',
+                  navigateText: '切换',
+                  closeText: '关闭'
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     footer: {
       message: '基于 MIT 协议开源',
-      copyright: 'Copyright © 2026 AI Guide Contributors'
+      copyright: 'Copyright © 2026 AI Agent Guide Contributors'
     }
   },
-  
-  // Vite 配置
   vite: {
     resolve: {
       alias: {
@@ -173,16 +106,13 @@ export default defineConfig({
       }
     }
   },
-  
-  // 构建后处理
   transformPageData(pageData) {
-    // 项目页发布在仓库子路径下，canonical 需要包含完整线上访问路径。
     const pagePath = pageData.relativePath
       .replace(/index\.md$/, '')
       .replace(/\.md$/, '')
     const canonicalPath = pagePath ? `${repositoryBase}${pagePath}` : repositoryBase
     const canonicalUrl = new URL(canonicalPath, publishedOrigin).toString()
-    
+
     pageData.frontmatter.head ??= []
     pageData.frontmatter.head.push([
       'link',
@@ -190,3 +120,150 @@ export default defineConfig({
     ])
   }
 })
+
+function buildSidebar() {
+  return {
+    '/guide/': sidebarGuide(),
+    '/models/python-basics/': sidebarPythonBasics(),
+    '/00-preface/': sidebarPreface(),
+    '/01-llm-foundations/': sidebarLLM(),
+    '/02-agent-core/': sidebarAgentCore(),
+    '/03-memory/': sidebarMemory(),
+    '/04-multi-agent/': sidebarMultiAgent(),
+    '/05-tools-frameworks/': sidebarTools(),
+    '/06-eval-evolution/': sidebarEval()
+  }
+}
+
+function sidebarGuide() {
+  return [
+    {
+      text: '学习指南',
+      collapsed: false,
+      items: [
+        { text: '学习指南', link: '/guide/' },
+        { text: '学习路线图', link: '/guide/roadmap/' },
+        { text: '先修知识', link: '/guide/prerequisites/' },
+        { text: '如何使用本知识库', link: '/guide/how-to-learn/' }
+      ]
+    }
+  ]
+}
+
+function sidebarPythonBasics() {
+  return [
+    {
+      text: 'Python 基础教程',
+      collapsed: false,
+      items: [
+        { text: '课程首页', link: '/models/python-basics/' },
+        { text: '第1期：环境搭建', link: '/models/python-basics/lesson-01/' },
+        { text: '第2期：数据类型', link: '/models/python-basics/lesson-02/' },
+        { text: '第3期：控制流', link: '/models/python-basics/lesson-03/' },
+        { text: '第4期：面向对象', link: '/models/python-basics/lesson-04/' },
+        { text: '第5期：文件操作', link: '/models/python-basics/lesson-05/' },
+        { text: 'Python 之后学什么', link: '/models/python-basics/next-steps/' }
+      ]
+    }
+  ]
+}
+
+function sidebarPreface() {
+  return [
+    {
+      text: '序章：范式转移',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/00-preface/' },
+        { text: '第三次范式转移', link: '/00-preface/paradigm-shift/' },
+        { text: 'AI 原生开发者思维', link: '/00-preface/ai-native-mindset/' },
+        { text: '学习路径指南', link: '/00-preface/how-to-use/' }
+      ]
+    }
+  ]
+}
+
+function sidebarLLM() {
+  return [
+    {
+      text: '语言模型基础',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/01-llm-foundations/' },
+        { text: 'LLM 到底是什么', link: '/01-llm-foundations/what-is-llm/' },
+        { text: '上下文窗口', link: '/01-llm-foundations/context-window/' }
+      ]
+    }
+  ]
+}
+
+function sidebarAgentCore() {
+  return [
+    {
+      text: 'Agent 核心机制',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/02-agent-core/' },
+        { text: 'Agent 的本质', link: '/02-agent-core/what-is-agent/' },
+        { text: 'Tool Use 完整机制', link: '/02-agent-core/tool-use/' },
+        { text: 'Context Engineering', link: '/02-agent-core/context-engineering/' }
+      ]
+    }
+  ]
+}
+
+function sidebarMemory() {
+  return [
+    {
+      text: 'Memory 体系',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/03-memory/' },
+        { text: 'Memory 的四种形态', link: '/03-memory/four-memory-types/' },
+        { text: 'RAG 原理', link: '/03-memory/rag-fundamentals/' }
+      ]
+    }
+  ]
+}
+
+function sidebarMultiAgent() {
+  return [
+    {
+      text: '多 Agent 系统',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/04-multi-agent/' },
+        { text: 'Orchestrator-Subagent', link: '/04-multi-agent/orchestrator-subagent/' },
+        { text: 'MCP 协议', link: '/04-multi-agent/mcp-protocol/' }
+      ]
+    }
+  ]
+}
+
+function sidebarTools() {
+  return [
+    {
+      text: '工具与框架',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/05-tools-frameworks/' },
+        { text: 'Cursor vs Claude Code vs Trae', link: '/05-tools-frameworks/cursor-vs-claude-code/' },
+        { text: '从零手写 Agent', link: '/05-tools-frameworks/build-from-scratch/' }
+      ]
+    }
+  ]
+}
+
+function sidebarEval() {
+  return [
+    {
+      text: '评估与进化',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/06-eval-evolution/' },
+        { text: 'Agentic Eval 设计', link: '/06-eval-evolution/agentic-eval-design/' },
+        { text: '奖励函数设计', link: '/06-eval-evolution/reward-function-design/' }
+      ]
+    }
+  ]
+}
