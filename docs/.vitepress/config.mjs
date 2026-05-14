@@ -184,7 +184,8 @@ function sidebarLLM() {
       items: [
         { text: '模块概述', link: '/01-llm-foundations/' },
         { text: 'LLM 到底是什么', link: '/01-llm-foundations/what-is-llm/' },
-        { text: '上下文窗口', link: '/01-llm-foundations/context-window/' }
+        { text: '上下文窗口', link: '/01-llm-foundations/context-window/' },
+        { text: 'Transformer、Attention 与 QKV', link: '/01-llm-foundations/transformer-attention-qkv/' }
       ]
     }
   ]
@@ -243,6 +244,8 @@ function sidebarTools() {
         { text: '模块概述', link: '/05-tools-frameworks/' },
         { text: 'Cursor vs Claude Code vs Trae', link: '/05-tools-frameworks/cursor-vs-claude-code/' },
         { text: '从零手写 Agent', link: '/05-tools-frameworks/build-from-scratch/' },
+        { text: 'LangGraph 原理', link: '/05-tools-frameworks/langgraph-principles/' },
+        { text: 'Spring AI 框架原理', link: '/05-tools-frameworks/spring-ai-framework/' },
         { text: 'Harness 设计', link: '/05-tools-frameworks/harness-design/' },
         { text: 'Agent Skills', link: '/05-tools-frameworks/agent-skills/' }
       ]

@@ -27,6 +27,7 @@ module: llm
 - 已经在用大模型，但对“模型到底是什么”仍然模糊的人
 - 经常把模型当数据库、搜索引擎或推理机使用的人
 - 想理解上下文窗口、提示设计和输出不稳定性根源的人
+- 想真正理解 Transformer、Attention、QKV 这些底层术语的人
 
 ## 进入前建议
 
@@ -37,6 +38,7 @@ module: llm
 
 1. 先读 [LLM 到底是什么](./what-is-llm)，建立对模型本质和能力边界的第一层理解。
 2. 再读 [上下文窗口](./context-window)，理解为什么上下文组织方式会直接影响系统表现。
+3. 最后读 [Transformer、Attention 与 QKV](./transformer-attention-qkv)，补上现代语言模型内部如何利用上下文的底层机制。
 
 ## 本模块文章
 
@@ -44,6 +46,7 @@ module: llm
 | --- | --- | --- |
 | [LLM 到底是什么](./what-is-llm) | 原理 | 建立对模型本质的第一层理解 |
 | [上下文窗口](./context-window) | 核心 | 理解窗口限制、上下文构成与工程启示 |
+| [Transformer、Attention 与 QKV](./transformer-attention-qkv) | 原理 | 理解 token 如何通过 attention 读取上下文 |
 
 ## 学完后去哪里
 
