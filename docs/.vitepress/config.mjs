@@ -1,5 +1,9 @@
 import { defineConfig } from 'vitepress'
 
+const repositoryBase = '/ai-guide/'
+const publishedOrigin = 'https://xiaoqianbaobao.github.io'
+const isProduction = process.env.NODE_ENV === 'production'
+
 export default defineConfig({
   // 基础配置
   lang: 'zh-CN',
@@ -13,8 +17,8 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   
-  // 子路径部署配置
-  base: process.env.NODE_ENV === 'production' ? '/ai-guide/' : '/',
+  // GitHub Pages 项目页在生产环境使用仓库子路径，本地开发保持根路径。
+  base: isProduction ? repositoryBase : '/',
   
   // Markdown 配置
   markdown: {
@@ -103,7 +107,7 @@ export default defineConfig({
     
     // 社交链接
     socialLinks: [
-      { icon: 'github', link: 'https://github.com/yourname/ai-guide' }
+      { icon: 'github', link: 'https://github.com/xiaoqianbaobao/ai-guide' }
     ],
     
     // 搜索（可选配置）
@@ -115,7 +119,7 @@ export default defineConfig({
     
     // 编辑链接
     editLink: {
-      pattern: 'https://github.com/yourname/ai-guide/edit/main/docs/:path',
+      pattern: 'https://github.com/xiaoqianbaobao/ai-guide/edit/main/docs/:path',
       text: '在 GitHub 上编辑此页'
     },
     
@@ -137,11 +141,12 @@ export default defineConfig({
   
   // 构建后处理
   transformPageData(pageData) {
-    // 添加 canonical URL
-    const baseUrl = process.env.NODE_ENV === 'production' ? 'https://csqread.top' : 'https://xiaoqianbaobao.github.io'
-    const canonicalUrl = `${baseUrl}${pageData.relativePath}`
+    // 项目页发布在仓库子路径下，canonical 需要包含完整线上访问路径。
+    const pagePath = pageData.relativePath
       .replace(/index\.md$/, '')
       .replace(/\.md$/, '')
+    const canonicalPath = pagePath ? `${repositoryBase}${pagePath}` : repositoryBase
+    const canonicalUrl = new URL(canonicalPath, publishedOrigin).toString()
     
     pageData.frontmatter.head ??= []
     pageData.frontmatter.head.push([

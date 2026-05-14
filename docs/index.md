@@ -10,7 +10,7 @@ hero:
       link: /guide/
     - theme: alt
       text: GitHub
-      link: https://github.com/yourname/ai-guide
+      link: https://github.com/xiaoqianbaobao/ai-guide
 features:
   - title: 🧠 系统学习
     details: 覆盖 AI 从基础原理到工程实践的完整知识体系

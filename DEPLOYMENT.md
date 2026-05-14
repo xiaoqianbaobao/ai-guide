@@ -1,67 +1,65 @@
 # 部署说明
 
-## 子路径部署配置
+## 当前方案
 
-本项目已配置为支持子路径部署，可以嵌入到其他网站中。
+本项目当前统一部署到 GitHub Pages 项目页，不再直接绑定 `csqread.top`。
 
-### 当前配置
+- **仓库地址**: `https://github.com/xiaoqianbaobao/ai-guide`
+- **线上地址**: `https://xiaoqianbaobao.github.io/ai-guide/`
+- **生产路径**: `/ai-guide/`
 
-- **部署路径**: `/ai-guide/`
-- **目标域名**: `csqread.top`
-- **GitHub Pages 域名**: `xiaoqianbaobao.github.io/ai-guide/`
+## 配置说明
 
-### 构建配置
+项目使用 VitePress 构建：
 
-项目使用 VitePress 构建，已配置 `base` 路径：
+```js
+const repositoryBase = '/ai-guide/'
+const isProduction = process.env.NODE_ENV === 'production'
 
-```typescript
-base: process.env.NODE_ENV === 'production' ? '/ai-guide/' : '/',
+export default defineConfig({
+  base: isProduction ? repositoryBase : '/'
+})
 ```
 
-### 部署流程
+- 生产环境通过仓库子路径发布，保证静态资源路径正确。
+- 本地开发仍使用根路径，方便 `vitepress dev` 调试。
+- canonical URL 已统一指向 GitHub Pages 线上地址。
+
+## 自动部署
 
 1. 推送代码到 `main` 分支
-2. GitHub Actions 自动构建并部署
-3. 部署完成后访问: https://csqread.top/ai-guide/
+2. GitHub Actions 执行 `npm ci` 和 `npm run build`
+3. 构建产物 `dist` 自动发布到 GitHub Pages
+4. 部署完成后访问 `https://xiaoqianbaobao.github.io/ai-guide/`
 
-### 注意事项
+## 本地构建
 
-1. **资源路径**: 所有资源链接（CSS、JS、图片）会自动添加 `/ai-guide/` 前缀
-2. **内部链接**: 文档内部链接会自动处理路径
-3. **外部链接**: 如需链接到其他子路径，需要使用完整 URL
-4. **SEO 优化**: canonical URL 已配置为 `https://csqread.top/...`
-
-### 手动部署
-
-如果需要手动触发部署：
+Windows、macOS、Linux 都可以直接执行：
 
 ```bash
-# 安装依赖
 npm ci
-
-# 构建
-NODE_ENV=production npm run build
-
-# 部署（需要配置 GITHUB_TOKEN）
-npm run deploy
+npm run build
 ```
 
-### 故障排除
+说明：
 
-如果部署后页面显示不正常：
+- `build` 脚本已改为跨平台清理 `dist`
+- 不再额外通过命令行覆盖 `--base`，统一以 `docs/.vitepress/config.mjs` 为准
 
-1. 检查浏览器控制台是否有 404 错误
-2. 确认所有资源路径都包含 `/ai-guide/` 前缀
-3. 刷新页面（Ctrl+F5 强制刷新）
-4. 清除浏览器缓存
+## 故障排查
 
-### 多域名支持
+如果部署后页面异常，优先检查：
 
-如需支持多个域名，可以在部署工作流中添加多个 cname：
+1. GitHub Actions 中是否只有 `deploy.yml` 在执行
+2. GitHub Pages 设置是否指向 Actions / `gh-pages`
+3. 页面资源路径是否包含 `/ai-guide/`
+4. 浏览器是否存在旧缓存
 
-```yaml
-cname: |
-  csqread.top
-  www.csqread.top
-  aiguide.dev
-```
+## 自定义域名说明
+
+`https://csqread.top/posts/ai/` 这类路径级挂载不属于独立 GitHub Pages 项目页的直接能力。
+
+如果后续要重新接入你自己的域名，推荐两种方式：
+
+1. 使用单独子域名，例如 `ai.csqread.top`
+2. 把构建产物并入你现有博客工程，由博客统一发布到 `/posts/ai/`

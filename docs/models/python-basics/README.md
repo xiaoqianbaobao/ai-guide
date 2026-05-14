@@ -67,9 +67,9 @@ Python基础教程学习路径
 - **主域名**：https://xiaoqianbaobao.github.io/ai-guide/
 - **Python教程子路径**：https://xiaoqianbaobao.github.io/ai-guide/models/python-basics/
 
-### 博客集成
-- **博客域名**：https://csqread.top/ai-guide/
-- **自动部署**：通过GitHub Actions实现自动化部署
+### 当前发布方式
+- **线上地址**：https://xiaoqianbaobao.github.io/ai-guide/
+- **自动部署**：通过 GitHub Actions 发布到 GitHub Pages
 
 ## 📈 项目统计
 
