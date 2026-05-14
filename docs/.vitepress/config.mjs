@@ -1,10 +1,11 @@
 import { defineConfig } from 'vitepress'
+import { withMermaid } from 'vitepress-plugin-mermaid'
 
 const repositoryBase = '/ai-guide/'
 const publishedOrigin = 'https://xiaoqianbaobao.github.io'
 const isProduction = process.env.NODE_ENV === 'production'
 
-export default defineConfig({
+export default withMermaid(defineConfig({
   lang: 'zh-CN',
   title: 'AI Agent Guide',
   titleTemplate: ':title | AI Agent 全栈知识体系',
@@ -23,6 +24,18 @@ export default defineConfig({
   ],
   markdown: {
     lineNumbers: true
+  },
+  mermaid: {
+    theme: 'base',
+    themeVariables: {
+      primaryColor: '#f1ece2',
+      primaryTextColor: '#2b3440',
+      primaryBorderColor: '#8c785d',
+      lineColor: '#7a7f87',
+      secondaryColor: '#f7f5f1',
+      tertiaryColor: '#ffffff',
+      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+    }
   },
   themeConfig: {
     logo: '/logo.svg',
@@ -118,7 +131,7 @@ export default defineConfig({
       { rel: 'canonical', href: canonicalUrl }
     ])
   }
-})
+}))
 
 function buildSidebar() {
   return {

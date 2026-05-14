@@ -29,6 +29,7 @@
     "unocss": "^0.58.5",
     "vite": "^5.0.12",
     "vitepress": "^1.0.0-rc.39",
+    "vitepress-plugin-mermaid": "^2.0.17",
     "vue-router": "^4.2.5"
   },
   "engines": {
