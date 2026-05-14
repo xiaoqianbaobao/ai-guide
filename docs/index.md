@@ -1,7 +1,11 @@
 ---
 layout: home
 hero:
+<<<<<<< HEAD
   name: "AI Agent Guide"
+=======
+  name: "AI Guide"
+>>>>>>> d0517e52cc4871a0c514d6a3a771c969544b6bb0
   text: "AI 全栈知识体系"
   tagline: "从第一性原理到工程实战，系统掌握 AI Agent 开发"
   actions:
