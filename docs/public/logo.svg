@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
+  <title>AI Guide Logo</title>
+  <desc>Gradient rounded square with AI text.</desc>
+  <defs>
+    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#2563eb" />
+      <stop offset="100%" stop-color="#7c3aed" />
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bg)" />
+  <path d="M43 84h-9l19-40h9l19 40h-9l-4-9H47l-4 9Zm7.8-16h14.4L58 51.5 50.8 68Z" fill="#fff" />
+  <path d="M87 44h9v40h-9z" fill="#fff" />
+</svg>
