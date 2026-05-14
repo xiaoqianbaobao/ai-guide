@@ -2,7 +2,7 @@
 layout: home
 hero:
   name: "AI Agent Guide"
-  text: "AI Agent 全栈知识体系"
+  text: "AI 全栈知识体系"
   tagline: "从第一性原理到工程实战，系统掌握 AI Agent 开发"
   actions:
     - theme: brand
