@@ -10,6 +10,7 @@ import CodeDemo from './components/CodeDemo.vue'
 import Quiz from './components/Quiz.vue'
 import ResourceCard from './components/ResourceCard.vue'
 import PaginationNav from './components/PaginationNav.vue'
+import ReadingModeToggle from './components/ReadingModeToggle.vue'
 
 export default {
   extends: DefaultTheme,
@@ -18,6 +19,7 @@ export default {
       // 扩展默认布局
       'home-features-after': () => h('div', { class: 'custom-home-section' }),
       'doc-footer-before': () => h('div', { class: 'custom-footer-section' }),
+      'doc-before': () => h(ReadingModeToggle),
       'doc-after': () => h(PaginationNav),
     })
   },
@@ -28,6 +30,7 @@ export default {
     app.component('Quiz', Quiz)
     app.component('ResourceCard', ResourceCard)
     app.component('PaginationNav', PaginationNav)
+    app.component('ReadingModeToggle', ReadingModeToggle)
     
     // 全局属性
     app.config.globalProperties.$site = siteData

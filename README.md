@@ -18,9 +18,12 @@ AI Guide 是一个基于 VitePress 构建的中文知识库，关注从 Python �
 
 - 重做了 `docs/guide/`，新增学习路线图、先修知识、使用方式三类入口页
 - 重构了 `docs/models/python-basics/index.md`，明确 Python 教程的 AI 学习导向
+- 重写了 Python 第 1、2 期，使基础内容更贴近文本、字典、列表和配置处理场景
 - 重写了 Python 第 4 期，修复原先内容错位问题
 - 优化了 Python 第 3 期与第 5 期，使其更贴近数据处理、JSON、脚本与工具开发场景
+- 新增 `docs/models/python-basics/next-steps.md`，用于承接 Python 之后的数据处理与 AI 学习路径
 - 调整了站点首页和主题样式，去掉过强的 AI 产品化视觉，收敛为更克制的文档站风格
+- 为正文页增加了阅读增强功能：侧边栏分组可折叠、目录隐藏切换、专注阅读模式与本地状态记忆
 
 ## 本地开发
 

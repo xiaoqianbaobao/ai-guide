@@ -71,14 +71,21 @@ export default defineConfig({
     // 侧边栏
     sidebar: {
       '/guide/': [
-        { text: '学习指南', link: '/guide/' },
-        { text: '学习路线图', link: '/guide/roadmap/' },
-        { text: '先修知识', link: '/guide/prerequisites/' },
-        { text: '如何使用本知识库', link: '/guide/how-to-learn/' }
+        {
+          text: '指南目录',
+          collapsed: false,
+          items: [
+            { text: '学习指南', link: '/guide/' },
+            { text: '学习路线图', link: '/guide/roadmap/' },
+            { text: '先修知识', link: '/guide/prerequisites/' },
+            { text: '如何使用本知识库', link: '/guide/how-to-learn/' }
+          ]
+        }
       ],
       '/models/': [
         {
           text: 'Python基础教程',
+          collapsed: false,
           items: [
             { text: 'Python基础教程', link: '/models/python-basics/' },
             { text: '第1期：环境搭建', link: '/models/python-basics/lesson-01/' },
@@ -91,21 +98,45 @@ export default defineConfig({
         }
       ],
       '/engineering/': [
-        { text: '推理优化', link: '/engineering/inference/' },
-        { text: '服务架构', link: '/engineering/architecture/' },
-        { text: '可观测性', link: '/engineering/observability/' }
+        {
+          text: '工程主题',
+          collapsed: false,
+          items: [
+            { text: '推理优化', link: '/engineering/inference/' },
+            { text: '服务架构', link: '/engineering/architecture/' },
+            { text: '可观测性', link: '/engineering/observability/' }
+          ]
+        }
       ],
       '/agent/': [
-        { text: '架构设计', link: '/agent/architecture/' },
-        { text: '开发框架', link: '/agent/frameworks/' },
-        { text: '工程实践', link: '/agent/engineering/' },
-        { text: '垂直案例', link: '/agent/cases/' }
+        {
+          text: 'Agent 主题',
+          collapsed: false,
+          items: [
+            { text: '架构设计', link: '/agent/architecture/' },
+            { text: '开发框架', link: '/agent/frameworks/' },
+            { text: '工程实践', link: '/agent/engineering/' },
+            { text: '垂直案例', link: '/agent/cases/' }
+          ]
+        }
       ],
       '/application/': [
-        { text: '示例应用', link: '/application/example/' }
+        {
+          text: '应用主题',
+          collapsed: false,
+          items: [
+            { text: '示例应用', link: '/application/example/' }
+          ]
+        }
       ],
       '/resources/': [
-        { text: '学习资源', link: '/resources/' }
+        {
+          text: '资源导航',
+          collapsed: false,
+          items: [
+            { text: '学习资源', link: '/resources/' }
+          ]
+        }
       ]
     },
     
