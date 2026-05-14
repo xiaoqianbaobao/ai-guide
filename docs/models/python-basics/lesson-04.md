@@ -1,378 +1,285 @@
 ---
-title: 控制流与函数
-description: 学习Python的控制流结构和函数定义，掌握程序流程控制
+title: 面向对象编程基础
+description: 学习类、对象、继承与封装，为后续 AI 工程中的代码组织打基础
 ---
 
-# 第4期：控制流与函数
+# 第4期：面向对象编程基础
 
-## 📖 学习目标
+当程序开始变复杂时，只靠一组零散函数已经不够了。你需要一种方式，把“数据”和“行为”组织到一起，这就是面向对象编程。
 
-- 掌握条件语句（if-elif-else）的使用
-- 熟练使用循环语句（for, while）
-- 理解break与continue语句的作用
-- 学会定义和调用函数
-- 掌握参数传递与返回值机制
-- 理解作用域与命名空间概念
+在 AI 开发里，这一章尤其常见。你以后会遇到很多类似对象：
 
-## 🎯 条件语句（if-elif-else）
+- 模型客户端
+- 数据样本对象
+- 配置对象
+- 工具类
+- 任务执行器
 
-### if语句
+## 本节目标
 
-```python
-# 基本if语句
-age = 18
-if age >= 18:
-    print("已成年")
-    print("可以投票")
+- 理解类和对象的关系
+- 学会定义属性和方法
+- 掌握构造函数 `__init__`
+- 理解实例属性、类属性和方法类型
+- 了解继承、封装和多态
+- 能用类组织一个简单的 AI 场景代码
 
-# if-else语句
-score = 85
-if score >= 60:
-    print("及格")
-else:
-    print("不及格")
+## 类与对象
 
-# if-elif-else语句
-score = 85
-if score >= 90:
-    grade = "优秀"
-elif score >= 80:
-    grade = "良好"
-elif score >= 70:
-    grade = "中等"
-elif score >= 60:
-    grade = "及格"
-else:
-    grade = "不及格"
-
-print(f"成绩等级: {grade}")
-```
-
-### 条件表达式（三元运算符）
+可以把“类”理解为模板，把“对象”理解为按照模板创建出来的实例。
 
 ```python
-# 传统if-else
-age = 18
-if age >= 18:
-    status = "成年"
-else:
-    status = "未成年"
+class Student:
+    def __init__(self, name, score):
+        self.name = name
+        self.score = score
 
-# 条件表达式（推荐）
-status = "成年" if age >= 18 else "未成年"
+    def show(self):
+        print(f"{self.name}: {self.score}")
 
-# 嵌套条件表达式
-score = 85
-result = "优秀" if score >= 90 else ("良好" if score >= 80 else "及格")
-
-print(f"结果: {result}")
+student = Student("Alice", 95)
+student.show()
 ```
 
-### 复合条件判断
+这里：
+
+- `Student` 是类
+- `student` 是对象
+- `name` 和 `score` 是属性
+- `show()` 是方法
+
+## 构造函数与实例属性
+
+`__init__` 会在创建对象时自动执行，通常用于初始化属性。
 
 ```python
-# and, or, not 运算符
-age = 25
-has_license = True
-has_car = False
+class PromptTask:
+    def __init__(self, topic, style):
+        self.topic = topic
+        self.style = style
 
-# and 运算符
-if age >= 18 and has_license:
-    print("可以开车")
+    def build_prompt(self):
+        return f"请用{self.style}风格介绍 {self.topic}"
 
-# or 运算符
-if has_license or has_car:
-    print("有交通工具")
-
-# not 运算符
-if not has_car:
-    print("没有车")
-
-# 复合条件
-if (age >= 18 and has_license) or has_car:
-    print("可以独立出行")
+task = PromptTask("向量数据库", "简洁")
+print(task.build_prompt())
 ```
 
-## 🔄 循环语句
+这类写法在后续封装提示词任务、模型参数和工具配置时会非常常见。
 
-### for循环
+## 实例方法、类方法与静态方法
+
+### 实例方法
+
+最常见的方法类型，第一个参数通常写成 `self`。
 
 ```python
-# 遍历列表
-fruits = ["苹果", "香蕉", "橙子"]
-for fruit in fruits:
-    print(f"我喜欢吃{fruit}")
+class Counter:
+    def __init__(self):
+        self.value = 0
 
-# 遍历字符串
-for char in "Python":
-    print(char)
+    def increase(self):
+        self.value += 1
 
-# 使用range()函数
-for i in range(5):
-    print(f"第{i+1}次循环")
-
-# range()的高级用法
-print("步长为2:", list(range(0, 10, 2)))  # [0, 2, 4, 6, 8]
-print("反向循环:", list(range(5, 0, -1)))  # [5, 4, 3, 2, 1]
-
-# 嵌套for循环
-for i in range(3):
-    for j in range(2):
-        print(f"({i}, {j})")
+counter = Counter()
+counter.increase()
+print(counter.value)
 ```
 
-### while循环
+### 类属性与类方法
 
 ```python
-# 基本while循环
-count = 0
-while count < 5:
-    print(f"计数: {count}")
-    count += 1
+class ModelConfig:
+    provider = "openai"
 
-# 无限循环 + break
-import random
-target = random.randint(1, 10)
-guess = 0
+    def __init__(self, model_name):
+        self.model_name = model_name
 
-while True:
-    guess = int(input("猜一个数字(1-10): "))
-    if guess == target:
-        print("猜对了!")
-        break
-    elif guess < target:
-        print("太小了")
-    else:
-        print("太大了")
+    @classmethod
+    def default(cls):
+        return cls("gpt-4o-mini")
 
-# while-else结构
-count = 0
-while count < 3:
-    print(f"尝试{count + 1}")
-    count += 1
-else:
-    print("所有尝试完成")
+config = ModelConfig.default()
+print(config.provider, config.model_name)
 ```
 
-### 循环控制语句
+### 静态方法
+
+静态方法不依赖对象状态，也不依赖类状态，更像是“和这个类相关的一组工具函数”。
 
 ```python
-# break语句
-for i in range(10):
-    if i == 5:
-        break
-    print(i)
-# 输出: 0 1 2 3 4
+class TextUtils:
+    @staticmethod
+    def normalize(text):
+        return text.strip().lower()
 
-# continue语句
-for i in range(10):
-    if i % 2 == 0:
-        continue
-    print(i)
-# 输出: 1 3 5 7 9
-
-# pass语句（占位符）
-for i in range(5):
-    if i == 2:
-        pass  # 占位，什么也不做
-    else:
-        print(i)
+print(TextUtils.normalize("  Hello AI  "))
 ```
 
-## 🎤 函数定义与调用
+## 封装
 
-### 函数定义
+封装不是把东西“藏起来”而已，而是让对象对外暴露稳定接口，内部细节可以后续调整。
 
 ```python
-# 基本函数定义
-def greet():
-    """问候函数"""
-    print("你好!")
+class DatasetRecord:
+    def __init__(self, text):
+        self._text = text
 
-# 无参数函数
-def get_pi():
-    return 3.14159
+    def get_text(self):
+        return self._text.strip()
 
-# 有参数函数
-def add(a, b):
-    """加法函数"""
-    return a + b
-
-# 多参数函数
-def calculate(x, y, operation="add"):
-    if operation == "add":
-        return x + y
-    elif operation == "multiply":
-        return x * y
-    else:
-        return 0
-
-# 调用函数
-greet()
-result = add(3, 5)
-print(f"3 + 5 = {result}")
+record = DatasetRecord("  sample text  ")
+print(record.get_text())
 ```
 
-### 参数传递
+Python 没有严格私有属性机制，但以下划线开头是一种约定，表示“这是内部属性，不建议随意直接修改”。
+
+## 继承
+
+继承允许你在已有类的基础上扩展能力。
 
 ```python
-# 位置参数
-def introduce(name, age):
-    print(f"我叫{name}，今年{age}岁")
+class BaseLoader:
+    def load(self):
+        raise NotImplementedError("子类需要实现 load 方法")
 
-introduce("张三", 25)  # 位置匹配
 
-# 关键字参数
-introduce(age=30, name="李四")  # 键值匹配
+class JsonLoader(BaseLoader):
+    def load(self):
+        return "读取 JSON 数据"
 
-# 默认参数
-def greet(name, greeting="你好"):
-    print(f"{greeting}，{name}!")
 
-greet("王五")  # 使用默认问候
-greet("赵六", "早上好")
+class CsvLoader(BaseLoader):
+    def load(self):
+        return "读取 CSV 数据"
 
-# 可变参数 *args
-def sum_all(*numbers):
-    total = 0
-    for num in numbers:
-        total += num
-    return total
-
-print(sum_all(1, 2, 3, 4, 5))  # 15
-
-# 关键字可变参数 **kwargs
-def print_info(**info):
-    for key, value in info.items():
-        print(f"{key}: {value}")
-
-print_info(name="张三", age=25, city="北京")
+print(JsonLoader().load())
+print(CsvLoader().load())
 ```
 
-### 返回值
+## 多态
+
+多态指的是：相同的调用方式，对不同对象会有不同表现。
 
 ```python
-# 单个返回值
-def square(x):
-    return x ** 2
+def run_loader(loader):
+    print(loader.load())
 
-result = square(5)
-print(result)  # 25
-
-# 多个返回值（返回元组）
-def get_name_age():
-    return "张三", 25
-
-name, age = get_name_age()
-print(f"姓名: {name}, 年龄: {age}")
-
-# 返回None（默认）
-def no_return():
-    print("这个函数没有显式返回值")
-
-result = no_return()
-print(result)  # None
+run_loader(JsonLoader())
+run_loader(CsvLoader())
 ```
 
-## 🌍 作用域与命名空间
+这在后续做“统一接口，不同实现”时非常有用。例如：
 
-### 作用域层次
+- 不同模型供应商的客户端
+- 不同数据格式的读取器
+- 不同工具的执行器
+
+## 魔术方法
+
+魔术方法可以让你的对象更像 Python 内置对象。
 
 ```python
-# 全局变量
-global_var = "我是全局变量"
+class Message:
+    def __init__(self, role, content):
+        self.role = role
+        self.content = content
 
-def outer_function():
-    # 外部函数变量
-    outer_var = "我是外部函数变量"
-    
-    def inner_function():
-        # 内部函数变量
-        inner_var = "我是内部函数变量"
-        print(f"内部函数: {inner_var}")
-        print(f"外部函数变量: {outer_var}")
-        print(f"全局变量: {global_var}")
-    
-    inner_function()
-    print(f"外部函数变量: {outer_var}")
-    # print(inner_var)  # 错误！内部变量无法访问
+    def __repr__(self):
+        return f"Message(role={self.role!r}, content={self.content!r})"
 
-outer_function()
-print(f"全局变量: {global_var}")
-# print(outer_var)  # 错误！外部变量无法访问
+message = Message("user", "请总结这段内容")
+print(message)
 ```
 
-### global和nonlocal关键字
+在调试数据对象、日志对象和中间结果时，`__repr__` 非常实用。
+
+## AI 场景示例：封装一个最小模型客户端
+
+这一节最重要的是学会“用对象组织代码”。
 
 ```python
-# global关键字
-counter = 0
+class SimpleLLMClient:
+    def __init__(self, model_name, temperature=0.2):
+        self.model_name = model_name
+        self.temperature = temperature
 
-def increment():
-    global counter
-    counter += 1
-    return counter
+    def build_payload(self, prompt):
+        return {
+            "model": self.model_name,
+            "temperature": self.temperature,
+            "prompt": prompt,
+        }
 
-print(increment())  # 1
-print(increment())  # 2
+    def call(self, prompt):
+        payload = self.build_payload(prompt)
+        return f"模拟调用完成: {payload}"
 
-# nonlocal关键字
-def outer():
-    x = 10
-    
-    def inner():
-        nonlocal x
-        x = 20
-        print(f"内部函数中: {x}")
-    
-    print(f"外部函数中: {x}")
-    inner()
-    print(f"外部函数中(修改后): {x}")
 
-outer()
+client = SimpleLLMClient("demo-model")
+print(client.call("请解释什么是向量检索"))
 ```
 
-## 🎓 练习题
+这里虽然没有真的请求 API，但已经体现了对象的价值：
+
+- 配置被收拢到一个对象里
+- 请求前的数据构造有了清晰入口
+- 后续更容易扩展日志、异常处理和重试机制
+
+## 常见错误
+
+### 1. 忘记写 `self`
+
+```python
+class Demo:
+    def show():
+        print("wrong")
+```
+
+实例方法必须显式接收 `self`。
+
+### 2. 在类外访问不存在的属性
+
+```python
+class User:
+    def __init__(self, name):
+        self.name = name
+
+user = User("Tom")
+print(user.age)
+```
+
+这会抛出属性错误，因为 `age` 并没有定义。
+
+### 3. 把类当作函数堆积容器
+
+如果一个类只是简单包装若干互不相关的函数，而几乎不保存状态，那它可能更适合写成普通函数或模块。
+
+## 练习建议
 
 ### 基础练习
 
-1. **条件判断**：编写程序判断输入的年份是否为闰年
-2. **循环练习**：使用for循环打印九九乘法表
-3. **函数定义**：实现一个简单的计算器，支持加减乘除
+1. 定义一个 `Book` 类，包含书名、作者和显示方法
+2. 定义一个 `Rectangle` 类，计算面积和周长
+3. 定义一个 `Account` 类，实现存款和取款逻辑
 
-### 编程练习
+### AI 导向练习
 
-1. **猜数字游戏**：编写一个猜数字游戏，统计用户猜测次数
-2. **密码验证**：实现密码强度检查函数
-3. **成绩统计**：编写程序统计学生成绩，计算平均分、最高分、最低分
+1. 定义一个 `PromptTemplate` 类，用于格式化不同主题的提示词
+2. 定义一个 `DatasetItem` 类，保存文本、标签和长度信息
+3. 定义一个 `BaseModelClient` 和两个子类，模拟不同模型的调用方式
 
-### 挑战练习
+## 本节小结
 
-1. **猜词游戏**：实现一个单词猜谜游戏
-2. **计算器**：编写一个支持表达式计算的高级计算器
-3. **数据处理**：实现一个简单的数据清洗和统计工具
+- 类是组织数据与行为的方式
+- 对象让状态和方法绑定在一起
+- 继承和多态让代码更容易扩展
+- 面向对象是后续理解 AI 工程代码结构的重要基础
 
-## 🔗 扩展阅读
-
-- [Python官方文档 - 条件表达式](https://docs.python.org/zh-cn/3/reference/expressions.html#conditional-expressions)
-- [Python官方文档 - 循环语句](https://docs.python.org/zh-cn/3/reference/compound_stmts.html#the-for-statement)
-- [Python官方文档 - 函数定义](https://docs.python.org/zh-cn/3/reference/compound_stmts.html#function-definitions)
-- [Python官方文档 - 命名空间](https://docs.python.org/zh-cn/3/tutorial/classes.html#python-scopes-and-namespaces)
+下一节会进入文件操作、异常处理和模块组织。那一节会更贴近真实开发，因为大多数 AI 项目都离不开文件、配置、JSON 和错误处理。
 
 ---
 
-**📝 本节小结：**
-
-- 条件语句是程序流程控制的基础，支持复杂的判断逻辑
-- 循环语句使程序能够重复执行，提高代码效率
-- break和continue语句提供对循环执行的精细控制
-- 函数是代码复用的基本单位，提高代码的模块化程度
-- 作用域和命名空间定义了变量的可见范围和生命周期
-
-**💡 下一节预告：** 在第4期中，我们将深入学习Python的面向对象编程，包括类的定义、对象的创建、继承与多态等核心概念。
-
----
-
-## 📚 分页导航
+## 分页导航
 
 [← 第3期：控制流与函数](./lesson-03) [第5期：文件操作与异常处理](./lesson-05) →

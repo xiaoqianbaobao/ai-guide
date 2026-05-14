@@ -1,72 +1,80 @@
-/* Kimi风格 - 深色主题自定义样式 */
 .VPContent {
   font-family: var(--vp-font-family-base);
-  line-height: 1.7;
+  line-height: 1.72;
   color: var(--vp-c-text-1);
 }
 
-/* 页面容器 */
 .VPDoc {
   background: var(--vp-c-bg);
   color: var(--vp-c-text-1);
 }
 
-/* 代码块 - Kimi风格 */
 .VPDoc code {
   font-family: var(--vp-font-family-mono);
-  font-size: 0.875em;
+  font-size: 0.88em;
   background: var(--vp-c-bg-soft);
-  padding: 0.2em 0.4em;
+  padding: 0.18em 0.42em;
   border-radius: 4px;
-  color: var(--vp-c-brand-1);
-  border: 1px solid var(--vp-c-brand-soft);
+  color: var(--vp-c-text-1);
+  border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
-/* 代码块容器 */
+.dark .VPDoc code {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 .VPDoc pre {
   background: var(--vp-c-bg-soft);
-  border: 1px solid var(--vp-c-brand-1);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 8px;
-  padding: 1.5rem;
+  padding: 1.25rem;
   overflow-x: auto;
-  margin: 1.5rem 0;
+  margin: 1.4rem 0;
+}
+
+.dark .VPDoc pre {
+  border-color: rgba(255, 255, 255, 0.08);
 }
 
 .VPDoc pre code {
   background: transparent;
+  border: 0;
   padding: 0;
   color: inherit;
 }
 
-/* 标题样式 */
 .VPDoc h1 {
-  font-weight: 600;
-  font-size: 2.5rem;
+  font-weight: 650;
+  font-size: 2.2rem;
   margin-bottom: 1rem;
-  color: var(--vp-c-brand-1);
+  color: var(--vp-c-text-1);
+  letter-spacing: -0.02em;
 }
 
 .VPDoc h2 {
-  font-weight: 600;
-  font-size: 1.8rem;
-  margin-top: 2.5rem;
-  margin-bottom: 1rem;
-  padding-bottom: 0.5rem;
-  border-bottom: 1px solid var(--vp-c-brand-soft);
+  font-weight: 620;
+  font-size: 1.65rem;
+  margin-top: 2.4rem;
+  margin-bottom: 0.9rem;
+  padding-bottom: 0.45rem;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+}
+
+.dark .VPDoc h2 {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 
 .VPDoc h3 {
-  font-weight: 500;
-  font-size: 1.4rem;
-  margin-top: 2rem;
-  margin-bottom: 0.8rem;
+  font-weight: 600;
+  font-size: 1.28rem;
+  margin-top: 1.8rem;
+  margin-bottom: 0.7rem;
 }
 
-/* 链接样式 */
 .VPDoc a {
   color: var(--vp-c-brand-1);
   text-decoration: none;
-  transition: all 0.2s ease;
+  transition: color 0.2s ease;
 }
 
 .VPDoc a:hover {
@@ -74,67 +82,84 @@
   text-decoration: underline;
 }
 
-/* 侧边栏样式 */
 .VPSidebar {
   font-size: 0.95rem;
   background: var(--vp-c-bg-elv);
-  border-right: 1px solid var(--vp-c-brand-soft);
+  border-right: 1px solid rgba(0, 0, 0, 0.06);
+}
+
+.dark .VPSidebar {
+  border-right-color: rgba(255, 255, 255, 0.08);
 }
 
 .VPSidebarItem a {
-  transition: all 0.2s ease;
-  border-radius: 4px;
-  padding: 4px 8px;
+  transition: background-color 0.2s ease, color 0.2s ease;
+  border-radius: 6px;
+  padding: 5px 8px;
   margin: 2px 0;
 }
 
 .VPSidebarItem a:hover {
-  color: var(--vp-c-brand-1);
+  color: var(--vp-c-text-1);
   background: var(--vp-c-brand-soft);
 }
 
-/* 导航栏样式 */
 .VPNavBar {
-  background: var(--vp-c-bg-elv);
-  border-bottom: 1px solid var(--vp-c-brand-soft);
+  background: color-mix(in srgb, var(--vp-c-bg-elv) 92%, transparent);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.06);
+  backdrop-filter: blur(10px);
+}
+
+.dark .VPNavBar {
+  border-bottom-color: rgba(255, 255, 255, 0.08);
 }
 
 .VPNavBarTitle {
   font-weight: 600;
-  font-size: 1.2rem;
-  color: var(--vp-c-brand-1);
+  font-size: 1.05rem;
+  color: var(--vp-c-text-1);
 }
 
-/* 按钮样式 */
 .VPButton {
   border-radius: 6px;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .VPButton:hover {
-  transform: translateY(-1px);
-  box-shadow: var(--vp-shadow-2);
+  transform: none;
+  box-shadow: none;
 }
 
-/* 卡片样式 */
+.VPFeature {
+  border: 1px solid rgba(0, 0, 0, 0.06);
+  border-radius: 10px;
+}
+
+.dark .VPFeature {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 .VPDoc .custom-block {
   border-radius: 8px;
-  border: 1px solid var(--vp-c-brand-soft);
+  border: 1px solid rgba(0, 0, 0, 0.08);
   background: var(--vp-c-bg-soft);
 }
 
-/* 响应式优化 */
+.dark .VPDoc .custom-block {
+  border-color: rgba(255, 255, 255, 0.08);
+}
+
 @media (max-width: 768px) {
   .VPDoc {
-    padding: 1.5rem;
+    padding: 1.2rem;
   }
-  
+
   .VPDoc h1 {
-    font-size: 2rem;
+    font-size: 1.9rem;
   }
-  
+
   .VPDoc h2 {
-    font-size: 1.5rem;
+    font-size: 1.45rem;
   }
 }

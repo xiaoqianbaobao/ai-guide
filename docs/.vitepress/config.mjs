@@ -34,7 +34,7 @@ export default defineConfig({
     logo: '/logo.svg',
     siteTitle: 'AI Guide',
     
-    // 导航栏 - Kimi风格
+    // 导航栏
     nav: [
       { text: '指南', link: '/guide/' },
       {
@@ -71,7 +71,10 @@ export default defineConfig({
     // 侧边栏
     sidebar: {
       '/guide/': [
-        { text: '示例文章', link: '/guide/example-article/' }
+        { text: '学习指南', link: '/guide/' },
+        { text: '学习路线图', link: '/guide/roadmap/' },
+        { text: '先修知识', link: '/guide/prerequisites/' },
+        { text: '如何使用本知识库', link: '/guide/how-to-learn/' }
       ],
       '/models/': [
         {
