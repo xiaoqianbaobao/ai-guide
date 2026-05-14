@@ -31,6 +31,13 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 - 已继续扩写第二批核心正文，包括 `RAG 原理`、`Orchestrator-Subagent`、`MCP 协议`、`Cursor vs Claude Code vs Trae` 与 `Agentic Eval 设计`
 - 已补齐 `从零手写 Agent` 与 `奖励函数设计` 两篇实现层/评估层关键正文，覆盖最小结构、常见误区、奖励组合与工程判断
 - 已补齐序章中的 `AI 原生开发者思维` 与 `学习路径指南`，把站点入口从“知道有哪些文章”推进到“知道该怎么学、为什么这样学”
+- 已为站点接入 Mermaid 图示能力，可在正文中直接编写流程图、时序图与脑图
+- 已扩写 `Tool Use 完整机制`、`Context Engineering`、`Memory 的四种形态`、`MCP 协议` 四篇文章，补充系统图示、典型误区、工程判断与更完整的概念边界
+- 已继续扩写 `RAG 原理`、`Agentic Eval 设计`、`从零手写 Agent`，补充检索链路、评估闭环、运行时结构、适用边界与图示化解释
+- 已新增 `Harness 设计` 与 `Agent Skills` 两篇文章，把长任务运行外壳、会话连续性、流程知识打包、skills 与 tool / MCP / harness 的关系正式纳入知识体系
+- 已更新工具与框架模块导航，并补强 `Cursor vs Claude Code vs Trae`、`Orchestrator-Subagent`、`奖励函数设计` 等页面与 harness / skill 新概念的衔接
+- 已新增 `Harness 与 Skill 的评估体系` 和 `Tool / MCP / Skill / Harness / Workflow / Agent 关系图` 两篇页面，把新知识点正式接入评估主线和系统概念地图
+- 本轮内容补强参考了公开工程资料中的共识方向，例如上下文工程、工具设计与评估、长期记忆分类、Agent 运行时与标准化接入，但已统一改写为更适合本站知识体系的中文教程表达
 - 已将 Python 教程从首页、导航和主侧边栏中移除，不再作为站点主入口展示，但内容文件仍保留在仓库中
 - 保留阅读增强功能：侧边栏折叠、目录隐藏、专注阅读与状态记忆
 - 统一了主题样式，按 `prd.md` 的前端设计思路继续细化首页、模块入口卡片和模块页层次，同时保留更适合阅读的文档站气质

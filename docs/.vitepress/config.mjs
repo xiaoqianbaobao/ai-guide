@@ -227,7 +227,8 @@ function sidebarMultiAgent() {
       items: [
         { text: '模块概述', link: '/04-multi-agent/' },
         { text: 'Orchestrator-Subagent', link: '/04-multi-agent/orchestrator-subagent/' },
-        { text: 'MCP 协议', link: '/04-multi-agent/mcp-protocol/' }
+        { text: 'MCP 协议', link: '/04-multi-agent/mcp-protocol/' },
+        { text: '系统概念关系图', link: '/04-multi-agent/system-relations/' }
       ]
     }
   ]
@@ -241,7 +242,9 @@ function sidebarTools() {
       items: [
         { text: '模块概述', link: '/05-tools-frameworks/' },
         { text: 'Cursor vs Claude Code vs Trae', link: '/05-tools-frameworks/cursor-vs-claude-code/' },
-        { text: '从零手写 Agent', link: '/05-tools-frameworks/build-from-scratch/' }
+        { text: '从零手写 Agent', link: '/05-tools-frameworks/build-from-scratch/' },
+        { text: 'Harness 设计', link: '/05-tools-frameworks/harness-design/' },
+        { text: 'Agent Skills', link: '/05-tools-frameworks/agent-skills/' }
       ]
     }
   ]
@@ -255,7 +258,8 @@ function sidebarEval() {
       items: [
         { text: '模块概述', link: '/06-eval-evolution/' },
         { text: 'Agentic Eval 设计', link: '/06-eval-evolution/agentic-eval-design/' },
-        { text: '奖励函数设计', link: '/06-eval-evolution/reward-function-design/' }
+        { text: '奖励函数设计', link: '/06-eval-evolution/reward-function-design/' },
+        { text: 'Harness 与 Skill 的评估体系', link: '/06-eval-evolution/harness-skill-evaluation/' }
       ]
     }
   ]

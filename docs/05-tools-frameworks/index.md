@@ -20,12 +20,13 @@ module: tools
 
 ## 模块定位
 
-这里不追求罗列所有流行工具，而是从真实工作流和工程边界出发，理解不同工具各自适合解决什么问题。
+这里不追求罗列所有流行工具，而是从真实工作流、运行时外壳和能力复用边界出发，理解不同工具各自适合解决什么问题。
 
 ## 适合谁读
 
 - 已经会使用一些 AI 工具，但不知道如何系统比较的人
 - 想判断“用框架还是自己搭”这个问题的人
+- 想理解长任务运行外壳、skills、工程化复用的人
 - 想把前面学到的原理落到实现层的人
 
 ## 进入前建议
@@ -37,6 +38,8 @@ module: tools
 
 1. 先读 [Cursor vs Claude Code vs Trae](./cursor-vs-claude-code)，从真实工具体验进入工程判断。
 2. 再读 [从零手写 Agent](./build-from-scratch)，理解不依赖框架时系统最小实现应该长什么样。
+3. 再读 [Harness 设计](./harness-design)，理解长任务和多窗口任务为什么需要运行时外壳。
+4. 最后读 [Agent Skills](./agent-skills)，理解流程知识、模板和脚本怎样被打包成可复用能力。
 
 ## 本模块文章
 
@@ -44,6 +47,8 @@ module: tools
 | --- | --- | --- |
 | [Cursor vs Claude Code vs Trae](./cursor-vs-claude-code) | 实战 | 从真实使用体验看三类工具的差异 |
 | [从零手写 Agent](./build-from-scratch) | 实战 | 不依赖框架理解 Agent 的最小实现 |
+| [Harness 设计](./harness-design) | 工程 | 理解长任务、跨窗口连续性与运行时外壳 |
+| [Agent Skills](./agent-skills) | 工程 | 理解可发现、可加载、可复用的流程知识包 |
 
 ## 学完后去哪里
 

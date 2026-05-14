@@ -27,6 +27,7 @@ module: multi-agent
 - 已经开始设计较长流程或复杂任务链路的人
 - 遇到单一上下文、单一角色不够用的问题的人
 - 想理解 MCP 为什么会成为 AI 工具互联基础协议的人
+- 想一次理清 Tool、MCP、Skill、Harness、Workflow、Agent 这些概念边界的人
 
 ## 进入前建议
 
@@ -37,6 +38,7 @@ module: multi-agent
 
 1. 先读 [Orchestrator-Subagent](./orchestrator-subagent)，理解最经典的协作拓扑。
 2. 再读 [MCP 协议](./mcp-protocol)，理解多工具、多系统接入为什么需要统一协议。
+3. 最后读 [系统概念关系图](./system-relations)，把多 Agent 周边高频概念一次串起来。
 
 ## 本模块文章
 
@@ -44,6 +46,7 @@ module: multi-agent
 | --- | --- | --- |
 | [Orchestrator-Subagent](./orchestrator-subagent) | 核心 | 理解指挥者与执行者的基本协作模式 |
 | [MCP 协议](./mcp-protocol) | 核心 | 理解 AI 工具互联为什么需要标准化接口 |
+| [系统概念关系图](./system-relations) | 工程 | 一次理清 Tool、MCP、Skill、Harness、Workflow、Agent 的边界 |
 
 ## 学完后去哪里
 
