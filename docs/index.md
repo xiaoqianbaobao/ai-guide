@@ -33,18 +33,6 @@ AI Guide 是一个专注于人工智能工程实践的中文知识体系，致�
 - **[应用层](/application/)** - AI 产品化与商业化方法论
 - **[资源层](/resources/)** - 持续学习与工具推荐
 
-## 🚀 快速开始
-
-```bash
-# 安装依赖
-npm install
-
-# 启动开发服务器
-npm run dev
-
-# 构建生产版本
-npm run build
-```
 
 ## 📖 内容特色
 
