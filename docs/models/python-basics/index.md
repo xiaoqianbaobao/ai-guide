@@ -150,6 +150,10 @@ AI 衔接点：
 3. 模型 API 调用与服务封装
 4. Agent 框架与工程实践
 
+如果你希望先看一个“从 Python 过渡到 AI 学习”的说明页，可以继续阅读：
+
+- [Python 之后学什么](./next-steps)
+
 ## 学习资源
 
 - [Python官方文档](https://docs.python.org/zh-cn/)
@@ -166,6 +170,7 @@ AI 衔接点：
 - [第3期：控制流与函数](./lesson-03)
 - [第4期：面向对象编程基础](./lesson-04)
 - [第5期：文件操作与异常处理](./lesson-05)
+- [Python 之后学什么](./next-steps)
 
 ---
 

@@ -85,7 +85,8 @@ export default defineConfig({
             { text: '第2期：数据类型', link: '/models/python-basics/lesson-02/' },
             { text: '第3期：控制流', link: '/models/python-basics/lesson-03/' },
             { text: '第4期：面向对象', link: '/models/python-basics/lesson-04/' },
-            { text: '第5期：文件操作', link: '/models/python-basics/lesson-05/' }
+            { text: '第5期：文件操作', link: '/models/python-basics/lesson-05/' },
+            { text: '学完后做什么', link: '/models/python-basics/next-steps/' }
           ]
         }
       ],

@@ -1,367 +1,321 @@
 ---
-title: Python环境搭建与基础语法
-description: 学习Python发展历史、环境搭建以及基础语法知识
+title: Python 环境搭建与基础语法
+description: 为后续数据处理、模型调用和 AI 工程脚本准备 Python 运行环境与基础语法
 ---
 
-# 第1期：Python环境搭建与基础语法
+# 第1期：Python 环境搭建与基础语法
 
-## 📖 学习目标
+这节课的目标不是停留在“装好 Python”，而是把你带到一个能真正开始写代码、跑脚本、处理文件的状态。
 
-- 了解Python语言的发展历史与核心特点
-- 掌握Python环境的安装与配置方法
-- 熟悉Python基础语法结构
-- 能够编写并运行简单的Python程序
+后面无论你要做数据清洗、模型调用，还是写 Agent 工具，第一步都离不开稳定的本地环境和最基本的语法习惯。
 
-## 🎯 Python语言概述
+## 本节目标
 
-### 历史背景
+- 理解为什么 AI 学习通常以 Python 为起点
+- 安装并验证 Python 与 `pip`
+- 学会使用终端运行 Python 脚本
+- 掌握变量、基本数据类型和常用运算符
+- 建立清晰、可维护的基础代码习惯
 
-Python由吉多·范罗苏姆（Guido van Rossum）于1989年创造，1991年首次发布。Python的设计哲学强调代码的可读性和简洁性，其名称来源于英国喜剧团体Monty Python。
+## 为什么 AI 学习常用 Python
 
-### 核心特点
+Python 在 AI 领域被广泛使用，核心原因不是“它最先进”，而是它足够适合学习和快速实现：
 
-1. **简洁易读**：语法清晰，代码结构简单
-2. **跨平台**：支持Windows、macOS、Linux等多种操作系统
-3. **开源免费**：完全开源，可自由使用和修改
-4. **功能强大**：丰富的标准库和第三方库
-5. **应用广泛**：涵盖Web开发、数据科学、人工智能、自动化等多个领域
+- 语法简洁，适合快速上手
+- 生态成熟，数据处理和模型工具丰富
+- 适合写脚本、实验代码和工具程序
+- 在数据科学、机器学习、推理服务和自动化领域都有广泛应用
 
-### 与其他语言的比较
+对于初学者来说，Python 最重要的价值是：你可以更快地把注意力放在问题本身，而不是被语言细节拖住。
 
-| 特性 | Python | Java | C++ |
-|------|--------|------|-----|
-| 学习难度 | ⭐⭐ | ⭐⭐⭐⭐ | ⭐⭐⭐⭐⭐ |
-| 执行速度 | 中等 | 快 | 最快 |
-| 代码量 | 少 | 多 | 多 |
-| 应用领域 | 广泛 | 企业级 | 系统编程 |
+## 环境搭建
 
-## 🛠️ 环境搭建
+### Windows
 
-### Windows环境安装
+最简单的方式是用官方安装包或 `winget`。
 
-#### 方法一：官方安装包
-
-1. 访问Python官网下载页面：https://www.python.org/downloads/
-2. 下载适合Windows的安装包（推荐下载最新稳定版本）
-3. 运行安装程序，勾选"Add Python to PATH"选项
-4. 完成安装后，在命令行中输入`python --version`验证安装
-
-#### 方法二：使用包管理器
-
-```bash
-# 使用winget（Windows 10+）
+```powershell
 winget install Python.Python.3.11
-
-# 使用Chocolatey
-choco install python
 ```
 
-### macOS环境安装
+安装时建议确认两点：
 
-#### 使用Homebrew（推荐）
+- 已将 Python 加入 PATH
+- 安装了 `pip`
+
+### macOS
+
+推荐使用 `Homebrew`：
 
 ```bash
-# 安装Homebrew（如果尚未安装）
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
-
-# 安装Python
 brew install python
 ```
 
-#### 官方安装包
+### Linux
 
-1. 访问Python官网下载macOS版本
-2. 运行.dmg安装包
-3. 按照安装向导完成安装
-
-### Linux环境安装
-
-#### Ubuntu/Debian系统
+以 Ubuntu / Debian 为例：
 
 ```bash
 sudo apt update
 sudo apt install python3 python3-pip
 ```
 
-#### CentOS/RHEL系统
+## 验证安装
+
+安装完成后，在终端中执行：
 
 ```bash
-sudo yum install python3 python3-pip
-```
-
-#### Fedora系统
-
-```bash
-sudo dnf install python3 python3-pip
-```
-
-### 验证安装
-
-在终端中执行以下命令验证安装是否成功：
-
-```bash
-# 检查Python版本
 python --version
-# 或
-python3 --version
-
-# 检查pip版本
 pip --version
-# 或
+```
+
+如果你的系统中 `python` 不可用，可以尝试：
+
+```bash
+python3 --version
 pip3 --version
 ```
 
-## 📝 第一个Python程序
+## 建议的开发习惯
 
-### Hello World程序
+从这一节开始，建议同时培养几个习惯：
 
-创建一个名为`hello.py`的文件，输入以下代码：
+- 习惯用终端运行脚本
+- 习惯把代码保存为 `.py` 文件，而不是只在解释器里临时试
+- 习惯为文件和变量起清晰的名字
+- 习惯在报错时先读错误信息，而不是直接放弃
+
+## 第一个 Python 程序
+
+创建一个 `hello.py`：
 
 ```python
-# 这是一个简单的Hello World程序
-print("Hello, World!")
+print("Hello, Python!")
 ```
 
-**代码解释：**
-- `#` 后面的内容是注释，会被Python解释器忽略
-- `print()` 是Python内置函数，用于输出内容到控制台
-
-### 运行程序
-
-在终端中执行以下命令：
+运行方式：
 
 ```bash
 python hello.py
-# 或
-python3 hello.py
 ```
 
-预期输出：
-```
-Hello, World!
+你会看到：
+
+```text
+Hello, Python!
 ```
 
-### 交互式解释器
+这一步看起来简单，但它意味着：
 
-Python还提供了交互式解释器（REPL），可以直接输入代码并立即看到结果：
+- 你的环境已经正确安装
+- 你知道如何执行一个脚本
+- 你可以开始进入真正的代码练习
+
+## 交互式解释器
+
+Python 也提供交互式环境，适合快速试验。
 
 ```bash
 python
-# 或
-python3
 ```
 
-进入交互式模式后，你可以直接输入Python代码：
+例如：
 
 ```python
->>> print("Hello, Python!")
-Hello, Python!
->>> 2 + 2
-4
->>> exit()
+>>> 2 + 3
+5
+>>> print("AI Guide")
+AI Guide
 ```
 
-## 🏷️ 变量与基本数据类型
+交互式环境适合验证小片段代码，但正式学习时仍建议优先写进 `.py` 文件。
 
-### 变量的概念
+## 变量与基本数据类型
 
-变量是存储数据的容器。在Python中，变量不需要预先声明类型，解释器会自动推断。
+### 变量
 
-### 变量命名规则
+变量可以理解为“带名字的数据”。
 
-1. 只能包含字母、数字和下划线
-2. 不能以数字开头
-3. 不能使用Python关键字
-4. 区分大小写
-
-**合法的变量名：**
 ```python
-name = "张三"
-age = 25
-_height = 1.75
-user_name = "user123"
+name = "Alice"
+age = 18
+temperature = 0.2
 ```
 
-**非法的变量名：**
+### 命名规则
+
+- 只能包含字母、数字和下划线
+- 不能以数字开头
+- 不能使用 Python 关键字
+- 推荐用有语义的英文名
+
 ```python
-# 2name = "张三"  # 错误：不能以数字开头
-# class = "Python"  # 错误：不能使用关键字
-# user-name = "张三"  # 错误：不能使用连字符
+user_name = "alice"
+max_tokens = 512
+model_name = "demo-model"
 ```
 
-### 基本数据类型
+这种命名方式在后续 AI 项目里也更自然，因为你会频繁接触 `prompt`、`temperature`、`dataset_path` 这类变量。
 
-#### 整数（int）
+### 常见基础类型
+
+#### 整数 `int`
 
 ```python
-# 整数示例
-positive_num = 42
-negative_num = -17
-zero = 0
-
-print(type(positive_num))  # <class 'int'>
+count = 10
+year = 2026
 ```
 
-#### 浮点数（float）
+#### 浮点数 `float`
 
 ```python
-# 浮点数示例
-pi = 3.14159
-scientific = 1.5e-3  # 科学计数法
-negative_float = -2.5
-
-print(type(pi))  # <class 'float'>
+score = 0.95
+learning_rate = 0.001
 ```
 
-#### 字符串（str）
+#### 字符串 `str`
 
 ```python
-# 字符串示例
-single_quote = 'Hello'
-double_quote = "World"
-triple_quote = """这是一个
-多行字符串"""
-
-# 字符串操作
-name = "Python"
-print(name.upper())  # PYTHON
-print(name.lower())  # python
-print(len(name))     # 6
+text = "hello"
+prompt = "请总结下面的内容"
 ```
 
-#### 布尔值（bool）
+#### 布尔值 `bool`
 
 ```python
-# 布尔值示例
-is_true = True
-is_false = False
-
-print(type(is_true))  # <class 'bool'>
+is_ready = True
+has_error = False
 ```
 
-## 🔢 运算符与表达式
+## 基本运算符
 
-### 算术运算符
+### 算术运算
 
 ```python
-# 基本算术运算
 a = 10
 b = 3
 
-print(a + b)  # 加法: 13
-print(a - b)  # 减法: 7
-print(a * b)  # 乘法: 30
-print(a / b)  # 除法: 3.333...
-print(a // b) # 整除: 3
-print(a % b)  # 取余: 1
-print(a ** b) # 幂运算: 1000
+print(a + b)
+print(a - b)
+print(a * b)
+print(a / b)
+print(a // b)
+print(a % b)
+print(a ** b)
 ```
 
-### 比较运算符
+### 比较运算
 
 ```python
-x = 5
-y = 8
-
-print(x == y)  # 等于: False
-print(x != y)  # 不等于: True
-print(x < y)   # 小于: True
-print(x > y)   # 大于: False
-print(x <= y)  # 小于等于: True
-print(x >= y)  # 大于等于: False
+print(5 > 3)
+print(5 == 5)
+print(5 != 2)
 ```
 
-### 逻辑运算符
+### 逻辑运算
 
 ```python
-a = True
-b = False
+is_python_ready = True
+has_pip = True
 
-print(a and b)  # 与: False
-print(a or b)   # 或: True
-print(not a)    # 非: False
+print(is_python_ready and has_pip)
+print(is_python_ready or False)
+print(not False)
 ```
 
-## 💬 代码注释与规范
+## 注释与基础规范
 
 ### 单行注释
 
 ```python
-# 这是单行注释
-print("Hello")  # 这也是注释
-```
-
-### 多行注释
-
-```python
-"""
-这是多行注释
-可以跨越多行
-通常用于文档字符串
-"""
-
-'''
-这也是多行注释
-使用单引号包裹
-'''
+# 这是注释
+print("hello")
 ```
 
 ### 文档字符串
 
 ```python
-def calculate_area(length, width):
-    """
-    计算矩形面积
-    
-    参数:
-        length (float): 矩形的长度
-        width (float): 矩形的宽度
-    
-    返回:
-        float: 矩形的面积
-    """
-    return length * width
+def greet(name):
+    """返回一条简单问候语。"""
+    return f"Hello, {name}"
 ```
 
-## 🎓 练习题
+### 基础规范建议
+
+- 保持缩进一致
+- 不要把一行写得过长
+- 变量名尽量表达含义
+- 示例代码优先追求清晰，再追求“高级技巧”
+
+## AI 场景示例：准备一个最小实验脚本
+
+从现在开始，尽量用更接近未来 AI 开发的变量名和例子。
+
+```python
+model_name = "demo-model"
+temperature = 0.3
+prompt = "请解释什么是监督学习"
+
+print("模型名称:", model_name)
+print("温度参数:", temperature)
+print("提示词:", prompt)
+```
+
+虽然这里只是打印，但它已经接近后续真实代码的形态：有配置、有输入、有参数。
+
+## 常见错误
+
+### 1. 没有配置 PATH
+
+如果终端提示找不到 `python`，通常说明安装成功但环境变量没有配置好。
+
+### 2. 中英文符号混用
+
+```python
+print（"hello"）
+```
+
+这类全角括号会导致语法错误。
+
+### 3. 变量名含义不清
+
+```python
+a = "demo-model"
+b = 0.2
+```
+
+建议改成：
+
+```python
+model_name = "demo-model"
+temperature = 0.2
+```
+
+## 练习建议
 
 ### 基础练习
 
-1. **环境验证**：在你的环境中运行Python，验证安装是否成功
-2. **Hello World**：创建并运行一个Hello World程序
-3. **变量练习**：创建不同类型的变量并打印它们的类型
+1. 在本机完成 Python 与 `pip` 安装验证
+2. 创建并运行一个 `hello.py`
+3. 定义 4 个不同类型的变量并打印它们
 
-### 编程练习
+### AI 导向练习
 
-1. **计算器程序**：编写一个简单的计算器，实现加减乘除运算
-2. **温度转换**：编写程序将摄氏度转换为华氏度
-3. **个人资料**：创建一个程序，输入并显示个人信息
+1. 创建变量保存 `model_name`、`temperature`、`prompt`
+2. 编写一个脚本打印“当前实验配置”
+3. 尝试用字符串保存一段提示词，并打印其长度
 
-### 挑战练习
+## 本节小结
 
-1. **斐波那契数列**：编写程序生成斐波那契数列的前n项
-2. **简单加密**：实现一个简单的字符替换加密算法
-3. **时间转换器**：编写程序将秒数转换为时分秒格式
+- Python 是后续 AI 学习中最重要的基础工具之一
+- 能稳定运行脚本，比记住很多概念更重要
+- 变量、基础类型和运算符会在后续每一节反复使用
+- 从第一节开始养成清晰命名和规范书写的习惯，会让后面轻松很多
 
-## 🔗 扩展阅读
-
-- [Python官方文档 - 语言参考](https://docs.python.org/zh-cn/3/reference/)
-- [Python变量命名规范](https://pep8.org/#naming-conventions)
-- [Python运算符优先级](https://docs.python.org/zh-cn/3/reference/expressions.html#operator-precedence)
+下一节会进入数据类型与容器。那一节会更贴近真实 AI 场景，因为文本、列表、字典和结构化数据会频繁出现。
 
 ---
 
-**📝 本节小结：**
+## 分页导航
 
-- Python是一门简洁、易读、功能强大的编程语言
-- 正确安装Python环境是学习的第一步
-- 掌握变量、数据类型和基本运算符是编程的基础
-- 良好的代码规范和注释习惯对编程非常重要
-
-**💡 下一节预告：** 在第2期中，我们将深入学习Python的数据类型系统，包括数值类型、字符串操作、容器类型等核心概念。
-
----
-
-## 📚 分页导航
-
-[← 第2期：数据类型与变量](./lesson-02) [第2期：数据类型与变量](./lesson-02) →
+[第2期：数据类型与变量](./lesson-02) →
