@@ -40,9 +40,10 @@ module: tools
 1. 先读 [Cursor vs Claude Code vs Trae](./cursor-vs-claude-code)，从真实工具体验进入工程判断。
 2. 再读 [从零手写 Agent](./build-from-scratch)，理解不依赖框架时系统最小实现应该长什么样。
 3. 再读 [LangGraph 原理](./langgraph-principles)，理解节点、边、状态和有向图为什么适合 Agent。
-4. 再读 [Spring AI 框架原理](./spring-ai-framework)，理解 Java 企业应用里 AI 集成层如何设计。
-5. 再读 [Harness 设计](./harness-design)，理解长任务和多窗口任务为什么需要运行时外壳。
-6. 最后读 [Agent Skills](./agent-skills)，理解流程知识、模板和脚本怎样被打包成可复用能力。
+4. 接着读 [LangGraph 状态图设计实战](./langgraph-state-design)，把 schema、reducer、messages、checkpoint 的工程取舍真正落下来。
+5. 再读 [Spring AI 框架原理](./spring-ai-framework)，理解 Java 企业应用里 AI 集成层如何设计。
+6. 再读 [Harness 设计](./harness-design)，理解长任务和多窗口任务为什么需要运行时外壳。
+7. 最后读 [Agent Skills](./agent-skills)，理解流程知识、模板和脚本怎样被打包成可复用能力。
 
 ## 本模块文章
 
@@ -51,6 +52,7 @@ module: tools
 | [Cursor vs Claude Code vs Trae](./cursor-vs-claude-code) | 实战 | 从真实使用体验看三类工具的差异 |
 | [从零手写 Agent](./build-from-scratch) | 实战 | 不依赖框架理解 Agent 的最小实现 |
 | [LangGraph 原理](./langgraph-principles) | 工程 | 理解节点、边、共享状态和有向图编排 |
+| [LangGraph 状态图设计实战](./langgraph-state-design) | 工程 | 理解 schema、reducer、checkpoint 和消息状态的真实设计方法 |
 | [Spring AI 框架原理](./spring-ai-framework) | 工程 | 理解 Java 生态中的模型、Advisor、Tool Calling 与 RAG 集成 |
 | [Harness 设计](./harness-design) | 工程 | 理解长任务、跨窗口连续性与运行时外壳 |
 | [Agent Skills](./agent-skills) | 工程 | 理解可发现、可加载、可复用的流程知识包 |

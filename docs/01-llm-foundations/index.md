@@ -39,6 +39,7 @@ module: llm
 1. 先读 [LLM 到底是什么](./what-is-llm)，建立对模型本质和能力边界的第一层理解。
 2. 再读 [上下文窗口](./context-window)，理解为什么上下文组织方式会直接影响系统表现。
 3. 然后进入 [Transformer 专题导读](./transformer-attention-qkv)，按章节系统学习模型内部机制。
+4. 如果你在第3章第一次真正卡住，可以继续读 [第3.5章 Attention 的矩阵视角与代码推演](./chapter-03b-attention-matrix-and-code)，把公式、shape 和代码一口气打通。
 
 ## Transformer 专题章节
 
@@ -47,9 +48,10 @@ module: llm
 1. [第1章 为什么是 Transformer](./chapter-01-why-transformer)
 2. [第2章 Token、Embedding 与位置编码](./chapter-02-token-embedding-position)
 3. [第3章 Self-Attention 与 QKV](./chapter-03-self-attention-qkv)
-4. [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)
-5. [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm)
-6. [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)
+4. [第3.5章 Attention 的矩阵视角与代码推演](./chapter-03b-attention-matrix-and-code)
+5. [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)
+6. [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm)
+7. [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)
 
 ## 本模块文章
 
@@ -61,6 +63,7 @@ module: llm
 | [第1章 为什么是 Transformer](./chapter-01-why-transformer) | 原理 | 理解它为何取代 RNN 成为主流 |
 | [第2章 Token、Embedding 与位置编码](./chapter-02-token-embedding-position) | 原理 | 理解文本如何变成可计算表示 |
 | [第3章 Self-Attention 与 QKV](./chapter-03-self-attention-qkv) | 核心 | 理解注意力匹配与聚合机制 |
+| [第3.5章 Attention 的矩阵视角与代码推演](./chapter-03b-attention-matrix-and-code) | 核心 | 从 shape、softmax、mask 到最小代码真正看懂 attention |
 | [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block) | 原理 | 理解一层完整 Transformer 的分工 |
 | [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm) | 原理 | 理解 BERT、GPT 等模型家族差异 |
 | [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution) | 工程 | 理解 KV Cache、RoPE、GQA、SwiGLU、MoE 等现实问题 |
