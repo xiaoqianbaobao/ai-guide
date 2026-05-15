@@ -69,7 +69,7 @@ features:
     <span>先建立 AI 原生开发与范式转移的整体认知。</span>
   </a>
   <a class="home-link-card" href="./01-llm-foundations/">
-    <strong>语言模型基础</strong>
+    <strong>大语言模型基础</strong>
     <span>从 LLM 本质与上下文窗口进入主线。</span>
   </a>
   <a class="home-link-card" href="./02-agent-core/">
@@ -81,7 +81,7 @@ features:
 ## 推荐阅读顺序
 
 1. 先读 [序章](/00-preface/)，建立范式转移与 AI 原生开发的整体视角。
-2. 进入 [语言模型基础](/01-llm-foundations/)，先把 LLM 和上下文窗口理解稳定。
+2. 进入 [大语言模型基础](/01-llm-foundations/)，先把 LLM 和上下文窗口理解稳定。
 3. 再读 [Agent 核心机制](/02-agent-core/)，理解 Tool Use、上下文工程与闭环系统。
 4. 接着进入 [Memory 体系](/03-memory/) 和 [多 Agent 系统](/04-multi-agent/)，看复杂任务如何扩展。
 5. 最后再看 [工具与框架](/05-tools-frameworks/) 和 [评估与进化](/06-eval-evolution/)，把认知落回工程选择与系统优化。
@@ -90,7 +90,7 @@ features:
 
 ```text
 序章
-  -> 语言模型基础
+  -> 大语言模型基础
   -> Agent 核心机制
   -> Memory 体系
   -> 多 Agent 系统
@@ -107,7 +107,7 @@ features:
     <span class="module-meta">起点模块</span>
   </a>
   <a class="home-module-card" href="./01-llm-foundations/">
-    <h3>语言模型基础</h3>
+    <h3>大语言模型基础</h3>
     <p>理解 LLM、本质边界与上下文窗口。</p>
     <span class="module-meta">原理主线</span>
   </a>
@@ -143,7 +143,7 @@ features:
 | 模块 | 当前状态 | 重点内容 |
 | --- | --- | --- |
 | 序章 | 已成型 | 范式转移、AI 原生思维、学习方式 |
-| 语言模型基础 | 已成型 | LLM 本质、上下文窗口 |
+| 大语言模型基础 | 已成型 | LLM 本质、上下文窗口 |
 | Agent 核心机制 | 已成型 | Agent 本质、Tool Use、Context Engineering |
 | Memory 体系 | 持续完善 | 四种记忆形态、RAG 基础 |
 | 多 Agent 系统 | 持续完善 | 协作模式、MCP 协议 |
