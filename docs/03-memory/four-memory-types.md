@@ -163,28 +163,28 @@ flowchart TD
 ## 一张脑图：四类记忆分别在管什么
 
 ```mermaid
-mindmap
-  root((Memory))
-    In-context
-      当前目标
-      本轮约束
-      最新证据
-      临时状态
-    External
-      知识库
-      历史摘要
-      文档索引
-      检索召回
-    Episodic
-      做过什么
-      失败原因
-      有效路径
-      经验轨迹
-    Semantic
-      稳定事实
-      用户偏好
-      项目约定
-      长期规则
+flowchart TD
+    A[Memory]
+    A --> B[In-context]
+    A --> C[External]
+    A --> D[Episodic]
+    A --> E[Semantic]
+    B --> B1[当前目标]
+    B --> B2[本轮约束]
+    B --> B3[最新证据]
+    B --> B4[临时状态]
+    C --> C1[知识库]
+    C --> C2[历史摘要]
+    C --> C3[文档索引]
+    C --> C4[检索召回]
+    D --> D1[做过什么]
+    D --> D2[失败原因]
+    D --> D3[有效路径]
+    D --> D4[经验轨迹]
+    E --> E1[稳定事实]
+    E --> E2[用户偏好]
+    E --> E3[项目约定]
+    E --> E4[长期规则]
 ```
 
 ## 一个简单的结构示例

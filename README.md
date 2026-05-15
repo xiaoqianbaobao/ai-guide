@@ -11,7 +11,7 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 
 - 学习指南：作为整套知识体系的入口页
 - 序章：建立范式转移与 AI 原生开发者思维
-- 语言模型基础：解释 LLM、本质、上下文窗口与 Transformer / Attention / QKV
+- 语言模型基础：解释 LLM、本质、上下文窗口，并以 6 章专题系统讲解 Transformer、QKV、Block、BERT/GPT 与现代演化
 - Agent 核心机制：覆盖 Tool Use、Context Engineering 等核心主题
 - Memory 体系：承接记忆设计与 RAG
 - 多 Agent 系统：进入复杂任务分工与 MCP
@@ -41,6 +41,14 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 - 已新增 `LangGraph 原理` 与 `Spring AI 框架原理`，把图式编排、节点/边/共享状态、有向图、ChatModel、ChatClient、Advisors、Tool Calling、RAG 等框架层知识正式纳入站点
 - 已同步更新 `语言模型基础`、`工具与框架`、`学习路线图` 和侧边栏，使底层模型原理与框架原理进入正式学习路径
 - 已修复首页卡片与知识地图组件中的根路径写死问题，改为 base 感知链接，避免部署在子路径或代理域名下时跳转到 `/00-preface/`、`/01-llm-foundations/` 这类错误地址
+- 已将 `语言模型基础` 模块重构为分章分节的小册子结构，新增 6 章 Transformer 专题，系统覆盖：
+  - 为什么 Transformer 取代 RNN
+  - Token、Embedding 与位置编码
+  - Self-Attention 与 QKV
+  - Multi-Head Attention 与 Transformer Block
+  - Encoder、Decoder 与 BERT/GPT 分化
+  - 训练、推理、KV Cache、RoPE、ALiBi、GQA、SwiGLU、MoE 等现代演化
+- 已将 `Transformer、Attention 与 QKV` 旧单页改为专题导读页，并为模型模块文章补充 `参考来源` 区块，统一标注论文、官方文档与高质量教程来源
 - 本轮内容补强参考了公开工程资料中的共识方向，例如上下文工程、工具设计与评估、长期记忆分类、Agent 运行时与标准化接入，但已统一改写为更适合本站知识体系的中文教程表达
 - 已将 Python 教程从首页、导航和主侧边栏中移除，不再作为站点主入口展示，但内容文件仍保留在仓库中
 - 保留阅读增强功能：侧边栏折叠、目录隐藏、专注阅读与状态记忆

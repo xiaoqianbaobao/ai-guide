@@ -231,21 +231,21 @@ flowchart TD
 ## 一张渐进式披露脑图
 
 ```mermaid
-mindmap
-  root((Skill 加载))
-    第1层
-      name
-      description
-      when_to_use
-    第2层
-      SKILL.md 正文
-      主流程
-      输出要求
-    第3层
-      模板
-      示例
-      参考文档
-      脚本
+flowchart TD
+    A[Skill 加载]
+    A --> B[第1层]
+    A --> C[第2层]
+    A --> D[第3层]
+    B --> B1[name]
+    B --> B2[description]
+    B --> B3[when_to_use]
+    C --> C1[SKILL.md 正文]
+    C --> C2[主流程]
+    C --> C3[输出要求]
+    D --> D1[模板]
+    D --> D2[示例]
+    D --> D3[参考文档]
+    D --> D4[脚本]
 ```
 
 这也是为什么 skill 可以很强，但又不会像“把整个手册塞进 system prompt”那样粗暴。

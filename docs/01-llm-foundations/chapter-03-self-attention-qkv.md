@@ -270,11 +270,18 @@ attention 不是总能“随便看”。
 
 ```mermaid
 flowchart LR
-    T1[Token 1] --> C[当前 token 3 可见]
-    T2[Token 2] --> C
-    T3[Token 3] --> C
-    T4[Token 4] -.未来不可见.-> C
-    T5[Token 5] -.未来不可见.-> C
+    subgraph 可见上下文
+        T1[Token 1]
+        T2[Token 2]
+        T3[Token 3]
+    end
+    subgraph 未来位置
+        T4[Token 4]
+        T5[Token 5]
+    end
+    T1 --> C[当前 token 3 可读取]
+    T2 --> C
+    T3 --> C
 ```
 
 这也是为什么生成模型里的 attention 不是“全互通”，而是“只看过去”。

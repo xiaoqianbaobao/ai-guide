@@ -123,9 +123,9 @@ flowchart TD
 
 ```mermaid
 flowchart LR
-    A[RNN/LSTM 时代<br/>顺序状态传递] --> B[Seq2Seq + Attention<br/>局部引入回看能力]
-    B --> C[Transformer<br/>以 attention 为中心]
-    C --> D[现代 LLM<br/>decoder-only 扩展]
+    A[RNN/LSTM 时代 顺序状态传递] --> B[Seq2Seq 加 Attention 局部回看]
+    B --> C[Transformer 以 attention 为中心]
+    C --> D[现代 LLM decoder-only 扩展]
 ```
 
 它解决的核心不是“模型更聪明”，而是三件更基础的事：
