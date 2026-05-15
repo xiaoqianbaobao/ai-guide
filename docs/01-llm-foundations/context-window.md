@@ -157,3 +157,14 @@ print("更清晰的上下文:", context_better)
     上下文不是模型的附件，而是模型在一次调用中能够感知到的全部现实，因此设计上下文，本质上就是在设计模型能看到的世界。
   </p>
 </div>
+
+## 参考来源
+
+- Hugging Face Transformers 文档，Caching  
+  https://huggingface.co/docs/transformers/v4.55.4/en/cache_explanation
+- Su et al. (2021), *RoFormer: Enhanced Transformer with Rotary Position Embedding*  
+  https://arxiv.org/abs/2104.09864
+- Press et al. (2021), *Train Short, Test Long: Attention with Linear Biases Enables Input Length Extrapolation*  
+  https://arxiv.org/abs/2108.12409
+- transformers.run，Transformer 系列中文教程首页  
+  https://transformers.run/

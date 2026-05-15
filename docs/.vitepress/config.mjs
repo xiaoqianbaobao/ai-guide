@@ -185,7 +185,13 @@ function sidebarLLM() {
         { text: '模块概述', link: '/01-llm-foundations/' },
         { text: 'LLM 到底是什么', link: '/01-llm-foundations/what-is-llm/' },
         { text: '上下文窗口', link: '/01-llm-foundations/context-window/' },
-        { text: 'Transformer、Attention 与 QKV', link: '/01-llm-foundations/transformer-attention-qkv/' }
+        { text: 'Transformer 专题导读', link: '/01-llm-foundations/transformer-attention-qkv/' },
+        { text: '第1章 为什么是 Transformer', link: '/01-llm-foundations/chapter-01-why-transformer/' },
+        { text: '第2章 Token、Embedding 与位置编码', link: '/01-llm-foundations/chapter-02-token-embedding-position/' },
+        { text: '第3章 Self-Attention 与 QKV', link: '/01-llm-foundations/chapter-03-self-attention-qkv/' },
+        { text: '第4章 Multi-Head Attention 与 Transformer Block', link: '/01-llm-foundations/chapter-04-multi-head-and-block/' },
+        { text: '第5章 Encoder、Decoder 与现代 LLM', link: '/01-llm-foundations/chapter-05-encoder-decoder-and-modern-llm/' },
+        { text: '第6章 训练、推理与现代 Transformer 演化', link: '/01-llm-foundations/chapter-06-training-inference-and-evolution/' }
       ]
     }
   ]

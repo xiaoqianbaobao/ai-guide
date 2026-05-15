@@ -161,3 +161,12 @@ print("语言模型式任务:", llm_style_prompt)
     LLM 的强大，不是因为它像数据库一样记住了一切，而是因为它用概率建模压缩了语言和任务的模式，因此能在上下文中生成看似理解过的输出。
   </p>
 </div>
+
+## 参考来源
+
+- Brown et al. (2020), *Language Models are Few-Shot Learners*  
+  https://arxiv.org/abs/2005.14165
+- Hugging Face Transformers 文档，Text generation  
+  https://huggingface.co/docs/transformers/main/en/llm_tutorial
+- transformers.run，Transformer 系列中文教程首页  
+  https://transformers.run/
