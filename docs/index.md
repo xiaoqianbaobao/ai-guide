@@ -60,19 +60,19 @@ features:
 ## 从哪里开始
 
 <div class="home-link-grid">
-  <a class="home-link-card" href="/guide/">
+  <a class="home-link-card" href="./guide/">
     <strong>学习指南</strong>
     <span>先看整体路线、阅读方式和模块关系。</span>
   </a>
-  <a class="home-link-card" href="/00-preface/">
+  <a class="home-link-card" href="./00-preface/">
     <strong>序章</strong>
     <span>先建立 AI 原生开发与范式转移的整体认知。</span>
   </a>
-  <a class="home-link-card" href="/01-llm-foundations/">
+  <a class="home-link-card" href="./01-llm-foundations/">
     <strong>语言模型基础</strong>
     <span>从 LLM 本质与上下文窗口进入主线。</span>
   </a>
-  <a class="home-link-card" href="/02-agent-core/">
+  <a class="home-link-card" href="./02-agent-core/">
     <strong>Agent 核心机制</strong>
     <span>理解 Tool Use、Context Engineering 与闭环系统。</span>
   </a>
@@ -101,37 +101,37 @@ features:
 ## 七大模块
 
 <div class="home-module-grid">
-  <a class="home-module-card" href="/00-preface/">
+  <a class="home-module-card" href="./00-preface/">
     <h3>序章</h3>
     <p>建立范式转移与 AI 原生开发的整体认知。</p>
     <span class="module-meta">起点模块</span>
   </a>
-  <a class="home-module-card" href="/01-llm-foundations/">
+  <a class="home-module-card" href="./01-llm-foundations/">
     <h3>语言模型基础</h3>
     <p>理解 LLM、本质边界与上下文窗口。</p>
     <span class="module-meta">原理主线</span>
   </a>
-  <a class="home-module-card" href="/02-agent-core/">
+  <a class="home-module-card" href="./02-agent-core/">
     <h3>Agent 核心机制</h3>
     <p>理解 Tool Use、闭环推理与上下文工程。</p>
     <span class="module-meta">核心模块</span>
   </a>
-  <a class="home-module-card" href="/03-memory/">
+  <a class="home-module-card" href="./03-memory/">
     <h3>Memory 体系</h3>
     <p>进入工作记忆、外部记忆与 RAG 设计。</p>
     <span class="module-meta">扩展模块</span>
   </a>
-  <a class="home-module-card" href="/04-multi-agent/">
+  <a class="home-module-card" href="./04-multi-agent/">
     <h3>多 Agent 系统</h3>
     <p>处理复杂任务中的角色分工、协作与 MCP。</p>
     <span class="module-meta">系统扩展</span>
   </a>
-  <a class="home-module-card" href="/05-tools-frameworks/">
+  <a class="home-module-card" href="./05-tools-frameworks/">
     <h3>工具与框架</h3>
     <p>从真实工具体验进入框架与实现层判断。</p>
     <span class="module-meta">工程视角</span>
   </a>
-  <a class="home-module-card" href="/06-eval-evolution/">
+  <a class="home-module-card" href="./06-eval-evolution/">
     <h3>评估与进化</h3>
     <p>让概率系统变得可比较、可测量、可迭代。</p>
     <span class="module-meta">优化闭环</span>

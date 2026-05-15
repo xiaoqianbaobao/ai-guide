@@ -40,6 +40,7 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 - 已新增 `Transformer、Attention 与 QKV`，系统解释 token、embedding、self-attention、多头注意力、FFN、因果掩码与 KV Cache 这些语言模型底层机制
 - 已新增 `LangGraph 原理` 与 `Spring AI 框架原理`，把图式编排、节点/边/共享状态、有向图、ChatModel、ChatClient、Advisors、Tool Calling、RAG 等框架层知识正式纳入站点
 - 已同步更新 `语言模型基础`、`工具与框架`、`学习路线图` 和侧边栏，使底层模型原理与框架原理进入正式学习路径
+- 已修复首页卡片与知识地图组件中的根路径写死问题，改为 base 感知链接，避免部署在子路径或代理域名下时跳转到 `/00-preface/`、`/01-llm-foundations/` 这类错误地址
 - 本轮内容补强参考了公开工程资料中的共识方向，例如上下文工程、工具设计与评估、长期记忆分类、Agent 运行时与标准化接入，但已统一改写为更适合本站知识体系的中文教程表达
 - 已将 Python 教程从首页、导航和主侧边栏中移除，不再作为站点主入口展示，但内容文件仍保留在仓库中
 - 保留阅读增强功能：侧边栏折叠、目录隐藏、专注阅读与状态记忆

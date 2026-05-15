@@ -4,7 +4,7 @@
     <div class="knowledge-map-track">
       <template v-for="(item, index) in modules" :key="item.id">
         <a
-          :href="item.link"
+          :href="withBase(item.link)"
           :class="[
             'knowledge-map-item',
             item.id === currentModule ? 'is-current' : 'is-other'
@@ -24,6 +24,8 @@
 </template>
 
 <script setup lang="ts">
+import { withBase } from 'vitepress'
+
 interface ModuleItem {
   id: string
   name: string
