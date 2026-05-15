@@ -1,6 +1,6 @@
 ---
 title: Agent Skills
-description: Skill 不是普通 prompt 模板，而是可发现、可组合、可按需加载的程序化知识包
+description: Claude Code 语境里的 Skill 不是泛化知识包，而是以 SKILL.md 为入口、可自动发现、可按需加载、可受控调用的能力目录
 module: tools
 tags:
   - 工程
@@ -8,338 +8,528 @@ tags:
 
 <KnowledgeMap current-module="tools" current-article="Agent Skills" />
 
-# Agent Skills：把经验从一次对话变成可复用能力
+# Agent Skills：把可复用流程变成 Claude 能自动调用的能力目录
 
 <ArticleHeader
   module="工具与框架"
   :tags="['工程']"
-  reading-time="16 分钟"
-  prerequisite="理解 Tool Use、Context Engineering 与 MCP 的基本概念"
-  summary="Agent Skill 的核心价值，是把流程知识、组织规范、脚本和参考资料打包成可发现、可按需加载、可组合复用的能力单元，让通用 Agent 获得更稳定的专业化行为。"
+  reading-time="18 分钟"
+  prerequisite="理解 Tool Use、MCP、Harness 与项目规则文件的作用"
+  summary="在 Claude Code 语境里，skill 不是抽象意义上的知识包，而是一个以 `SKILL.md` 为入口、带 frontmatter、支持自动发现、按需加载、直接调用和附属文件的能力目录。它解决的是：如何把经常重复的流程、检查清单、模板和脚本，变成 Claude 可以稳定复用的本地能力。"
 />
 
-## 为什么 Skill 会成为新知识点
+## 为什么要重讲 Skills
 
-很多团队在真实使用 Agent 时都会碰到一个问题：
+我前一版把 skill 讲成了比较泛化的“流程知识包”，这个方向不算错，但还不够贴近 Claude Code 的真实用法。
 
-- 某个流程明明已经总结过很多次
-- 某类任务明明已经有固定做法
-- 某些组织规范明明应该被稳定复用
+在 Claude Code 里，skills 更具体：
 
-但每次新任务开始时，还是要重新解释一遍。
+- 它们有明确目录结构
+- 有 `SKILL.md` 入口文件
+- 有 YAML frontmatter
+- 能被自动发现
+- 可以自动触发，也可以通过 `/skill-name` 直接调用
+- 可以带模板、脚本、示例和参考资料
 
-这就暴露出一个典型缺口：
-
-`模型知道很多通用知识，但它并不会天然继承你的流程知识。`
-
-Skill 要解决的，正是把这些流程知识、操作规范和辅助资源，从“一次性的上下文说明”变成“可复用的能力包”。
+所以它不只是“一个好思路”，而是一个明确可落地的能力组织标准。
 
 <div class="key-insight">
   <div class="key-insight-label">核心洞察</div>
   <p class="key-insight-text">
-    Skill 的价值，不是把 prompt 写得更长，而是把经验、规范、脚本和参考资料打包成可发现、可组合、可按需加载的程序化知识单元。
+    Claude Code 里的 skill，不是“更长的 prompt”，而是一个以 `SKILL.md` 为入口、带描述、触发规则、支持文件和调用控制的能力目录。它让重复流程从临时对话指令，变成可自动发现、按需加载、可持续维护的局部能力。
   </p>
 </div>
 
-## Skill 到底是什么
+## Skills 解决的是什么问题
 
-一个实用定义是：
+当你不断把同一类内容粘贴进聊天窗口时，例如：
 
-`Skill = 面向 Agent 的可复用任务知识包`
+- 一套代码审查清单
+- 一套发布流程
+- 一套 README 更新规范
+- 一套特定项目的调试手册
+
+其实就在暴露一个问题：
+
+`这已经不是临时指令，而是可复用程序。`
+
+如果继续把这些内容写在对话里，会有几个问题：
+
+- 每次都要重新粘贴
+- 对话一结束就丢
+- 长文档会占上下文预算
+- 很难带上模板、示例和脚本
+
+skills 正是为这类问题设计的。
+
+## Claude Code 语境里 Skill 到底是什么
+
+一个更准确的定义是：
+
+`Skill = 一个以 SKILL.md 为入口、可被 Claude 自动发现和按需加载的能力目录`
 
 它通常包含：
 
-- 一段高层描述，说明它适合解决什么问题
-- 一份核心说明文档，解释怎么做
-- 若干附属资源，例如参考文档、模板、脚本、规范文件
+- 一个 `SKILL.md`
+- frontmatter
+- 正文说明
+- 可选支持文件
 
-所以它既不像普通 prompt，也不像单个工具函数。
+最小结构通常像这样：
 
-Skill 更接近：
-
-`把一个领域里的“做事方法”写成 Agent 能加载和执行的 onboarding package`
-
-## 先看一张结构图
-
-```mermaid
-flowchart TD
-    A[Skill]
-    A --> B[元信息 name / description]
-    A --> C[核心说明 SKILL.md]
-    A --> D[附属资源]
-    D --> E[脚本 scripts]
-    D --> F[参考资料 references]
-    D --> G[模板 templates]
+```text
+my-skill/
+├── SKILL.md
+├── reference.md
+├── examples.md
+└── scripts/
+   └── helper.sh
 ```
 
-这张图最关键的点是：
+这里最关键的是：
 
-Skill 不是单文件 prompt，而是一个目录化、分层化的能力单元。
+- `SKILL.md` 是入口
+- 其他文件是按需加载的支持资源
 
-## 为什么 Skill 不等于 Prompt 模板
+## Skill 的入口文件为什么是 `SKILL.md`
 
-很多人第一次听到 Skill，会误以为它只是：
-
-- 一段更长的 system prompt
-- 一个提示词模板库
-- 一份 SOP 文档
-
-这些理解都不够完整。
-
-Skill 和普通 prompt 模板最大的差别在于：
-
-- 它有明确边界
-- 它能被发现
-- 它能按需加载
-- 它可以包含脚本和附属资源
-- 它能与其他 skill 组合
-
-所以 Skill 不是“把话术写下来”，而是“把可复用流程知识结构化打包”。
-
-## Progressive Disclosure：为什么 Skill 不会把上下文压爆
-
-Skill 体系里一个非常关键的设计思想，是渐进式加载。
-
-第一层通常只暴露少量元信息，例如：
+因为 Claude 需要一个统一入口来知道：
 
 - 这个 skill 叫什么
-- 它适合处理什么任务
+- 什么时候该用
+- 被调用后要遵循什么说明
 
-只有当 Agent 判断当前任务确实相关时，才继续读取 skill 的完整说明。
+这也是为什么 `SKILL.md` 是唯一必需文件，而其他内容都是可选增强。
 
-如果完整说明里还引用了其他文档、模板或脚本，再进一步按需读取。
+## `SKILL.md` 不是普通 Markdown
 
-## 一张图看懂渐进式加载
+它一般分成两部分：
+
+1. YAML frontmatter
+2. Markdown 主体
+
+示意如下：
+
+```md
+---
+name: explain-code
+description: Explains code with diagrams and analogies
+---
+
+When explaining code:
+1. Start with an analogy
+2. Draw a diagram
+3. Walk through step by step
+```
+
+其中最关键的往往不是正文，而是前面的元信息。
+
+## 为什么 frontmatter 这么关键
+
+在 Claude Code 里，skill 的 `description` 不只是给人看的说明，它直接关系到：
+
+- Claude 是否知道这个 skill 存在
+- Claude 何时自动触发它
+- `/` 菜单里如何展示它
+
+所以一个 skill 写得好不好，往往先输赢在 frontmatter。
+
+## 官方文档里最关键的几个字段
+
+最常见也最值得先理解的字段包括：
+
+- `name`
+- `description`
+- `when_to_use`
+- `disable-model-invocation`
+- `user-invocable`
+- `allowed-tools`
+- `context`
+- `paths`
+
+这些字段不是“锦上添花”，而是 skill 行为的控制面。
+
+## 先看一张 Skills 触发图
 
 ```mermaid
 flowchart TD
-    A[任务到来] --> B[读取已安装 skills 的元信息]
-    B --> C{哪个 skill 相关}
-    C -->|不相关| D[不加载正文]
-    C -->|相关| E[加载完整 SKILL.md]
-    E --> F{是否需要附属资源}
-    F -->|需要| G[继续读取脚本/参考文件]
-    F -->|不需要| H[直接执行任务]
+    A[任务到来] --> B[Claude 读取可用 skill 描述]
+    B --> C{是否匹配 description / when_to_use}
+    C -->|否| D[不加载 skill 正文]
+    C -->|是| E[加载 SKILL.md]
+    E --> F{是否还需要支持文件}
+    F -->|需要| G[按需读取 template / examples / scripts docs]
+    F -->|不需要| H[直接执行当前流程]
 ```
 
-这就是为什么 skill 体系比“一股脑把所有规范全塞进 prompt”更可扩展。
+这张图说明了一件特别重要的事：
 
-## Skill 最适合承载什么
+`skill 的自动触发，先靠描述被看见，再靠正文被加载。`
 
-Skill 最适合承载的，通常是“流程知识”和“领域经验”。
+## 为什么它和 Prompt 不是一回事
 
-例如：
+这也是最容易混淆的点。
 
-- 如何进行代码审查
-- 如何整理用户访谈纪要
-- 如何按照公司规范更新 README
-- 如何生成某类报告
-- 如何执行特定调试流程
+### Prompt 更像
 
-这些内容的共同特点是：
+- 当前这轮临时指令
+- 反应式说明
+- 会随着对话结束而消散
 
-- 不是一次性任务
-- 会在多个任务中反复复用
-- 既有规则，也有步骤
-- 往往还伴随模板、脚本和参考资料
+### Skill 更像
 
-## Skill 和 Tool、MCP、Harness 的区别
+- 可长期存在的本地能力目录
+- 可以自动发现
+- 可以直接 `/name` 调用
+- 可以只在相关时才把正文读入上下文
 
-这是最容易混淆的一组关系。
+所以：
 
-| 概念 | 核心职责 | 更像什么 |
-| --- | --- | --- |
-| Tool | 执行动作 | 一把工具 |
-| MCP | 标准化接入能力 | 接口层 |
-| Skill | 打包流程知识 | onboarding 包 |
-| Harness | 保证多轮连续工作 | 运行纪律 |
+`Prompt 是对话里的临时指挥，Skill 是可复用能力的本地安装包。`
 
-更直白一点：
+## 它为什么比 `CLAUDE.md` 更适合流程程序
 
-- Tool 告诉 Agent `能做什么动作`
-- MCP 告诉系统 `这些能力怎么统一接入`
-- Skill 告诉 Agent `这类任务通常该怎么做`
-- Harness 告诉 Agent `长任务怎么持续推进`
+官方文档里有一句很重要的意思：
 
-## 一张关系脑图
+当 `CLAUDE.md` 里的某部分已经演变成“程序”而不是“事实”时，就应该考虑做成 skill。
+
+这背后其实是在区分两种内容：
+
+### `CLAUDE.md` 更适合
+
+- 长期规则
+- 项目事实
+- 常设约束
+
+### Skill 更适合
+
+- 某类流程
+- 某类操作步骤
+- 某类检查清单
+- 某类需要模板或脚本支持的任务
+
+也就是说：
+
+- `CLAUDE.md` 更像长期宪法
+- skill 更像按需调用的 SOP
+
+## Progressive Disclosure 为什么是 Skills 的核心设计
+
+你给的参考文章里讲得很对，这里的关键就是 `progressive disclosure`，也就是渐进式披露。
+
+在 skills 体系里，它体现为三层：
+
+1. 先只暴露简短描述
+2. 真相关时再加载完整 `SKILL.md`
+3. 真需要时才继续读附属文件
+
+这能解决两个大问题：
+
+- 不让长文档一上来就占满上下文
+- 让 skill 可以带很多资源，却不至于每次都全量加载
+
+## 一张渐进式披露脑图
 
 ```mermaid
 mindmap
-  root((Agent 能力体系))
-    Tool
-      读文件
-      调接口
-      执行命令
-    MCP
-      标准化接入
-      tools
-      resources
-      prompts
-    Skill
-      流程知识
-      规范
+  root((Skill 加载))
+    第1层
+      name
+      description
+      when_to_use
+    第2层
+      SKILL.md 正文
+      主流程
+      输出要求
+    第3层
       模板
+      示例
+      参考文档
       脚本
-    Harness
-      会话连续性
-      交接
-      验证
-      运行纪律
 ```
 
-## 一个 Skill 的典型 anatomy
+这也是为什么 skill 可以很强，但又不会像“把整个手册塞进 system prompt”那样粗暴。
 
-一个实用的 skill 目录通常至少包含：
+## Skills 的目录位置为什么也很重要
 
-1. `SKILL.md`
-2. 必要的元信息
-3. 参考文件
-4. 可执行脚本或模板
+Claude Code 里，skill 放在哪儿，会决定它的作用范围。
 
-一个概念化示例如下：
+常见范围包括：
+
+- 个人级
+- 项目级
+- 企业级
+- 插件级
+
+这意味着 skill 不只是“一个文件夹”，而是带有作用域的能力单元。
+
+例如：
+
+- 个人技能适合你的通用工作习惯
+- 项目技能适合某个仓库的特定流程
+- 企业技能适合团队共享规范
+
+## 自动发现意味着什么
+
+自动发现是 Claude Code skill 非常强的一点。
+
+它不要求你每次都手工注册所有内容。  
+只要目录结构和位置符合规则，Claude 就能发现这些 skill。
+
+这带来的变化非常大：
+
+- 能力变成本地安装资产
+- 不再依赖某次聊天中临时提到
+- 项目目录本身就可以携带自己的 skill
+
+对于 monorepo 或复杂工程，这一点尤其有价值。
+
+## 什么时候自动触发，什么时候手动触发
+
+Skill 有两种主要使用方式：
+
+### 自动触发
+
+Claude 根据 `description` 和 `when_to_use` 判断当前任务是否相关，然后自动加载。
+
+### 手动触发
+
+你直接用 `/skill-name` 调用。
+
+这两种方式适合不同内容。
+
+## 什么样的 skill 适合自动触发
+
+更适合自动触发的通常是：
+
+- 背景知识
+- 风格规范
+- 某类高频任务指导
+- 与某类文件或路径强相关的辅助规则
+
+## 什么样的 skill 适合手动触发
+
+更适合手动触发的通常是：
+
+- 有明显副作用的工作流
+- 部署、提交、发布这类敏感动作
+- 你希望自己明确决定何时执行的流程
+
+这就是为什么 `disable-model-invocation: true` 很关键。  
+它不是附加参数，而是在告诉系统：
+
+`这个 skill 只能由人主动拉闸。`
+
+## 调用控制是 Claude Code skills 的关键增强点
+
+这一点和“泛泛而谈的 skill 概念”最大的区别就在这里。
+
+在 Claude Code 里，你不仅能定义 skill 做什么，还能控制：
+
+- 谁可以调用它
+- Claude 能不能自动调用
+- 用户能不能在 `/` 菜单直接看到
+- skill 活动时是否预批准某些工具
+
+这让 skill 不只是内容组织方式，更是局部治理机制。
+
+## `allowed-tools` 为什么非常重要
+
+假设你有一个 `/commit` skill。  
+它的核心流程很明确，但如果每一步 git 命令都重新审批，体验会很差。
+
+这时 `allowed-tools` 的作用就是：
+
+- 在 skill 激活期间预授权部分工具
+- 让该 skill 对应的局部流程更顺畅
+
+这说明 skills 不只是说明文档，还能影响运行权限体验。
+
+## Skill 内容生命周期也很关键
+
+很多人会误以为：
+
+- Claude 每轮都会重新去读 skill 文件
+
+其实不是这么简单。
+
+官方文档里一个很重要的点是：
+
+- skill 被调用后，其渲染内容会进入当前对话
+- 后续会继续留在会话中
+- 自动压缩后，系统会尝试重新附加最近调用的 skills
+
+这意味着 skill 的效果并不只是一瞬间。
+
+但也意味着：
+
+- skill 太多会互相竞争上下文
+- 过大的 skill 会在 compact 后丢失更多内容
+
+所以 skill 的大小和结构，真的会影响长期表现。
+
+## 支持文件不是摆设
+
+Claude Code skill 的另一大特点是支持目录化支持文件，例如：
+
+- 模板
+- 示例
+- 参考文档
+- 可执行脚本
+
+这非常关键，因为它让 skill 从“说明”变成“能力组合”。
+
+一个很实用的结构通常像：
 
 ```text
-release-note-skill/
-  SKILL.md
-  checklist.md
-  templates/
-    release-note-template.md
-  scripts/
-    collect-changes.py
+readme-update/
+├── SKILL.md
+├── template.md
+├── examples.md
+└── scripts/
+   └── collect_changes.py
 ```
 
-这里的核心不是文件名，而是分层：
+这里的分工可能是：
 
-- `SKILL.md` 负责讲主流程
-- `checklist.md` 负责补充具体规则
-- `template` 负责输出结构
-- `script` 负责确定性操作
+- `SKILL.md` 讲主流程
+- `template.md` 约束输出格式
+- `examples.md` 告诉 Claude 什么是好结果
+- `script` 负责确定性动作
 
-## Skill 为什么特别适合组织经验沉淀
+## 一个贴近本站的例子：README 更新 Skill
 
-很多流程知识都有一个特点：
+对于这个站点来说，一个很自然的 skill 就是 `README 更新`：
 
-- 只靠模型常识不够稳定
-- 每次重写说明太浪费上下文
-- 只靠外部 wiki 又不够贴近 Agent 执行
+- 什么时候必须更新
+- 更新哪些栏目
+- 本轮新增了什么文章
+- 怎样写摘要而不夸张
+- 是否要调用脚本辅助收集文件变化
 
-Skill 刚好处在中间：
+这类东西如果只靠每次临时口头提醒，很容易漂移。  
+做成 skill 之后，它就从“记忆负担”变成“稳定资产”了。<mccoremem id="03g3scg169nl5yq6v52ylnpz3|01KRCW3RP7JWJ1YTBGYERJHTGV" />
 
-- 比 prompt 更结构化
-- 比纯文档更可执行
-- 比硬编码 Agent 更灵活
+## Skill 和 MCP、Tool、Harness 的边界
 
-这就是为什么 skill 非常适合承接“团队经验沉淀”。
+| 概念 | 主要解决什么 | 更像什么 |
+| --- | --- | --- |
+| Tool | 让模型能做动作 | 动作接口 |
+| MCP | 让外部能力可标准化接入 | 接入层 |
+| Skill | 把流程与说明组织成本地能力目录 | 能力目录 |
+| Harness | 把系统维持在有界秩序中 | 控制结构 |
 
-## 一个具体例子：README 更新 Skill
+所以：
 
-假设你希望 Agent 每次完成任务后都同步更新 README。  
-如果只靠每次临时提醒，会有几个问题：
+- MCP 不是教方法
+- Tool 不是教流程
+- Harness 不是局部技能目录
+- Skill 则刚好负责“这类事通常怎么做”
 
-- 容易忘
-- 容易表述不一致
-- 很难稳定复用模板
+## 一个很实用的分类：参考型 skill 和任务型 skill
 
-而如果把它做成一个 skill，就可以包含：
+Claude Code 文档里其实给了一个很有用的区分。
 
-- 什么时候必须更新 README
-- README 更新的固定栏目
-- 变更摘要怎么写
-- 哪些信息不能乱写
-- 必要时调用什么脚本辅助收集改动
+### 参考型 skill
 
-这时你就不是在重复提醒，而是在复用一套稳定流程知识。
+更适合承载：
 
-## Skill 什么时候最有价值
+- 约定
+- 规范
+- 风格指南
+- 项目知识
 
-下面这些情况，通常特别适合做成 skill：
+它更像背景知识能力。
 
-- 某类任务反复出现
-- 团队已经有明确做法
-- 做法包含多个步骤和边界条件
-- 需要模板、脚本、参考资料协同
-- 你希望不同 Agent / 不同任务都能复用
+### 任务型 skill
 
-如果一个知识点只是一次性备注，就不一定值得单独做成 skill。
+更适合承载：
 
-## Skill 设计的几个关键原则
+- deploy
+- commit
+- release
+- codegen
+- report generation
 
-### 原则一：单个 Skill 尽量聚焦
+它更像明确工作流，很多时候更适合手动触发。
 
-不要把所有东西都塞进一个 super skill。  
-更好的做法通常是一个 skill 解决一类明确问题。
+这个区分特别重要，因为它直接影响：
 
-### 原则二：描述要强调适用边界
+- frontmatter 怎么写
+- 是否允许自动调用
+- 是否需要预批准工具
 
-Skill 不只要说明“怎么做”，还要说明：
+## Skill 设计时最容易写错的地方
 
-- 什么情况下该用
-- 什么情况下不该用
+### 1. `description` 写成第一人称
 
-### 原则三：把高频步骤写成稳定结构
+例如：
 
-越是反复出现的步骤，越应该写成：
+- “我可以帮助你……”
+- “你可以让我……”
 
-- checklist
-- template
-- script
-- reference
+这类写法往往不如第三人称、任务导向描述稳定。
 
-### 原则四：把确定性操作交给代码
+更好的方式通常是：
 
-如果一个步骤完全可以用脚本稳定完成，就不要强迫模型每次自己发挥。
+- “处理 Excel 并生成报告”
+- “在解释代码时使用类比和图示”
+
+因为 description 的目标是帮助 Claude 判断何时触发，不是写广告词。
+
+### 2. `SKILL.md` 过长
+
+如果主文件太长，skill 会变重，也更容易在上下文里失焦。
+
+### 3. 把所有内容塞进正文，不拆支持文件
+
+这样会失去渐进式加载的优势。
+
+### 4. 把高风险动作也交给自动触发
+
+部署、提交、发消息这类事情，通常更适合禁用自动调用。
+
+## Skill 什么时候最值得做
+
+下面这些信号通常说明你该做 skill，而不是继续用 prompt：
+
+- 同一套说明反复粘贴
+- 某类任务已经形成稳定流程
+- 需要模板、示例或脚本一起配合
+- 你希望项目目录自己带着这份能力
+- 你希望 Claude 在相关任务里自动想起它
 
 ## 常见失败模式
 
-### 失败一：Skill 太大，加载成本太高
+### 失败一：把 skill 当成巨型 prompt
 
-如果 skill 过度膨胀，它就会失去“按需加载”的优势。
+只写一大段正文，不设计 frontmatter、调用方式和支持文件。
 
-### 失败二：Skill 写成纯概念文章
+### 失败二：description 太差
 
-如果 skill 只有泛泛解释，没有步骤、边界、模板和资源，它更像博客，不像能力包。
+Claude 根本不知道什么时候该用它。
 
-### 失败三：Skill 和 Tool 职责不清
+### 失败三：skill 太大
 
-如果一个 skill 里塞满了本该由工具承担的确定性动作，系统就会变得混乱。
+上下文负担过重，效果反而变差。
 
-### 失败四：Skill 没有维护机制
+### 失败四：高风险任务允许自动触发
 
-过期 skill 会比没有 skill 更危险，因为它会把旧流程稳定地带给 Agent。
+最后变成系统自己想部署、自己想提交。
 
-## Skill 该怎么评估
+### 失败五：skill 目录没有维护
 
-Skill 不是写完就结束，它同样应该被评估。
-
-一个很实用的评估方向包括：
-
-- 触发是否准确
-- 加载后是否显著提升任务完成质量
-- 是否降低重复解释成本
-- 是否减少流程偏航
-- 是否带来过高上下文开销
-
-也就是说，skill 的目标不是“存在感更强”，而是“任务表现更稳”。
-
-## Skill 和 Eval 的关系
-
-如果一个系统越来越依赖 skill，你最终就需要评估：
-
-- 哪些 skill 真有增益
-- 哪些 skill 经常误触发
-- 哪些 skill 已经过期
-- 多个 skill 组合后是否会冲突
-
-这也是为什么 skill 不是纯内容问题，而是系统能力问题。
+模板过期、脚本失效、说明和项目实际流程脱节。
 
 ## 本节总结
 
-- Skill 是面向 Agent 的可复用流程知识包，不是普通 prompt 模板
-- 它适合承载反复出现的流程、规范、模板和脚本
-- Skill 和 Tool、MCP、Harness 分别解决不同层次的问题
-- 好的 skill 要聚焦、可发现、可按需加载，并能带来可测量的任务增益
+- 在 Claude Code 里，skill 是一个以 `SKILL.md` 为入口的能力目录，不只是抽象知识包
+- 它依赖 frontmatter、自动发现、按需加载、支持文件和调用控制
+- `description`、`when_to_use`、`disable-model-invocation`、`allowed-tools` 等字段直接决定它怎么被使用
+- Skill 最适合承载那些反复出现、已形成流程、需要模板或脚本支持的任务
+- 它和 Prompt、Tool、MCP、Harness 各自处在不同层级
 
 ## 下一步
 
-- 继续阅读 [Harness 设计](./harness-design)
-- 或回到 [MCP 协议](../04-multi-agent/mcp-protocol) 对照理解“知识包”和“能力接入层”的差别
+- 回到 [Harness 设计](./harness-design)，理解 Skill 是怎样嵌进更大的控制结构里的
+- 或继续阅读 [Harness 与 Skill 的评估体系](../06-eval-evolution/harness-skill-evaluation)，看这些能力该如何被评估

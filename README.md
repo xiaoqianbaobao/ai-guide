@@ -11,7 +11,7 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 
 - 学习指南：作为整套知识体系的入口页
 - 序章：建立范式转移与 AI 原生开发者思维
-- 语言模型基础：解释 LLM、本质与上下文窗口
+- 语言模型基础：解释 LLM、本质、上下文窗口与 Transformer / Attention / QKV
 - Agent 核心机制：覆盖 Tool Use、Context Engineering 等核心主题
 - Memory 体系：承接记忆设计与 RAG
 - 多 Agent 系统：进入复杂任务分工与 MCP
@@ -34,9 +34,12 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 - 已为站点接入 Mermaid 图示能力，可在正文中直接编写流程图、时序图与脑图
 - 已扩写 `Tool Use 完整机制`、`Context Engineering`、`Memory 的四种形态`、`MCP 协议` 四篇文章，补充系统图示、典型误区、工程判断与更完整的概念边界
 - 已继续扩写 `RAG 原理`、`Agentic Eval 设计`、`从零手写 Agent`，补充检索链路、评估闭环、运行时结构、适用边界与图示化解释
-- 已新增 `Harness 设计` 与 `Agent Skills` 两篇文章，把长任务运行外壳、会话连续性、流程知识打包、skills 与 tool / MCP / harness 的关系正式纳入知识体系
+- 已重写 `Harness 设计` 与 `Agent Skills` 两篇文章：前者改为从控制平面、query loop、权限、中断、上下文治理、恢复与验证来讲 harness engineering；后者改为贴近 Claude Code 官方 skills 语境，系统讲解 `SKILL.md`、frontmatter、自动发现、调用控制、支持文件与生命周期
 - 已更新工具与框架模块导航，并补强 `Cursor vs Claude Code vs Trae`、`Orchestrator-Subagent`、`奖励函数设计` 等页面与 harness / skill 新概念的衔接
 - 已新增 `Harness 与 Skill 的评估体系` 和 `Tool / MCP / Skill / Harness / Workflow / Agent 关系图` 两篇页面，把新知识点正式接入评估主线和系统概念地图
+- 已新增 `Transformer、Attention 与 QKV`，系统解释 token、embedding、self-attention、多头注意力、FFN、因果掩码与 KV Cache 这些语言模型底层机制
+- 已新增 `LangGraph 原理` 与 `Spring AI 框架原理`，把图式编排、节点/边/共享状态、有向图、ChatModel、ChatClient、Advisors、Tool Calling、RAG 等框架层知识正式纳入站点
+- 已同步更新 `语言模型基础`、`工具与框架`、`学习路线图` 和侧边栏，使底层模型原理与框架原理进入正式学习路径
 - 本轮内容补强参考了公开工程资料中的共识方向，例如上下文工程、工具设计与评估、长期记忆分类、Agent 运行时与标准化接入，但已统一改写为更适合本站知识体系的中文教程表达
 - 已将 Python 教程从首页、导航和主侧边栏中移除，不再作为站点主入口展示，但内容文件仍保留在仓库中
 - 保留阅读增强功能：侧边栏折叠、目录隐藏、专注阅读与状态记忆
