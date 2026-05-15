@@ -59,9 +59,12 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
   - 两篇文章都已在文末补充 `参考来源`
 - 已新增 `第3.5章 Attention 的矩阵视角与代码推演`，把 `QK^T`、缩放、softmax、mask、shape 流转和最小 PyTorch 实现拆开讲清楚，作为第 3 章和第 4 章之间的桥接页
 - 已新增 `第6.5章 KV Cache 与自回归推理实战`，把 `prefill`、`decode`、逐 token 生成、每层缓存增长和推理成本拆开讲透，补齐模型模块里从“知道 KV Cache”到“真正理解推理执行过程”的一层
+- 已新增 `第6.6章 RoPE 与长上下文外推实战`，把旋转位置编码、相对位置关系、长上下文外推和“能接收长度不等于能稳定利用长度”这层工程边界真正讲清楚
 - 已新增 `LangGraph 状态图设计实战`，把 schema 分层、reducer 选择、messages 边界、checkpoint 取舍和 interrupt / resume 对状态设计的约束补进工具与框架主线
 - 已新增 `LangGraph Interrupt Resume 与 Human Review 实战`，把 `thread`、`checkpoint`、`interrupt`、`resume`、人工审核与副作用边界放回真实工作流，补齐 LangGraph 从原理到可恢复运行时的实践层
-- 已同步更新 `语言模型基础`、`Transformer 专题导读`、`工具与框架` 模块页以及侧边栏，把新增的模型推理实践内容和 LangGraph 可恢复工作流纳入正式学习路径
+- 已新增 `Spring AI ChatClient Advisor 与 Structured Output 实战`，把 `ChatClient` 调用入口、`Advisor` 顺序、结构化输出与 `Tool Calling` 放回真实 Spring Boot 业务代码，补齐 Spring AI 从原理到落地接入的一层
+- 已同步更新 `语言模型基础`、`Transformer 专题导读`、`工具与框架` 模块页以及侧边栏，把新增的长上下文原理、LangGraph 可恢复工作流和 Spring AI 实战内容纳入正式学习路径
+- 已继续修复 Mermaid 线上兼容问题，修正 `docs/02-agent-core/context-engineering.md` 中一处流程图节点缺失导致的 Chrome / GitHub Pages 运行时解析报错
 - 本轮内容补强参考了公开工程资料中的共识方向，例如上下文工程、工具设计与评估、长期记忆分类、Agent 运行时与标准化接入，但已统一改写为更适合本站知识体系的中文教程表达
 - 已将 Python 教程从首页、导航和主侧边栏中移除，不再作为站点主入口展示，但内容文件仍保留在仓库中
 - 保留阅读增强功能：侧边栏折叠、目录隐藏、专注阅读与状态记忆

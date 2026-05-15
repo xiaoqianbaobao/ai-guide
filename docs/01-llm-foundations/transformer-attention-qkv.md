@@ -39,6 +39,7 @@ Transformer、Attention、QKV 这些概念如果只压在一篇文章里，常�
 6. [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm)
 7. [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)
 8. [第6.5章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)
+9. [第6.6章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context)
 
 ## 各章节分别解决什么
 
@@ -52,12 +53,13 @@ Transformer、Attention、QKV 这些概念如果只压在一篇文章里，常�
 | 第5章 | BERT、GPT、encoder/decoder 为什么会分化 |
 | 第6章 | KV Cache、RoPE、GQA、SwiGLU、MoE 这些演化各自在解决什么 |
 | 第6.5章 | 把 prefill、decode、缓存增长和推理成本真正串起来 |
+| 第6.6章 | 把 RoPE、长上下文外推和可用性边界真正串起来 |
 
 ## 你应该怎样读这组章节
 
 - 如果你是第一次系统学 Transformer，建议按 1 到 6 顺序读完。
-- 如果你已经会基础公式，建议从 [第3章](./chapter-03-self-attention-qkv) 和 [第3.5章](./chapter-03b-attention-matrix-and-code) 开始，再补 [第1章](./chapter-01-why-transformer)、[第6章](./chapter-06-training-inference-and-evolution) 和 [第6.5章](./chapter-06b-kv-cache-and-autoregressive-decoding)。
-- 如果你更关心后面的 Agent 工程，建议至少读完 [第2章](./chapter-02-token-embedding-position)、[第3章](./chapter-03-self-attention-qkv)、[第6章](./chapter-06-training-inference-and-evolution) 和 [第6.5章](./chapter-06b-kv-cache-and-autoregressive-decoding)。
+- 如果你已经会基础公式，建议从 [第3章](./chapter-03-self-attention-qkv) 和 [第3.5章](./chapter-03b-attention-matrix-and-code) 开始，再补 [第1章](./chapter-01-why-transformer)、[第6章](./chapter-06-training-inference-and-evolution)、[第6.5章](./chapter-06b-kv-cache-and-autoregressive-decoding) 和 [第6.6章](./chapter-06c-rope-and-long-context)。
+- 如果你更关心后面的 Agent 工程，建议至少读完 [第2章](./chapter-02-token-embedding-position)、[第3章](./chapter-03-self-attention-qkv)、[第6章](./chapter-06-training-inference-and-evolution)、[第6.5章](./chapter-06b-kv-cache-and-autoregressive-decoding) 和 [第6.6章](./chapter-06c-rope-and-long-context)。
 
 ## 学完这组专题后会有什么收益
 
