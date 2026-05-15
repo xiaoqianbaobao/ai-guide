@@ -178,7 +178,7 @@ flowchart LR
     B3 --> C3[V]
     C1 --> D[QK^T]
     C2 --> D
-    D --> E[/ sqrt(d_k)]
+    D --> E[按 sqrt(d_k) 缩放]
     E --> F[softmax]
     F --> G[attention weights]
     G --> H[weights x V]
