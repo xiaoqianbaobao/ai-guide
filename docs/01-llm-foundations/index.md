@@ -40,9 +40,9 @@ module: llm
 2. 再读 [上下文窗口](./context-window)，理解为什么上下文组织方式会直接影响系统表现。
 3. 然后进入 [Transformer 专题导读](./transformer-attention-qkv)，按章节系统学习模型内部机制。
 4. 如果你在第3章第一次真正卡住，可以继续读 [第3.5章 Attention 的矩阵视角与代码推演](./chapter-03b-attention-matrix-and-code)，把公式、shape 和代码一口气打通。
-5. 学到第6章时，如果你想把推理链路真正落到工程细节，可以继续读 [第6.5章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)，把 prefill、decode 和缓存增长机制串起来。
-6. 如果你想进一步理解长上下文为什么“能接收”不等于“能稳定利用”，继续读 [第6.6章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context)，把位置编码、外推与上下文治理连起来。
-7. 如果你想继续理解现代推理系统为什么要在质量和吞吐之间做结构折中，再读 [第6.7章 GQA MQA 与推理带宽权衡实战](./chapter-06d-gqa-mqa-and-bandwidth)，把 KV 组数、带宽和长上下文成本真正串起来。
+5. 学到第6章时，如果你想把推理链路真正落到工程细节，可以继续读 [第7章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)，把 prefill、decode 和缓存增长机制串起来。
+6. 如果你想进一步理解长上下文为什么“能接收”不等于“能稳定利用”，继续读 [第8章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context)，把位置编码、外推与上下文治理连起来。
+7. 如果你想继续理解现代推理系统为什么要在质量和吞吐之间做结构折中，再读 [第9章 GQA MQA 与推理带宽权衡实战](./chapter-06d-gqa-mqa-and-bandwidth)，把 KV 组数、带宽和长上下文成本真正串起来。
 
 ## Transformer 专题章节
 
@@ -55,9 +55,9 @@ module: llm
 5. [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)
 6. [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm)
 7. [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)
-8. [第6.5章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)
-9. [第6.6章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context)
-10. [第6.7章 GQA MQA 与推理带宽权衡实战](./chapter-06d-gqa-mqa-and-bandwidth)
+8. [第7章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)
+9. [第8章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context)
+10. [第9章 GQA MQA 与推理带宽权衡实战](./chapter-06d-gqa-mqa-and-bandwidth)
 
 ## 本模块文章
 
@@ -73,9 +73,9 @@ module: llm
 | [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block) | 原理 | 理解一层完整 Transformer 的分工 |
 | [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm) | 原理 | 理解 BERT、GPT 等模型家族差异 |
 | [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution) | 工程 | 理解 KV Cache、RoPE、GQA、SwiGLU、MoE 等现实问题 |
-| [第6.5章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding) | 工程 | 把 prefill、decode、缓存增长与推理成本真正拆开讲清楚 |
-| [第6.6章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context) | 原理 | 把旋转位置编码、长上下文外推与可用性边界真正拆开讲清楚 |
-| [第6.7章 GQA MQA 与推理带宽权衡实战](./chapter-06d-gqa-mqa-and-bandwidth) | 工程 | 把 MHA、MQA、GQA、KV Cache 和推理带宽之间的结构权衡真正讲清楚 |
+| [第7章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding) | 工程 | 把 prefill、decode、缓存增长与推理成本真正拆开讲清楚 |
+| [第8章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context) | 原理 | 把旋转位置编码、长上下文外推与可用性边界真正拆开讲清楚 |
+| [第9章 GQA MQA 与推理带宽权衡实战](./chapter-06d-gqa-mqa-and-bandwidth) | 工程 | 把 MHA、MQA、GQA、KV Cache 和推理带宽之间的结构权衡真正讲清楚 |
 
 ## 学完后去哪里
 

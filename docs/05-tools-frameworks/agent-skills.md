@@ -14,7 +14,7 @@ tags:
   module="工具与框架"
   :tags="['工程']"
   reading-time="18 分钟"
-  prerequisite="理解 Tool Use、MCP、Harness 与项目规则文件的作用"
+  prerequisite="理解 Tool Use、MCP 与项目规则文件的作用"
   summary="在 Claude Code 语境里，skill 不是抽象意义上的知识包，而是一个以 `SKILL.md` 为入口、带 frontmatter、支持自动发现、按需加载、直接调用和附属文件的能力目录。它解决的是：如何把经常重复的流程、检查清单、模板和脚本，变成 Claude 可以稳定复用的本地能力。"
 />
 
@@ -531,6 +531,6 @@ Claude 根本不知道什么时候该用它。
 
 ## 下一步
 
-- 回到 [Harness 设计](./harness-design)，理解 Skill 是怎样嵌进更大的控制结构里的
+- 继续阅读 [Harness 设计](./harness-design)，理解 Skill 是怎样嵌进更大的控制结构里的
 - 或继续阅读 [Harness 与 Skill 的评估体系](../06-eval-evolution/harness-skill-evaluation)，看这些能力该如何被评估
 

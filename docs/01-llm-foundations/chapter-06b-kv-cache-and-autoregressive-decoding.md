@@ -1,5 +1,5 @@
 ---
-title: 第6.5章 KV Cache 与自回归推理实战
+title: 第7章 KV Cache 与自回归推理实战
 description: 从 prefill、decode、缓存增长到最小代码，真正看懂大模型为什么一字一字生成以及 KV Cache 如何提速
 module: llm
 tags:
@@ -8,7 +8,7 @@ tags:
   - 推理
 ---
 
-<KnowledgeMap current-module="llm" current-article="第6.5章 KV Cache 与自回归推理实战" />
+<KnowledgeMap current-module="llm" current-article="第7章 KV Cache 与自回归推理实战" />
 
 <ArticleHeader
   module="语言模型基础"
@@ -18,7 +18,7 @@ tags:
   summary="这一章专门解决推理阶段最容易一知半解的部分：什么是 prefill，什么是 decode，KV Cache 到底缓存了什么，为什么它能显著降低重复计算，以及它为什么又会让长上下文越来越贵。"
 />
 
-# 第6.5章 KV Cache 与自回归推理实战
+# 第7章 KV Cache 与自回归推理实战
 
 很多人知道 `KV Cache` 很重要，但一旦问得更具体，就会开始模糊：
 

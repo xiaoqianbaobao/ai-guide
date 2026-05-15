@@ -20,14 +20,14 @@ module: tools
 
 ## 模块定位
 
-这里不追求罗列所有流行工具，而是从真实工作流、运行时外壳和能力复用边界出发，理解不同工具各自适合解决什么问题。
+这里不追求罗列所有流行工具，而是从能力接入、真实工作流、能力复用和运行时治理边界出发，理解不同工具各自适合解决什么问题。
 
 ## 适合谁读
 
 - 已经会使用一些 AI 工具，但不知道如何系统比较的人
 - 想判断“用框架还是自己搭”这个问题的人
 - 想理解 LangGraph、Spring AI 这类框架内部组织方式的人
-- 想理解长任务运行外壳、skills、工程化复用的人
+- 想理解 MCP、skills、harness、工程化复用的人
 - 想把前面学到的原理落到实现层的人
 
 ## 进入前建议
@@ -39,14 +39,15 @@ module: tools
 
 1. 先读 [Cursor vs Claude Code vs Trae](./cursor-vs-claude-code)，从真实工具体验进入工程判断。
 2. 再读 [从零手写 Agent](./build-from-scratch)，理解不依赖框架时系统最小实现应该长什么样。
-3. 再读 [LangGraph 原理](./langgraph-principles)，理解节点、边、状态和有向图为什么适合 Agent。
-4. 接着读 [LangGraph 状态图设计实战](./langgraph-state-design)，把 schema、reducer、messages、checkpoint 的工程取舍真正落下来。
-5. 再读 [LangGraph Interrupt Resume 与 Human Review 实战](./langgraph-interrupt-resume)，把中断恢复、人工审核和副作用边界放回真实工作流里。
-6. 接着读 [LangGraph 多角色协作图实战](./langgraph-multi-role-collaboration)，把 planner、researcher、coder、reviewer 的协作结构真正落到共享状态和回退路径里。
-7. 再读 [Spring AI 框架原理](./spring-ai-framework)，理解 Java 企业应用里 AI 集成层如何设计。
-8. 接着读 [Spring AI ChatClient Advisor 与 Structured Output 实战](./spring-ai-chatclient-advisors-practice)，把调用入口、Advisor 链、结构化输出与 Tool Calling 落到业务代码里。
-9. 再读 [Harness 设计](./harness-design)，理解长任务和多窗口任务为什么需要运行时外壳。
-10. 最后读 [Agent Skills](./agent-skills)，理解流程知识、模板和脚本怎样被打包成可复用能力。
+3. 再读 [MCP 协议](./mcp-protocol)，理解工具、资源和提示为什么需要标准化能力接入层。
+4. 接着读 [LangGraph 原理](./langgraph-principles)，理解节点、边、状态和有向图为什么适合 Agent。
+5. 再读 [LangGraph 状态图设计实战](./langgraph-state-design)，把 schema、reducer、messages、checkpoint 的工程取舍真正落下来。
+6. 接着读 [LangGraph Interrupt Resume 与 Human Review 实战](./langgraph-interrupt-resume)，把中断恢复、人工审核和副作用边界放回真实工作流里。
+7. 再读 [LangGraph 多角色协作图实战](./langgraph-multi-role-collaboration)，把 planner、researcher、coder、reviewer 的协作结构真正落到共享状态和回退路径里。
+8. 接着读 [Spring AI 框架原理](./spring-ai-framework)，理解 Java 企业应用里 AI 集成层如何设计。
+9. 再读 [Spring AI ChatClient Advisor 与 Structured Output 实战](./spring-ai-chatclient-advisors-practice)，把调用入口、Advisor 链、结构化输出与 Tool Calling 落到业务代码里。
+10. 接着读 [Agent Skills](./agent-skills)，理解流程知识、模板和脚本怎样被打包成可发现、可加载、可复用能力。
+11. 最后读 [Harness 设计](./harness-design)，理解运行时控制结构怎样治理 skills、工具权限、上下文和恢复路径。
 
 ## 本模块文章
 
@@ -54,14 +55,15 @@ module: tools
 | --- | --- | --- |
 | [Cursor vs Claude Code vs Trae](./cursor-vs-claude-code) | 实战 | 从真实使用体验看三类工具的差异 |
 | [从零手写 Agent](./build-from-scratch) | 实战 | 不依赖框架理解 Agent 的最小实现 |
+| [MCP 协议](./mcp-protocol) | 核心 | 理解工具、资源和提示为什么需要标准化能力接入 |
 | [LangGraph 原理](./langgraph-principles) | 工程 | 理解节点、边、共享状态和有向图编排 |
 | [LangGraph 状态图设计实战](./langgraph-state-design) | 工程 | 理解 schema、reducer、checkpoint 和消息状态的真实设计方法 |
 | [LangGraph Interrupt Resume 与 Human Review 实战](./langgraph-interrupt-resume) | 工程 | 理解 thread、checkpoint、interrupt、resume 与人工审核工作流 |
 | [LangGraph 多角色协作图实战](./langgraph-multi-role-collaboration) | 工程 | 理解多角色节点如何共享状态、分工协作与评审回退 |
 | [Spring AI 框架原理](./spring-ai-framework) | 工程 | 理解 Java 生态中的模型、Advisor、Tool Calling 与 RAG 集成 |
 | [Spring AI ChatClient Advisor 与 Structured Output 实战](./spring-ai-chatclient-advisors-practice) | 工程 | 理解 ChatClient、Advisor 顺序、结构化输出与工具调用的落地方式 |
-| [Harness 设计](./harness-design) | 工程 | 理解长任务、跨窗口连续性与运行时外壳 |
 | [Agent Skills](./agent-skills) | 工程 | 理解可发现、可加载、可复用的流程知识包 |
+| [Harness 设计](./harness-design) | 工程 | 理解运行时控制结构如何治理长任务、权限与恢复 |
 
 ## 学完后去哪里
 

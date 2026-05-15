@@ -280,4 +280,4 @@ def orchestrate(user_task):
 
 ## 下一步
 
-如果你已经理解了多 Agent 的基本协作拓扑，下一步建议阅读 [MCP 协议](./mcp-protocol)，看标准化工具接入为什么会成为多 Agent 和 AI 工具系统的基础设施。
+如果你已经理解了多 Agent 的基本协作拓扑，下一步建议先阅读 [系统概念关系图](./system-relations)，再进入 [MCP 协议](../05-tools-frameworks/mcp-protocol)，看标准化能力接入为什么会成为工程系统的重要基础设施。

@@ -351,7 +351,7 @@ Harness 真正成熟的标志，不是你自己会用，而是团队可以稳定
 | --- | --- | --- |
 | Workflow | 固定步骤怎么排 | 流程骨架 |
 | Framework | 开发抽象怎么搭 | 工程工具箱 |
-| Skill | 某类任务怎么做 | 局部知识包 |
+| Skill | 某类任务怎么做 | 局部能力目录 |
 | Harness | 整套系统如何保持有界与可控 | 控制结构 |
 
 所以：
@@ -393,7 +393,7 @@ Harness 真正成熟的标志，不是你自己会用，而是团队可以稳定
 
 ## 下一步
 
-- 继续阅读 [Agent Skills](./agent-skills)
+- 如果你还没系统理解过 Skills，先阅读 [Agent Skills](./agent-skills)
 - 或回到 [系统概念关系图](../04-multi-agent/system-relations) 对照理解 Harness 在整套体系里的层级
 
 
