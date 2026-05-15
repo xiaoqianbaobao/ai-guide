@@ -42,10 +42,11 @@ module: tools
 3. 再读 [LangGraph 原理](./langgraph-principles)，理解节点、边、状态和有向图为什么适合 Agent。
 4. 接着读 [LangGraph 状态图设计实战](./langgraph-state-design)，把 schema、reducer、messages、checkpoint 的工程取舍真正落下来。
 5. 再读 [LangGraph Interrupt Resume 与 Human Review 实战](./langgraph-interrupt-resume)，把中断恢复、人工审核和副作用边界放回真实工作流里。
-6. 再读 [Spring AI 框架原理](./spring-ai-framework)，理解 Java 企业应用里 AI 集成层如何设计。
-7. 接着读 [Spring AI ChatClient Advisor 与 Structured Output 实战](./spring-ai-chatclient-advisors-practice)，把调用入口、Advisor 链、结构化输出与 Tool Calling 落到业务代码里。
-8. 再读 [Harness 设计](./harness-design)，理解长任务和多窗口任务为什么需要运行时外壳。
-9. 最后读 [Agent Skills](./agent-skills)，理解流程知识、模板和脚本怎样被打包成可复用能力。
+6. 接着读 [LangGraph 多角色协作图实战](./langgraph-multi-role-collaboration)，把 planner、researcher、coder、reviewer 的协作结构真正落到共享状态和回退路径里。
+7. 再读 [Spring AI 框架原理](./spring-ai-framework)，理解 Java 企业应用里 AI 集成层如何设计。
+8. 接着读 [Spring AI ChatClient Advisor 与 Structured Output 实战](./spring-ai-chatclient-advisors-practice)，把调用入口、Advisor 链、结构化输出与 Tool Calling 落到业务代码里。
+9. 再读 [Harness 设计](./harness-design)，理解长任务和多窗口任务为什么需要运行时外壳。
+10. 最后读 [Agent Skills](./agent-skills)，理解流程知识、模板和脚本怎样被打包成可复用能力。
 
 ## 本模块文章
 
@@ -56,6 +57,7 @@ module: tools
 | [LangGraph 原理](./langgraph-principles) | 工程 | 理解节点、边、共享状态和有向图编排 |
 | [LangGraph 状态图设计实战](./langgraph-state-design) | 工程 | 理解 schema、reducer、checkpoint 和消息状态的真实设计方法 |
 | [LangGraph Interrupt Resume 与 Human Review 实战](./langgraph-interrupt-resume) | 工程 | 理解 thread、checkpoint、interrupt、resume 与人工审核工作流 |
+| [LangGraph 多角色协作图实战](./langgraph-multi-role-collaboration) | 工程 | 理解多角色节点如何共享状态、分工协作与评审回退 |
 | [Spring AI 框架原理](./spring-ai-framework) | 工程 | 理解 Java 生态中的模型、Advisor、Tool Calling 与 RAG 集成 |
 | [Spring AI ChatClient Advisor 与 Structured Output 实战](./spring-ai-chatclient-advisors-practice) | 工程 | 理解 ChatClient、Advisor 顺序、结构化输出与工具调用的落地方式 |
 | [Harness 设计](./harness-design) | 工程 | 理解长任务、跨窗口连续性与运行时外壳 |

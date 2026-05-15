@@ -194,7 +194,8 @@ function sidebarLLM() {
         { text: '第5章 Encoder、Decoder 与现代 LLM', link: '/01-llm-foundations/chapter-05-encoder-decoder-and-modern-llm/' },
         { text: '第6章 训练、推理与现代 Transformer 演化', link: '/01-llm-foundations/chapter-06-training-inference-and-evolution/' },
         { text: '第6.5章 KV Cache 与自回归推理实战', link: '/01-llm-foundations/chapter-06b-kv-cache-and-autoregressive-decoding/' },
-        { text: '第6.6章 RoPE 与长上下文外推实战', link: '/01-llm-foundations/chapter-06c-rope-and-long-context/' }
+        { text: '第6.6章 RoPE 与长上下文外推实战', link: '/01-llm-foundations/chapter-06c-rope-and-long-context/' },
+        { text: '第6.7章 GQA MQA 与推理带宽权衡实战', link: '/01-llm-foundations/chapter-06d-gqa-mqa-and-bandwidth/' }
       ]
     }
   ]
@@ -256,6 +257,7 @@ function sidebarTools() {
         { text: 'LangGraph 原理', link: '/05-tools-frameworks/langgraph-principles/' },
         { text: 'LangGraph 状态图设计实战', link: '/05-tools-frameworks/langgraph-state-design/' },
         { text: 'LangGraph Interrupt Resume 与 Human Review 实战', link: '/05-tools-frameworks/langgraph-interrupt-resume/' },
+        { text: 'LangGraph 多角色协作图实战', link: '/05-tools-frameworks/langgraph-multi-role-collaboration/' },
         { text: 'Spring AI 框架原理', link: '/05-tools-frameworks/spring-ai-framework/' },
         { text: 'Spring AI ChatClient Advisor 与 Structured Output 实战', link: '/05-tools-frameworks/spring-ai-chatclient-advisors-practice/' },
         { text: 'Harness 设计', link: '/05-tools-frameworks/harness-design/' },
