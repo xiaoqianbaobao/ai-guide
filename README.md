@@ -49,6 +49,11 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
   - Encoder、Decoder 与 BERT/GPT 分化
   - 训练、推理、KV Cache、RoPE、ALiBi、GQA、SwiGLU、MoE 等现代演化
 - 已将 `Transformer、Attention 与 QKV` 旧单页改为专题导读页，并为模型模块文章补充 `参考来源` 区块，统一标注论文、官方文档与高质量教程来源
+- 已修复一批 Mermaid 图在 Chrome 下的运行时兼容问题，主要将 `mindmap`、节点内 HTML 换行和带文案虚线边等高风险语法降级为更稳的 `flowchart` 写法，降低 GitHub Pages 线上解析失败概率
+- 已继续补强 `工具与框架` 模块中的 [LangGraph 原理](./docs/05-tools-frameworks/langgraph-principles.md) 与 [Spring AI 框架原理](./docs/05-tools-frameworks/spring-ai-framework.md)：
+  - `LangGraph` 新增 reducer、super-step、checkpoint、thread、interrupt、resume、Command 路由等运行时机制讲解
+  - `Spring AI` 新增 provider abstraction、ChatClient 分层、Advisor 顺序、结构化输出、Observability、MCP 边界等内容
+  - 两篇文章都已在文末补充 `参考来源`
 - 本轮内容补强参考了公开工程资料中的共识方向，例如上下文工程、工具设计与评估、长期记忆分类、Agent 运行时与标准化接入，但已统一改写为更适合本站知识体系的中文教程表达
 - 已将 Python 教程从首页、导航和主侧边栏中移除，不再作为站点主入口展示，但内容文件仍保留在仓库中
 - 保留阅读增强功能：侧边栏折叠、目录隐藏、专注阅读与状态记忆

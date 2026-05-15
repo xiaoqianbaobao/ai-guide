@@ -109,6 +109,118 @@ flowchart TD
 
 这些能力不是孤立外挂，而是可以通过 advisor 和 Spring 生态方式被整合进调用链。
 
+## 再往下拆一层：Spring AI 的真正分层
+
+如果你只记“它有 ChatClient 和 Advisor”，还不够工程化。  
+更完整的理解方式是把 Spring AI 看成四层：
+
+### 第 1 层：Provider Abstraction
+
+也就是对模型厂商的抽象，包括：
+
+- Chat Model
+- Embedding Model
+- Image Model
+- Audio / Speech 等能力
+
+这一层的目标是：
+
+`尽量让业务代码依赖 Spring AI 抽象，而不是被某个模型厂商 SDK 锁死。`
+
+### 第 2 层：Application API
+
+也就是 `ChatClient` 这类更顺手的调用入口。  
+它面向的是应用开发者，而不是底层 provider 细节。
+
+### 第 3 层：Cross-cutting AI Patterns
+
+也就是 `Advisors`、Memory、RAG、Logging、Observability 这些横切能力。
+
+### 第 4 层：Spring Integration
+
+也就是：
+
+- 自动配置
+- Bean 管理
+- 配置中心
+- 安全体系
+- Web 层 / Service 层 / Data 层集成
+
+这四层加在一起，才是 Spring AI 的完整定位。
+
+## 一张更完整的 Spring AI 分层图
+
+```mermaid
+flowchart TD
+    A[Spring Boot App]
+    A --> B[Controller / Service]
+    B --> C[ChatClient API]
+    C --> D[Advisors / Memory / RAG / Logging]
+    D --> E[ChatModel / EmbeddingModel / Tool Calling]
+    E --> F[OpenAI Anthropic Ollama Azure Bedrock 等 Provider]
+    A --> G[Spring Config Security Observability Data]
+```
+
+这张图特别能说明 Spring AI 的边界：
+
+- 它上面连的是业务系统
+- 它下面连的是模型和向量库
+- 它旁边连的是整个 Spring 工程体系
+
+## Provider 抽象为什么重要
+
+很多团队一开始会低估这个问题，以为：
+
+> 反正先接 OpenAI，后面再说。
+
+但工程里很快就会出现下面这些变化：
+
+- 某条业务要切到本地模型
+- 某些请求要换成 Anthropic
+- 某些嵌入模型和聊天模型来自不同供应商
+- 某些环境只能走企业云提供商
+
+如果应用层代码直接耦合到底层 SDK，这种切换会很痛。  
+Spring AI 的价值之一，就是把“厂商切换成本”压到更低层。
+
+## ChatClient 不只是“语法更顺手”
+
+很多人第一次看 `ChatClient`，会误以为它只是一个 fluent builder。
+
+其实它的重要性在于：
+
+- 统一 prompt 组织方式
+- 统一 advisors 挂载入口
+- 统一 metadata 注入方式
+- 统一 call / stream 风格
+- 让应用层代码和模型底层协议脱钩
+
+也就是说，`ChatClient` 实际上是：
+
+`业务层进入 AI 调用链的标准入口。`
+
+## Advisors 最像什么：AI 语义下的责任链
+
+你可以把 Advisors 理解成“AI 调用链里的 Filter / Interceptor / Middleware”。
+
+但它比普通 HTTP 拦截器多了一层语义，因为它处理的是：
+
+- Prompt
+- Message 列表
+- 检索上下文
+- 记忆注入
+- 模型返回
+- 共享 advisor context
+
+Spring AI 官方文档也明确强调了：
+
+- advisor 可以修改 request / response
+- advisor 有执行顺序
+- advisor 可以共享 context map
+- advisor 可以参与 observability
+
+这使得它非常适合承接“经常重复出现的 AI 模式”。
+
 ## ChatModel 到底在抽象什么
 
 很多 AI 应用一开始都会踩到同一个坑：
@@ -203,6 +315,64 @@ sequenceDiagram
 - Advisors 面向的是 AI 请求与响应语义
 - 它们处理的不只是 HTTP，而是 prompt、model response、上下文增强、记忆注入、RAG 等 AI 特有对象
 
+## Advisor 顺序为什么值得单独理解
+
+很多团队刚开始用 advisor 时，容易把它当成几个插件并列挂上去。
+
+但顺序会直接影响结果。
+
+例如：
+
+1. 先注入 Memory
+2. 再做 RAG
+3. 再做 Logging
+4. 最后发给模型
+
+和下面这个顺序：
+
+1. 先 Logging
+2. 再 RAG
+3. 再 Memory
+
+得到的观测结果、上下文内容，甚至最终答案都可能不一样。
+
+所以 Spring AI 的 advisor 不是“有就行”，而是需要明确：
+
+- 谁先读请求
+- 谁先改请求
+- 谁依赖前一个 advisor 的输出
+- 谁负责记录最终送进模型的内容
+
+## 一张 Advisor 顺序影响图
+
+```mermaid
+flowchart LR
+    A[User Prompt] --> B[Memory Advisor]
+    B --> C[RAG Advisor]
+    C --> D[Safety or Logging Advisor]
+    D --> E[ChatModel]
+```
+
+如果你把 RAG 放在 Memory 前面，或者把 Logging 提前到“增强前”，看到的就是另一套请求现场。
+
+## Spring AI 的 Tool Calling 本质上还是“宿主执行”
+
+这一点和其他生态没有本质区别。  
+真正重要的是，Spring AI 让工具暴露更容易贴合既有企业系统。
+
+在 Java / Spring 体系里，工具往往天然对应：
+
+- 一个 Service 方法
+- 一个 Bean
+- 一个对外 API 封装
+- 一个数据库或消息系统操作
+
+这和“为了 agent 特地再造一套工具层”不完全一样。
+
+所以很多企业项目里，Spring AI 的 Tool Calling 更像：
+
+`把已有业务能力用 AI 可调用的方式重新暴露出来。`
+
 ## Spring AI 怎么理解 Tool Calling
 
 Spring AI 里 Tool Calling 的核心目的和其他生态一样：
@@ -239,6 +409,21 @@ flowchart TD
 
 `在 Spring AI 里，工具调用会更自然地嵌进 Java 服务化体系。`
 
+### 一个更贴近企业系统的例子
+
+```java
+@Service
+public class OrderService {
+
+    public String queryOrderStatus(String orderId) {
+        return "订单 " + orderId + " 当前状态: 已发货";
+    }
+}
+```
+
+从 AI 系统角度看，这不是“普通业务方法”，而是潜在可暴露给模型的工具能力。  
+这也是为什么 Spring AI 很适合把传统业务系统慢慢升级成“AI 可调用系统”。
+
 ## Spring AI 中的 RAG 为什么也很自然
 
 RAG 在 Spring AI 里的一个重要特点是：
@@ -257,6 +442,95 @@ RAG 在 Spring AI 里的一个重要特点是：
 - 把能力模块化
 - 把增强点插到链上
 - 把配置和注入交给框架
+
+## Spring AI 里的结构化输出为什么重要
+
+企业系统往往不满足于“生成一段文本”，而更需要：
+
+- 返回结构化字段
+- 映射成 DTO / POJO
+- 进入下游业务流程
+
+这也是 Spring AI 官方强调 Structured Output 的原因。  
+因为真正进业务系统的结果，很多时候不是一段聊天文本，而是：
+
+- 分类结果
+- 风险等级
+- 工单摘要
+- 提取后的实体
+- 后续流程需要的字段对象
+
+### 一个概念示例
+
+```java
+public record TicketSummary(
+    String issueType,
+    String priority,
+    String summary
+) {}
+```
+
+如果模型结果最终能映射到这类对象，系统和 AI 的边界会清晰很多：
+
+- LLM 负责生成
+- Spring AI 负责对接与转换
+- 业务系统负责消费结构化结果
+
+## Spring AI 为什么特别强调 Observability
+
+AI 系统上线后，最麻烦的问题之一是：
+
+- 你不知道 prompt 到底长什么样
+- 你不知道 advisor 改了什么
+- 你不知道 RAG 注入了哪些材料
+- 你不知道某次调用为什么贵、为什么慢
+
+Spring AI 的优势之一，是它天然愿意把这类问题纳入 Spring 常见的可观测性体系，而不是把 AI 调用做成黑盒。
+
+所以它非常适合企业场景下的这些要求：
+
+- 链路追踪
+- 指标采集
+- 统一日志
+- 故障定位
+- 审计需求
+
+## Spring AI 和 MCP 是什么关系
+
+这一块你之后在企业场景里会越来越常遇到。
+
+可以先用一个简单边界来理解：
+
+- `Spring AI` 解决的是应用内部 AI 集成问题
+- `MCP` 解决的是能力以标准协议暴露给宿主或 agent 的问题
+
+它们并不冲突。
+
+很常见的组合方式是：
+
+- Spring AI 负责模型、RAG、Memory、Tool Calling、Observability
+- 某些能力再通过 MCP 形式对外暴露
+
+也就是说，Spring AI 偏“应用集成层”，MCP 偏“能力接入协议层”。
+
+## 一张 Spring AI 与企业系统集成图
+
+```mermaid
+flowchart TD
+    A[Web or API Request] --> B[Spring Controller]
+    B --> C[Application Service]
+    C --> D[ChatClient]
+    D --> E[Advisors]
+    E --> F[Model Provider]
+    C --> G[Business Services]
+    C --> H[Vector Store]
+    C --> I[Observability]
+    G --> J[ERP CRM Order DB Internal APIs]
+```
+
+这张图可以帮助你抓住 Spring AI 的核心位置：
+
+`它不是孤立的 Agent 沙盒，而是企业应用内部的一段 AI 中间层。`
 
 ## Spring AI 为什么对企业系统友好
 
@@ -399,3 +673,12 @@ String content = chatClient.prompt()
 
 - 回到 [LangGraph 原理](./langgraph-principles)，比较“图式编排”和“企业集成层”的差别
 - 或继续阅读 [Harness 设计](./harness-design)，理解当系统进入长任务后，运行时外壳又会提出什么新要求
+
+## 参考来源
+
+- Spring AI 官方总览: [Spring AI Introduction](https://docs.spring.io/spring-ai/reference/1.0/index.html)
+- Spring AI 官方文档 Chat Client API: [Chat Client API](https://docs.spring.io/spring-ai/reference/2.0/api/chatclient.html)
+- Spring AI 官方文档 Advisors API: [Advisors API](https://docs.spring.io/spring-ai/reference/1.0/api/advisors.html)
+- Spring AI 官方文档 RAG: [Retrieval Augmented Generation](https://docs.spring.io/spring-ai/reference/2.0/api/retrieval-augmented-generation.html)
+- Spring AI 官方文档 Tool Calling: [Tools and Function Calling](https://docs.spring.io/spring-ai/reference/1.0/api/tools.html)
+- Spring AI 官方文档 Concepts: [AI Concepts](https://docs.spring.io/spring-ai/reference/1.0/concepts.html)
