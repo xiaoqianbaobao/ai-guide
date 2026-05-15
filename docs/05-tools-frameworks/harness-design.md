@@ -1,4 +1,4 @@
----
+﻿---
 title: Harness 设计
 description: Harness 不是包装层小技巧，而是控制平面、query loop、权限、恢复与验证共同组成的控制结构
 module: tools
@@ -127,7 +127,7 @@ flowchart LR
     C[用户指令] --> D
     D --> E[当前轮行为约束]
     D --> F[工具使用边界]
-    D --> G[停止/求助/验证规则]
+    D --> G[停止求助与验证规则]
 ```
 
 你可以把控制平面理解成：  
@@ -262,7 +262,7 @@ Harness 需要给出恢复路径，而不是把失败理解成系统终点。
 flowchart TD
     A[执行失败] --> B{失败类型}
     B -->|可重试| C[调整参数后重试]
-    B -->|需改路径| D[换工具/换策略]
+    B -->|需改路径| D[更换工具与策略]
     B -->|需人工确认| E[请求用户介入]
     B -->|需回退| F[回到上一稳定状态]
     C --> G[继续 Query Loop]
@@ -395,3 +395,5 @@ Harness 真正成熟的标志，不是你自己会用，而是团队可以稳定
 
 - 继续阅读 [Agent Skills](./agent-skills)
 - 或回到 [系统概念关系图](../04-multi-agent/system-relations) 对照理解 Harness 在整套体系里的层级
+
+

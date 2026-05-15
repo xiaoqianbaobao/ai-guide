@@ -1,4 +1,4 @@
----
+﻿---
 title: 第3章 Self-Attention 与 QKV
 description: 从相关性匹配到加权聚合，真正看懂注意力如何在上下文中重写 token 表示
 module: llm
@@ -176,12 +176,12 @@ flowchart LR
     B1 --> C1[Q]
     B2 --> C2[K]
     B3 --> C3[V]
-    C1 --> D[QK^T]
+    C1 --> D[Q 与 K 匹配分数]
     C2 --> D
-    D --> E[按 sqrt(d_k) 缩放]
+    D --> E[分数缩放]
     E --> F[softmax]
     F --> G[attention weights]
-    G --> H[weights x V]
+    G --> H[按权重聚合 V]
     C3 --> H
     H --> I[输出表示]
 ```
@@ -333,3 +333,5 @@ attention weight 确实提供了“模型在这一层此时更关注谁”的线
   https://huggingface.co/docs/transformers/v4.55.4/en/cache_explanation
 - transformers.run，Transformer 系列中文教程首页  
   https://transformers.run/
+
+

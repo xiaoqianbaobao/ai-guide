@@ -1,4 +1,4 @@
----
+﻿---
 title: 第2章 Token、Embedding 与位置编码
 description: 从文本切分、向量表示到位置编码，理解序列是如何进入 Transformer 的
 module: llm
@@ -190,7 +190,7 @@ PE(pos, 2i+1) = cos(pos / 10000^(2i / d_model))
 
 ```mermaid
 flowchart TD
-    A[位置 pos] --> B[多个频率的 sin/cos]
+    A[位置索引] --> B[多个频率的正弦余弦]
     B --> C[位置向量]
     C --> D[与 token embedding 相加]
 ```
@@ -327,3 +327,5 @@ print("with position:\\n", input_embeddings)
   https://github.com/huggingface/blog/blob/main/designing-positional-encoding.md
 - transformers.run，Transformer 系列中文教程首页  
   https://transformers.run/
+
+

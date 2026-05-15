@@ -1,4 +1,4 @@
----
+﻿---
 title: RAG 原理
 description: RAG 的价值不在于接上向量库，而在于让模型得到与当前任务相关的外部信息
 module: memory
@@ -59,10 +59,10 @@ tags:
 flowchart TD
     A[用户问题] --> B[查询改写]
     B --> C[检索候选片段]
-    C --> D[筛选/重排]
+    C --> D[筛选与重排]
     D --> E[组织进上下文]
     E --> F[模型生成答案]
-    F --> G[引用来源/返回结果]
+    F --> G[返回结果与来源]
 ```
 
 这张图里，最容易被低估的不是“检索”本身，而是中间两件事：
@@ -381,3 +381,5 @@ OpenAI 和 Anthropic 在近年的 agent / eval / tool 公开资料里都反复�
 ## 下一步
 
 如果你已经理解了 RAG 是如何扩展单个 Agent 的记忆能力，下一步建议进入 [Orchestrator-Subagent](../04-multi-agent/orchestrator-subagent)，看看当任务复杂到单个 Agent 不够时，系统会如何继续扩展。
+
+

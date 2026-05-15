@@ -1,4 +1,4 @@
----
+﻿---
 title: 第6章 训练、推理与现代 Transformer 演化
 description: 把 next-token 训练、KV Cache、RoPE、ALiBi、GQA、SwiGLU 与 MoE 放回同一条工程主线
 module: llm
@@ -107,9 +107,9 @@ sequenceDiagram
 
 ```mermaid
 flowchart LR
-    A[历史 token] --> B[已有 K/V]
+    A[历史 token] --> B[已有 KV 缓存]
     B --> C[缓存起来]
-    D[新 token] --> E[只算新的 Q/K/V]
+    D[新 token] --> E[只计算新的 QKV]
     C --> F[与新 token 一起做注意力]
     E --> F
 ```
@@ -353,3 +353,5 @@ def generate(prefix_tokens, model, max_new_tokens):
   https://arxiv.org/abs/2002.05202
 - transformers.run，Transformer 系列中文教程首页  
   https://transformers.run/
+
+

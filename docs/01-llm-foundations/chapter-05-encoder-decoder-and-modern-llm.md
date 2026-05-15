@@ -1,4 +1,4 @@
----
+﻿---
 title: 第5章 Encoder、Decoder 与现代 LLM
 description: 从原始 encoder-decoder Transformer 走到 BERT、GPT，理解主流模型家族为何分化
 module: llm
@@ -90,9 +90,9 @@ decoder 的 self-attention 通常带 causal mask。
 ```mermaid
 flowchart TD
     A[Encoder] --> A1[双向 self-attention]
-    A --> A2[偏理解/表示学习]
+    A --> A2[偏理解与表示学习]
     B[Decoder] --> B1[因果 self-attention]
-    B --> B2[偏生成/续写]
+    B --> B2[偏生成与续写]
 ```
 
 ## 5.3 为什么 BERT 是 encoder-only
@@ -293,3 +293,5 @@ sequenceDiagram
   https://huggingface.co/docs/transformers/v4.27.0/model_doc/bert
 - transformers.run，Transformer 系列中文教程首页  
   https://transformers.run/
+
+

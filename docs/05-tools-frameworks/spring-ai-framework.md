@@ -1,4 +1,4 @@
----
+﻿---
 title: Spring AI 框架原理
 description: 从 ChatModel、ChatClient、Advisors、Tool Calling 到 RAG，理解 Spring AI 在 Java 生态中的定位
 module: tools
@@ -62,11 +62,11 @@ Spring AI 的价值，就在于它不是单纯再造一个聊天 demo 库，而�
 ```mermaid
 flowchart TD
     A[Spring Boot Application]
-    A --> B[Controller / Service]
+    A --> B[Controller 与 Service]
     B --> C[ChatClient]
     C --> D[Advisors]
     D --> E[ChatModel]
-    D --> F[Memory / RAG / Logging]
+    D --> F[Memory 与 RAG 与 Logging]
     C --> G[Tool Calling]
     E --> H[Model Provider]
 ```
@@ -153,9 +153,9 @@ flowchart TD
 ```mermaid
 flowchart TD
     A[Spring Boot App]
-    A --> B[Controller / Service]
+    A --> B[Controller 与 Service]
     B --> C[ChatClient API]
-    C --> D[Advisors / Memory / RAG / Logging]
+    C --> D[Advisors 与 Memory 与 RAG 与 Logging]
     D --> E[ChatModel / EmbeddingModel / Tool Calling]
     E --> F[OpenAI Anthropic Ollama Azure Bedrock 等 Provider]
     A --> G[Spring Config Security Observability Data]
@@ -682,3 +682,6 @@ String content = chatClient.prompt()
 - Spring AI 官方文档 RAG: [Retrieval Augmented Generation](https://docs.spring.io/spring-ai/reference/2.0/api/retrieval-augmented-generation.html)
 - Spring AI 官方文档 Tool Calling: [Tools and Function Calling](https://docs.spring.io/spring-ai/reference/1.0/api/tools.html)
 - Spring AI 官方文档 Concepts: [AI Concepts](https://docs.spring.io/spring-ai/reference/1.0/concepts.html)
+
+
+

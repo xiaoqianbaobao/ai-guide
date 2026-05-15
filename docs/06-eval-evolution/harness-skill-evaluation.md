@@ -1,4 +1,4 @@
----
+﻿---
 title: Harness 与 Skill 的评估体系
 description: 当系统开始依赖 harness 和 skills 时，应该如何评估连续性、触发准确率与真实增益
 module: eval
@@ -71,9 +71,9 @@ flowchart TD
     B --> C[模型表现]
     B --> D[Harness 表现]
     B --> E[Skill 表现]
-    C --> F[结果/行为/轨迹评分]
-    D --> G[连续性/恢复/交接评分]
-    E --> H[触发/加载/增益评分]
+    C --> F[结果行为轨迹评分]
+    D --> G[连续性恢复交接评分]
+    E --> H[触发加载增益评分]
     F --> I[综合分析]
     G --> I
     H --> I
@@ -208,7 +208,7 @@ flowchart TD
     B -->|应触发且已触发| C[评估任务增益]
     B -->|应触发但未触发| D[漏触发]
     B -->|不应触发却触发| E[误触发]
-    C --> F[看成功率/稳定性/成本]
+    C --> F[看成功率稳定性成本]
     D --> F
     E --> F
 ```
@@ -350,3 +350,7 @@ Skill 再漂亮，如果触发不准、加载过重、没有任务增益，依�
 
 - 继续阅读 [奖励函数设计](./reward-function-design)
 - 或回到 [Tool / MCP / Skill / Harness / Workflow / Agent 关系图](../04-multi-agent/system-relations)
+
+
+
+

@@ -1,4 +1,4 @@
----
+﻿---
 title: LangGraph 原理
 description: 用节点、边、状态和有向图来理解 LangGraph 为什么特别适合构建 Agent 系统
 module: tools
@@ -181,8 +181,8 @@ planner -> tool_executor
 
 ```mermaid
 flowchart LR
-    A[Node: planner] --> B[Node: tool_executor]
-    B --> C[Node: validator]
+    A[planner 节点] --> B[tool_executor 节点]
+    B --> C[validator 节点]
     C --> D{Conditional Edge}
     D -->|通过| E[END]
     D -->|失败| A
@@ -748,3 +748,6 @@ flowchart TD
 - LangGraph 官方文档 Durable execution: [Durable execution](https://docs.langchain.com/oss/python/langgraph/durable-execution)
 - LangChain 官方总览，关于 LangChain 与 LangGraph 的层级关系: [LangChain overview](https://docs.langchain.com/oss/javascript/langchain/overview)
 - Google Pregel 论文，用于理解 super-step 与消息传递范式: [Pregel: A System for Large-Scale Graph Processing](https://research.google/pubs/pregel-a-system-for-large-scale-graph-processing/)
+
+
+

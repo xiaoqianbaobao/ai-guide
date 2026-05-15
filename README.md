@@ -50,6 +50,8 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
   - 训练、推理、KV Cache、RoPE、ALiBi、GQA、SwiGLU、MoE 等现代演化
 - 已将 `Transformer、Attention 与 QKV` 旧单页改为专题导读页，并为模型模块文章补充 `参考来源` 区块，统一标注论文、官方文档与高质量教程来源
 - 已修复一批 Mermaid 图在 Chrome 下的运行时兼容问题，主要将 `mindmap`、节点内 HTML 换行和带文案虚线边等高风险语法降级为更稳的 `flowchart` 写法，降低 GitHub Pages 线上解析失败概率
+- 已进一步修复 `chapter-03-self-attention-qkv` 中一处 Mermaid 非兼容节点语法：将 `[/ sqrt(d_k)]` 这类容易触发解析失败的写法改为普通节点文案，避免在 GitHub Pages 的 Chrome 环境出现 `Parse error on line ...` 运行时报错
+- 已继续清理模型模块 Mermaid 节点中的高风险标签字符，特别是括号、斜杠、冒号与 `&` 等写法；例如将 `子层 F(x)`、`K/V`、`Q/K/V`、`RNN/LSTM` 一类节点文案改为更稳的自然语言标签，以降低 `mermaid 10.9.5` 在 GitHub Pages 浏览器环境中的解析失败概率
 - 已继续补强 `工具与框架` 模块中的 [LangGraph 原理](./docs/05-tools-frameworks/langgraph-principles.md) 与 [Spring AI 框架原理](./docs/05-tools-frameworks/spring-ai-framework.md)：
   - `LangGraph` 新增 reducer、super-step、checkpoint、thread、interrupt、resume、Command 路由等运行时机制讲解
   - `Spring AI` 新增 provider abstraction、ChatClient 分层、Advisor 顺序、结构化输出、Observability、MCP 边界等内容

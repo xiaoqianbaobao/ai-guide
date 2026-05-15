@@ -1,4 +1,4 @@
----
+﻿---
 title: Tool、MCP、Skill、Harness、Workflow、Agent 的关系
 description: 这些高频概念经常一起出现，但它们解决的是不同层次的问题
 module: multi-agent
@@ -193,10 +193,10 @@ Agent 解决的是：
 
 ```mermaid
 flowchart BT
-    A[MCP: 能力接入标准]
-    B[Tool: 动作接口]
-    C[Skill: 流程知识包]
-    D[Harness: 运行外壳]
+    A[MCP 能力接入标准]
+    B[Tool 动作接口]
+    C[Skill 流程知识包]
+    D[Harness 运行外壳]
     E[Workflow: 固定流程骨架]
     F[Agent: 决策与执行主体]
 
@@ -355,3 +355,7 @@ flowchart BT
 
 - 回到 [Harness 设计](../05-tools-frameworks/harness-design)
 - 或进入 [Harness 与 Skill 的评估体系](../06-eval-evolution/harness-skill-evaluation)
+
+
+
+

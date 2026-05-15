@@ -1,4 +1,4 @@
----
+﻿---
 title: Agent Skills
 description: Claude Code 语境里的 Skill 不是泛化知识包，而是以 SKILL.md 为入口、可自动发现、可按需加载、可受控调用的能力目录
 module: tools
@@ -158,7 +158,7 @@ flowchart TD
     C -->|否| D[不加载 skill 正文]
     C -->|是| E[加载 SKILL.md]
     E --> F{是否还需要支持文件}
-    F -->|需要| G[按需读取 template / examples / scripts docs]
+    F -->|需要| G[按需读取模板示例与脚本文档]
     F -->|不需要| H[直接执行当前流程]
 ```
 
@@ -533,3 +533,4 @@ Claude 根本不知道什么时候该用它。
 
 - 回到 [Harness 设计](./harness-design)，理解 Skill 是怎样嵌进更大的控制结构里的
 - 或继续阅读 [Harness 与 Skill 的评估体系](../06-eval-evolution/harness-skill-evaluation)，看这些能力该如何被评估
+

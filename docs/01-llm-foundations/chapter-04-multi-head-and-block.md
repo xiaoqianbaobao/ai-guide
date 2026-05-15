@@ -1,4 +1,4 @@
----
+﻿---
 title: 第4章 Multi-Head Attention 与 Transformer Block
 description: 从单头注意力走到完整 Transformer 层，理解多头、残差、归一化与 FFN 的分工
 module: llm
@@ -66,10 +66,10 @@ tags:
 ```mermaid
 flowchart TD
     A[输入表示 X]
-    A --> H1[Head 1: Q1 K1 V1]
-    A --> H2[Head 2: Q2 K2 V2]
-    A --> H3[Head 3: Q3 K3 V3]
-    A --> H4[Head 4: Q4 K4 V4]
+    A --> H1[Head 1 Q1 K1 V1]
+    A --> H2[Head 2 Q2 K2 V2]
+    A --> H3[Head 3 Q3 K3 V3]
+    A --> H4[Head 4 Q4 K4 V4]
     H1 --> O1[Attn 1]
     H2 --> O2[Attn 2]
     H3 --> O3[Attn 3]
@@ -135,7 +135,7 @@ FFN 是 position-wise feed-forward network，意思是：
 ```mermaid
 flowchart LR
     A[attention 输出] --> B[线性升维]
-    B --> C[激活/门控]
+    B --> C[激活或门控]
     C --> D[线性降维]
     D --> E[新表示]
 ```
@@ -167,7 +167,7 @@ Transformer 很深，如果每一层都完全覆盖上一层表示，会导致�
 
 ```mermaid
 flowchart TD
-    X[输入 x] --> A[子层 F(x)]
+    X[输入向量] --> A[子层计算]
     X --> B[跳跃连接]
     A --> C[相加]
     B --> C
@@ -203,9 +203,9 @@ LayerNorm 的目标是让表示分布更稳定。
 flowchart TD
     X[输入表示]
     X --> A[Multi-Head Attention]
-    A --> B[Add & Norm]
+    A --> B[残差归一化一]
     B --> C[FFN]
-    C --> D[Add & Norm]
+    C --> D[残差归一化二]
     D --> Y[输出表示]
 ```
 
@@ -285,3 +285,12 @@ def transformer_block(x, mha, norm1, ffn, norm2):
   https://arxiv.org/abs/2002.05202
 - transformers.run，Transformer 系列中文教程首页  
   https://transformers.run/
+
+
+
+
+
+
+
+
+
