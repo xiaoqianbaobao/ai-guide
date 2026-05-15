@@ -40,6 +40,7 @@ module: llm
 2. 再读 [上下文窗口](./context-window)，理解为什么上下文组织方式会直接影响系统表现。
 3. 然后进入 [Transformer 专题导读](./transformer-attention-qkv)，按章节系统学习模型内部机制。
 4. 如果你在第3章第一次真正卡住，可以继续读 [第3.5章 Attention 的矩阵视角与代码推演](./chapter-03b-attention-matrix-and-code)，把公式、shape 和代码一口气打通。
+5. 学到第6章时，如果你想把推理链路真正落到工程细节，可以继续读 [第6.5章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)，把 prefill、decode 和缓存增长机制串起来。
 
 ## Transformer 专题章节
 
@@ -52,6 +53,7 @@ module: llm
 5. [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)
 6. [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm)
 7. [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)
+8. [第6.5章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)
 
 ## 本模块文章
 
@@ -67,6 +69,7 @@ module: llm
 | [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block) | 原理 | 理解一层完整 Transformer 的分工 |
 | [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm) | 原理 | 理解 BERT、GPT 等模型家族差异 |
 | [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution) | 工程 | 理解 KV Cache、RoPE、GQA、SwiGLU、MoE 等现实问题 |
+| [第6.5章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding) | 工程 | 把 prefill、decode、缓存增长与推理成本真正拆开讲清楚 |
 
 ## 学完后去哪里
 
