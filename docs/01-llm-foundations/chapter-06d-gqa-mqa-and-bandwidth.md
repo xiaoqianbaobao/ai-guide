@@ -1,5 +1,5 @@
 ---
-title: 第6.7章 GQA MQA 与推理带宽权衡实战
+title: 第9章 GQA MQA 与推理带宽权衡实战
 description: 从 MHA 到 MQA 再到 GQA，理解现代 LLM 为什么要牺牲部分注意力自由度来换取更低的 KV Cache 和更好的推理吞吐
 module: llm
 tags:

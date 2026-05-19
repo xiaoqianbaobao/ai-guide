@@ -1,5 +1,5 @@
 ---
-title: 第6.6章 RoPE 与长上下文外推实战
+title: 第8章 RoPE 与长上下文外推实战
 description: 从旋转位置编码、相对位置关系到长上下文外推，理解现代 LLM 为什么偏爱 RoPE，以及它为什么仍然不是无限上下文的万能答案
 module: llm
 tags:
