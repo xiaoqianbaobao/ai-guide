@@ -18,28 +18,6 @@ tags:
   summary="Harness 更准确的含义，不是一个包住 Agent 的外壳，而是把不稳定模型约束进工程秩序里的整套控制结构。它涉及控制平面、query loop、工具权限、中断、上下文治理、恢复路径、验证分工和团队落地方式。"
 />
 
-## 目录
-
-1. [为什么要重新理解 Harness](#1-为什么要重新理解-harness)
-2. [一个核心公式：Agent = Model + Harness](#2-一个核心公式agent--model--harness)
-3. [Harness 到底是什么](#3-harness-到底是什么)
-4. [七层控制结构详解](#4-七层控制结构详解)
-   - 4.1 [第一层：控制平面（Control Plane）](#41-第一层控制平面control-plane)
-   - 4.2 [第二层：Query Loop（主循环）](#42-第二层query-loop主循环)
-   - 4.3 [第三层：工具、权限与中断](#43-第三层工具权限与中断)
-   - 4.4 [第四层：Context Governance（上下文治理）](#44-第四层context-governance上下文治理)
-   - 4.5 [第五层：错误与恢复路径](#45-第五层错误与恢复路径)
-   - 4.6 [第六层：验证与分工](#46-第六层验证与分工)
-   - 4.7 [第七层：团队落地与本地治理](#47-第七层团队落地与本地治理)
-5. [从零手写一个最小 Harness](#5-从零手写一个最小-harness)
-6. [Claude Code 的 Harness 架构解析](#6-claude-code-的-harness-架构解析)
-7. [Harness 的"棘轮机制"：把每一次失败变成规则](#7-harness-的棘轮机制把每一次失败变成规则)
-8. [Harness vs Workflow vs Framework vs Skill](#8-harness-vs-workflow-vs-framework-vs-skill)
-9. [实战：为一个代码 Agent 设计完整 Harness](#9-实战为一个代码-agent-设计完整-harness)
-10. [常见症状与 Harness 诊断](#10-常见症状与-harness-诊断)
-11. [设计 Harness 时最先要回答的 6 个问题](#11-设计-harness-时最先要回答的-6-个问题)
-12. [本节总结](#12-本节总结)
-
 ---
 
 ## 1. 为什么要重新理解 Harness
