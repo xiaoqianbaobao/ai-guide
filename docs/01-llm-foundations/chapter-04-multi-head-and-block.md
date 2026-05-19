@@ -1,4 +1,4 @@
-﻿---
+﻿﻿---
 title: 第4章 Multi-Head Attention 与 Transformer Block
 description: 从单头注意力走到完整 Transformer 层，理解多头、残差、归一化与 FFN 的分工
 module: llm

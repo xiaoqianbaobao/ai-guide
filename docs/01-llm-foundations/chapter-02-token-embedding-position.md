@@ -1,4 +1,4 @@
-﻿---
+﻿﻿---
 title: 第2章 Token、Embedding 与位置编码
 description: 从文本切分、向量表示到位置编码，理解序列是如何进入 Transformer 的
 module: llm
