@@ -1,4 +1,4 @@
-﻿﻿---
+﻿﻿﻿---
 title: Spring AI 框架原理
 description: 从 ChatModel、ChatClient、Advisors、Tool Calling 到 RAG，理解 Spring AI 在 Java 生态中的定位
 module: tools

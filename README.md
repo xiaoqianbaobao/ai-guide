@@ -57,14 +57,16 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
   - `LangGraph` 新增 reducer、super-step、checkpoint、thread、interrupt、resume、Command 路由等运行时机制讲解
   - `Spring AI` 新增 provider abstraction、ChatClient 分层、Advisor 顺序、结构化输出、Observability、MCP 边界等内容
   - 两篇文章都已在文末补充 `参考来源`
-- 已新增 `第3.5章 Attention 的矩阵视角与代码推演`，把 `QK^T`、缩放、softmax、mask、shape 流转和最小 PyTorch 实现拆开讲清楚，作为第 3 章和第 4 章之间的桥接页
-- 已新增 `第6.5章 KV Cache 与自回归推理实战`，把 `prefill`、`decode`、逐 token 生成、每层缓存增长和推理成本拆开讲透，补齐模型模块里从“知道 KV Cache”到“真正理解推理执行过程”的一层
-- 已新增 `第6.6章 RoPE 与长上下文外推实战`，把旋转位置编码、相对位置关系、长上下文外推和“能接收长度不等于能稳定利用长度”这层工程边界真正讲清楚
-- 已新增 `第6.7章 GQA MQA 与推理带宽权衡实战`，把 `MHA`、`MQA`、`GQA`、KV 组数、KV Cache 与推理带宽压力之间的结构权衡拆开讲清楚，补齐现代推理优化主线
+- 已新增 `第4章 Attention 的矩阵视角与代码推演`，把 `QK^T`、缩放、softmax、mask、shape 流转和最小 PyTorch 实现拆开讲清楚，作为注意力理解与完整 Transformer 层之间的桥接页
+- 已新增 `第8章 KV Cache 与自回归推理实战`，把 `prefill`、`decode`、逐 token 生成、每层缓存增长和推理成本拆开讲透，补齐模型模块里从“知道 KV Cache”到“真正理解推理执行过程”的一层
+- 已新增 `第9章 RoPE 与长上下文外推实战`，把旋转位置编码、相对位置关系、长上下文外推和“能接收长度不等于能稳定利用长度”这层工程边界真正讲清楚
+- 已新增 `第10章 GQA MQA 与推理带宽权衡实战`，把 `MHA`、`MQA`、`GQA`、KV 组数、KV Cache 与推理带宽压力之间的结构权衡拆开讲清楚，补齐现代推理优化主线
+- 已把 `语言模型基础` 模块的章节编号统一重排为连续的 `第1章` 到 `第10章`，移除 `第3.5章 / 第6.5章 / 第6.6章 / 第6.7章` 这类补丁式编号，并同步更新正文标题、模块页、专题导读与侧边栏
 - 已新增 `LangGraph 状态图设计实战`，把 schema 分层、reducer 选择、messages 边界、checkpoint 取舍和 interrupt / resume 对状态设计的约束补进工具与框架主线
 - 已新增 `LangGraph Interrupt Resume 与 Human Review 实战`，把 `thread`、`checkpoint`、`interrupt`、`resume`、人工审核与副作用边界放回真实工作流，补齐 LangGraph 从原理到可恢复运行时的实践层
 - 已新增 `LangGraph 多角色协作图实战`，把 `planner`、`researcher`、`coder`、`reviewer` 的协作图、共享状态、评审回退和多角色节点分工真正落到工程结构
 - 已新增 `Spring AI ChatClient Advisor 与 Structured Output 实战`，把 `ChatClient` 调用入口、`Advisor` 顺序、结构化输出与 `Tool Calling` 放回真实 Spring Boot 业务代码，补齐 Spring AI 从原理到落地接入的一层
+- 已把 `MCP 协议` 从 `多 Agent 系统` 模块迁入 `工具与框架` 模块，明确它是标准化能力接入协议而不是多 Agent 子概念；同时把工程阅读顺序调整为 `Skill` 在前、`Harness` 在后
 - 已同步更新 `语言模型基础`、`Transformer 专题导读`、`工具与框架` 模块页以及侧边栏，把新增的推理结构优化、多角色协作图、长上下文原理和 Spring AI 实战内容纳入正式学习路径
 - 已继续修复 Mermaid 线上兼容问题，修正 `docs/02-agent-core/context-engineering.md` 中一处 Mermaid 代码块缺少结束 fence 导致后续标题被当成图语法解析的 Chrome / GitHub Pages 运行时报错
 - 本轮内容补强参考了公开工程资料中的共识方向，例如上下文工程、工具设计与评估、长期记忆分类、Agent 运行时与标准化接入，但已统一改写为更适合本站知识体系的中文教程表达

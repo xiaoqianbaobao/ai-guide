@@ -1,5 +1,5 @@
-﻿﻿---
-title: 第6章 训练、推理与现代 Transformer 演化
+﻿---
+title: 第7章 训练、推理与现代 Transformer 演化
 description: 把 next-token 训练、KV Cache、RoPE、ALiBi、GQA、SwiGLU 与 MoE 放回同一条工程主线
 module: llm
 tags:
@@ -7,15 +7,15 @@ tags:
   - 工程
 ---
 
-<KnowledgeMap current-module="llm" current-article="第6章 训练、推理与现代 Transformer 演化" />
+<KnowledgeMap current-module="llm" current-article="第7章 训练、推理与现代 Transformer 演化" />
 
-# 第 6 章 训练、推理与现代 Transformer 演化
+# 第 7 章 训练、推理与现代 Transformer 演化
 
 <ArticleHeader
   module="语言模型基础"
   :tags="['原理', '工程']"
   reading-time="24 分钟"
-  prerequisite="已读第 5 章"
+  prerequisite="已读第 6 章"
   summary="这一章把 Transformer 从“论文中的模块”推进到“现实里的大模型系统”。我们会讲训练目标、推理为何昂贵、KV Cache 为什么关键，以及 RoPE、ALiBi、MQA/GQA、SwiGLU、MoE 这些现代演化到底各自在解决什么问题。"
 />
 
@@ -353,5 +353,4 @@ def generate(prefix_tokens, model, max_new_tokens):
   https://arxiv.org/abs/2002.05202
 - transformers.run，Transformer 系列中文教程首页  
   https://transformers.run/
-
 

@@ -34,13 +34,13 @@ Transformer、Attention、QKV 这些概念如果只压在一篇文章里，常�
 1. [第1章 为什么是 Transformer](./chapter-01-why-transformer)
 2. [第2章 Token、Embedding 与位置编码](./chapter-02-token-embedding-position)
 3. [第3章 Self-Attention 与 QKV](./chapter-03-self-attention-qkv)
-4. [第3.5章 Attention 的矩阵视角与代码推演](./chapter-03b-attention-matrix-and-code)
-5. [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)
-6. [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm)
-7. [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)
-8. [第7章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)
-9. [第8章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context)
-10. [第9章 GQA MQA 与推理带宽权衡实战](./chapter-06d-gqa-mqa-and-bandwidth)
+4. [第4章 Attention 的矩阵视角与代码推演](./chapter-03b-attention-matrix-and-code)
+5. [第5章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)
+6. [第6章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm)
+7. [第7章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)
+8. [第8章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)
+9. [第9章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context)
+10. [第10章 GQA MQA 与推理带宽权衡实战](./chapter-06d-gqa-mqa-and-bandwidth)
 
 ## 各章节分别解决什么
 
@@ -49,19 +49,19 @@ Transformer、Attention、QKV 这些概念如果只压在一篇文章里，常�
 | 第1章 | 为什么 Transformer 会取代 RNN |
 | 第2章 | 文本怎样变成模型可计算的向量输入 |
 | 第3章 | QKV 与 self-attention 到底在做什么 |
-| 第3.5章 | 把 QKV、shape、mask 和最小代码真正算清楚 |
-| 第4章 | 一个完整 Transformer block 如何分工 |
-| 第5章 | BERT、GPT、encoder/decoder 为什么会分化 |
-| 第6章 | KV Cache、RoPE、GQA、SwiGLU、MoE 这些演化各自在解决什么 |
-| 第7章 | 把 prefill、decode、缓存增长和推理成本真正串起来 |
-| 第8章 | 把 RoPE、长上下文外推和可用性边界真正串起来 |
-| 第9章 | 把 MHA、MQA、GQA、KV 组数和带宽权衡真正串起来 |
+| 第4章 | 把 QKV、shape、mask 和最小代码真正算清楚 |
+| 第5章 | 一个完整 Transformer block 如何分工 |
+| 第6章 | BERT、GPT、encoder/decoder 为什么会分化 |
+| 第7章 | KV Cache、RoPE、GQA、SwiGLU、MoE 这些演化各自在解决什么 |
+| 第8章 | 把 prefill、decode、缓存增长和推理成本真正串起来 |
+| 第9章 | 把 RoPE、长上下文外推和可用性边界真正串起来 |
+| 第10章 | 把 MHA、MQA、GQA、KV 组数和带宽权衡真正串起来 |
 
 ## 你应该怎样读这组章节
 
-- 如果你是第一次系统学 Transformer，建议按 1 到 6 顺序读完。
-- 如果你已经会基础公式，建议从 [第3章](./chapter-03-self-attention-qkv) 和 [第3.5章](./chapter-03b-attention-matrix-and-code) 开始，再补 [第1章](./chapter-01-why-transformer)、[第6章](./chapter-06-training-inference-and-evolution)、[第7章](./chapter-06b-kv-cache-and-autoregressive-decoding)、[第8章](./chapter-06c-rope-and-long-context) 和 [第9章](./chapter-06d-gqa-mqa-and-bandwidth)。
-- 如果你更关心后面的 Agent 工程，建议至少读完 [第2章](./chapter-02-token-embedding-position)、[第3章](./chapter-03-self-attention-qkv)、[第6章](./chapter-06-training-inference-and-evolution)、[第7章](./chapter-06b-kv-cache-and-autoregressive-decoding)、[第8章](./chapter-06c-rope-and-long-context) 和 [第9章](./chapter-06d-gqa-mqa-and-bandwidth)。
+- 如果你是第一次系统学 Transformer，建议按 1 到 10 顺序读完。
+- 如果你已经会基础公式，建议从 [第3章](./chapter-03-self-attention-qkv) 和 [第4章](./chapter-03b-attention-matrix-and-code) 开始，再补 [第1章](./chapter-01-why-transformer)、[第7章](./chapter-06-training-inference-and-evolution)、[第8章](./chapter-06b-kv-cache-and-autoregressive-decoding)、[第9章](./chapter-06c-rope-and-long-context) 和 [第10章](./chapter-06d-gqa-mqa-and-bandwidth)。
+- 如果你更关心后面的 Agent 工程，建议至少读完 [第2章](./chapter-02-token-embedding-position)、[第3章](./chapter-03-self-attention-qkv)、[第7章](./chapter-06-training-inference-and-evolution)、[第8章](./chapter-06b-kv-cache-and-autoregressive-decoding)、[第9章](./chapter-06c-rope-and-long-context) 和 [第10章](./chapter-06d-gqa-mqa-and-bandwidth)。
 
 ## 学完这组专题后会有什么收益
 

@@ -1,4 +1,4 @@
-﻿﻿---
+﻿﻿﻿---
 title: LangGraph 原理
 description: 用节点、边、状态和有向图来理解 LangGraph 为什么特别适合构建 Agent 系统
 module: tools

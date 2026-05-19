@@ -1,5 +1,5 @@
-﻿﻿---
-title: 第5章 Encoder、Decoder 与现代 LLM
+﻿---
+title: 第6章 Encoder、Decoder 与现代 LLM
 description: 从原始 encoder-decoder Transformer 走到 BERT、GPT，理解主流模型家族为何分化
 module: llm
 tags:
@@ -7,15 +7,15 @@ tags:
   - 模型家族
 ---
 
-<KnowledgeMap current-module="llm" current-article="第5章 Encoder、Decoder 与现代 LLM" />
+<KnowledgeMap current-module="llm" current-article="第6章 Encoder、Decoder 与现代 LLM" />
 
-# 第 5 章 Encoder、Decoder 与现代 LLM
+# 第 6 章 Encoder、Decoder 与现代 LLM
 
 <ArticleHeader
   module="语言模型基础"
   :tags="['原理', '模型家族']"
   reading-time="22 分钟"
-  prerequisite="已读第 4 章"
+  prerequisite="已读第 5 章"
   summary="理解单个 Transformer block 之后，还要继续回答另一个重要问题：为什么有的模型像 BERT，只擅长编码理解；有的模型像 GPT，特别擅长生成。答案就在 encoder、decoder 以及训练目标的不同组合中。"
 />
 
@@ -279,7 +279,7 @@ sequenceDiagram
 
 ## 下一章
 
-继续阅读 [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把训练目标、KV Cache、RoPE、GQA、SwiGLU、MoE 等现代演化一起串起来。
+继续阅读 [第7章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把训练目标、KV Cache、RoPE、GQA、SwiGLU、MoE 等现代演化一起串起来。
 
 ## 参考来源
 
@@ -293,5 +293,4 @@ sequenceDiagram
   https://huggingface.co/docs/transformers/v4.27.0/model_doc/bert
 - transformers.run，Transformer 系列中文教程首页  
   https://transformers.run/
-
 

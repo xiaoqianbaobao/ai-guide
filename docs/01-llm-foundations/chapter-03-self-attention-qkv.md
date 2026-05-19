@@ -1,4 +1,4 @@
-﻿﻿---
+﻿---
 title: 第3章 Self-Attention 与 QKV
 description: 从相关性匹配到加权聚合，真正看懂注意力如何在上下文中重写 token 表示
 module: llm
@@ -323,7 +323,7 @@ attention weight 确实提供了“模型在这一层此时更关注谁”的线
 
 ## 下一章
 
-继续阅读 [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)，把“一个 attention 头”推进到“一个完整的 Transformer 层”。
+继续阅读 [第5章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)，把“一个 attention 头”推进到“一个完整的 Transformer 层”。
 
 ## 参考来源
 
@@ -333,5 +333,4 @@ attention weight 确实提供了“模型在这一层此时更关注谁”的线
   https://huggingface.co/docs/transformers/v4.55.4/en/cache_explanation
 - transformers.run，Transformer 系列中文教程首页  
   https://transformers.run/
-
 

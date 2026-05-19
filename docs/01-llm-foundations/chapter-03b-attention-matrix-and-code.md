@@ -1,5 +1,5 @@
 ---
-title: 第3.5章 Attention 的矩阵视角与代码推演
+title: 第4章 Attention 的矩阵视角与代码推演
 description: 从矩阵形状、缩放、mask 到最小 PyTorch 实现，真正看懂 QKV 和 attention 是怎么算出来的
 module: llm
 tags:
@@ -8,7 +8,7 @@ tags:
   - 代码
 ---
 
-<KnowledgeMap current-module="llm" current-article="第3.5章 Attention 的矩阵视角与代码推演" />
+<KnowledgeMap current-module="llm" current-article="第4章 Attention 的矩阵视角与代码推演" />
 
 <ArticleHeader
   module="语言模型基础"
@@ -18,7 +18,7 @@ tags:
   summary="这一章专门解决一个常见痛点：很多人知道 attention 公式，却不知道矩阵到底怎么乘、shape 怎么变、为什么要缩放、mask 怎么进来。这一页会把它真正算清楚。"
 />
 
-# 第3.5章 Attention 的矩阵视角与代码推演
+# 第4章 Attention 的矩阵视角与代码推演
 
 前一章已经把 Q、K、V 的角色讲清了。  
 但很多人在真正写代码时还是会卡住：
@@ -371,7 +371,7 @@ attention 的矩阵视角，不只是为了考试或公式推导。
 ## 下一步
 
 - 返回 [第3章 Self-Attention 与 QKV](./chapter-03-self-attention-qkv)，把概念视角和矩阵视角连起来
-- 继续阅读 [第4章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)，理解单头 attention 如何变成完整一层
+- 继续阅读 [第5章 Multi-Head Attention 与 Transformer Block](./chapter-04-multi-head-and-block)，理解单头 attention 如何变成完整一层
 
 ## 参考来源
 

@@ -1,5 +1,5 @@
 ---
-title: 第8章 RoPE 与长上下文外推实战
+title: 第9章 RoPE 与长上下文外推实战
 description: 从旋转位置编码、相对位置关系到长上下文外推，理解现代 LLM 为什么偏爱 RoPE，以及它为什么仍然不是无限上下文的万能答案
 module: llm
 tags:
@@ -8,17 +8,17 @@ tags:
   - 长上下文
 ---
 
-<KnowledgeMap current-module="llm" current-article="第6.6章 RoPE 与长上下文外推实战" />
+<KnowledgeMap current-module="llm" current-article="第9章 RoPE 与长上下文外推实战" />
 
 <ArticleHeader
   module="语言模型基础"
   :tags="['原理', '工程', '长上下文']"
   reading-time="14 分钟"
-  prerequisite="建议先读第6章 与 第6.5章 KV Cache 与自回归推理实战"
+  prerequisite="建议先读第7章 与 第8章 KV Cache 与自回归推理实战"
   summary="这一章专门解决一个高频误解：很多人知道 RoPE 很流行，却不知道它到底在 attention 里改了什么、为什么有助于长上下文，以及为什么只靠 RoPE 仍然无法自动获得无限长度外推能力。"
 />
 
-# 第6.6章 RoPE 与长上下文外推实战
+# 第9章 RoPE 与长上下文外推实战
 
 在现代 LLM 里，`RoPE` 几乎已经成了一个绕不开的词。
 
@@ -408,8 +408,8 @@ RoPE 相关知识会帮助你理解：
 
 ## 下一步
 
-- 先回到 [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把这页作为位置编码与长上下文部分的展开理解
-- 再读 [第6.5章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)，把“位置表示”和“推理成本”两个维度连起来
+- 先回到 [第7章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把这页作为位置编码与长上下文部分的展开理解
+- 再读 [第8章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)，把“位置表示”和“推理成本”两个维度连起来
 
 ## 参考来源
 

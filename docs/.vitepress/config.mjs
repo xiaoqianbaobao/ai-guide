@@ -189,13 +189,13 @@ function sidebarLLM() {
         { text: '第1章 为什么是 Transformer', link: '/01-llm-foundations/chapter-01-why-transformer/' },
         { text: '第2章 Token、Embedding 与位置编码', link: '/01-llm-foundations/chapter-02-token-embedding-position/' },
         { text: '第3章 Self-Attention 与 QKV', link: '/01-llm-foundations/chapter-03-self-attention-qkv/' },
-        { text: '第3.5章 Attention 的矩阵视角与代码推演', link: '/01-llm-foundations/chapter-03b-attention-matrix-and-code/' },
-        { text: '第4章 Multi-Head Attention 与 Transformer Block', link: '/01-llm-foundations/chapter-04-multi-head-and-block/' },
-        { text: '第5章 Encoder、Decoder 与现代 LLM', link: '/01-llm-foundations/chapter-05-encoder-decoder-and-modern-llm/' },
-        { text: '第6章 训练、推理与现代 Transformer 演化', link: '/01-llm-foundations/chapter-06-training-inference-and-evolution/' },
-        { text: '第7章 KV Cache 与自回归推理实战', link: '/01-llm-foundations/chapter-06b-kv-cache-and-autoregressive-decoding/' },
-        { text: '第8章 RoPE 与长上下文外推实战', link: '/01-llm-foundations/chapter-06c-rope-and-long-context/' },
-        { text: '第9章 GQA MQA 与推理带宽权衡实战', link: '/01-llm-foundations/chapter-06d-gqa-mqa-and-bandwidth/' }
+        { text: '第4章 Attention 的矩阵视角与代码推演', link: '/01-llm-foundations/chapter-03b-attention-matrix-and-code/' },
+        { text: '第5章 Multi-Head Attention 与 Transformer Block', link: '/01-llm-foundations/chapter-04-multi-head-and-block/' },
+        { text: '第6章 Encoder、Decoder 与现代 LLM', link: '/01-llm-foundations/chapter-05-encoder-decoder-and-modern-llm/' },
+        { text: '第7章 训练、推理与现代 Transformer 演化', link: '/01-llm-foundations/chapter-06-training-inference-and-evolution/' },
+        { text: '第8章 KV Cache 与自回归推理实战', link: '/01-llm-foundations/chapter-06b-kv-cache-and-autoregressive-decoding/' },
+        { text: '第9章 RoPE 与长上下文外推实战', link: '/01-llm-foundations/chapter-06c-rope-and-long-context/' },
+        { text: '第10章 GQA MQA 与推理带宽权衡实战', link: '/01-llm-foundations/chapter-06d-gqa-mqa-and-bandwidth/' }
       ]
     }
   ]

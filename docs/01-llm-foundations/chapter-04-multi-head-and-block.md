@@ -1,5 +1,5 @@
-﻿﻿---
-title: 第4章 Multi-Head Attention 与 Transformer Block
+﻿---
+title: 第5章 Multi-Head Attention 与 Transformer Block
 description: 从单头注意力走到完整 Transformer 层，理解多头、残差、归一化与 FFN 的分工
 module: llm
 tags:
@@ -7,15 +7,15 @@ tags:
   - Transformer Block
 ---
 
-<KnowledgeMap current-module="llm" current-article="第4章 Multi-Head Attention 与 Transformer Block" />
+<KnowledgeMap current-module="llm" current-article="第5章 Multi-Head Attention 与 Transformer Block" />
 
-# 第 4 章 Multi-Head Attention 与 Transformer Block
+# 第 5 章 Multi-Head Attention 与 Transformer Block
 
 <ArticleHeader
   module="语言模型基础"
   :tags="['原理', 'Transformer Block']"
   reading-time="20 分钟"
-  prerequisite="已读第 3 章"
+  prerequisite="已读第 4 章"
   summary="单头 attention 解释了相关性匹配，但还不足以解释现代 LLM 的一层到底如何工作。这一章会把多头注意力、输出投影、残差连接、LayerNorm 和前馈网络拼成一个完整 Transformer block。"
 />
 
@@ -275,7 +275,7 @@ def transformer_block(x, mha, norm1, ffn, norm2):
 
 ## 下一章
 
-继续阅读 [第5章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm)，把 block 继续拼成 BERT、GPT 这类模型家族。
+继续阅读 [第6章 Encoder、Decoder 与现代 LLM](./chapter-05-encoder-decoder-and-modern-llm)，把 block 继续拼成 BERT、GPT 这类模型家族。
 
 ## 参考来源
 
@@ -285,7 +285,6 @@ def transformer_block(x, mha, norm1, ffn, norm2):
   https://arxiv.org/abs/2002.05202
 - transformers.run，Transformer 系列中文教程首页  
   https://transformers.run/
-
 
 
 

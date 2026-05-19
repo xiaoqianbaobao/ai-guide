@@ -1,5 +1,5 @@
 ---
-title: 第9章 GQA MQA 与推理带宽权衡实战
+title: 第10章 GQA MQA 与推理带宽权衡实战
 description: 从 MHA 到 MQA 再到 GQA，理解现代 LLM 为什么要牺牲部分注意力自由度来换取更低的 KV Cache 和更好的推理吞吐
 module: llm
 tags:
@@ -8,17 +8,17 @@ tags:
   - 核心
 ---
 
-<KnowledgeMap current-module="llm" current-article="第6.7章 GQA MQA 与推理带宽权衡实战" />
+<KnowledgeMap current-module="llm" current-article="第10章 GQA MQA 与推理带宽权衡实战" />
 
 <ArticleHeader
   module="语言模型基础"
   :tags="['工程', '推理', '核心']"
   reading-time="14 分钟"
-  prerequisite="建议先读第6章、第6.5章 KV Cache 与自回归推理实战"
+  prerequisite="建议先读第7章、第8章 KV Cache 与自回归推理实战"
   summary="这一章专门解决推理优化里的一个高频问题：为什么模型会从传统多头注意力走向 MQA 和 GQA，它们到底节省了什么，牺牲了什么，以及这些变化为什么会直接影响长上下文推理成本。"
 />
 
-# 第6.7章 GQA MQA 与推理带宽权衡实战
+# 第10章 GQA MQA 与推理带宽权衡实战
 
 当大家第一次学 `Multi-Head Attention` 时，通常会形成一个印象：
 
@@ -387,8 +387,8 @@ GQA 的关键是“分组共享”，它是真正的结构折中。
 
 ## 下一步
 
-- 回到 [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把这一页作为 GQA 和推理优化部分的展开理解
-- 继续阅读 [第6.5章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)，把 cache 机制和 KV 组数控制一起连起来
+- 回到 [第7章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把这一页作为 GQA 和推理优化部分的展开理解
+- 继续阅读 [第8章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)，把 cache 机制和 KV 组数控制一起连起来
 
 ## 参考来源
 

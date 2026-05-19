@@ -1,5 +1,5 @@
 ---
-title: 第7章 KV Cache 与自回归推理实战
+title: 第8章 KV Cache 与自回归推理实战
 description: 从 prefill、decode、缓存增长到最小代码，真正看懂大模型为什么一字一字生成以及 KV Cache 如何提速
 module: llm
 tags:
@@ -8,17 +8,17 @@ tags:
   - 推理
 ---
 
-<KnowledgeMap current-module="llm" current-article="第7章 KV Cache 与自回归推理实战" />
+<KnowledgeMap current-module="llm" current-article="第8章 KV Cache 与自回归推理实战" />
 
 <ArticleHeader
   module="语言模型基础"
   :tags="['工程', '核心', '推理']"
   reading-time="14 分钟"
-  prerequisite="建议先读第6章 训练、推理与现代 Transformer 演化"
+  prerequisite="建议先读第7章 训练、推理与现代 Transformer 演化"
   summary="这一章专门解决推理阶段最容易一知半解的部分：什么是 prefill，什么是 decode，KV Cache 到底缓存了什么，为什么它能显著降低重复计算，以及它为什么又会让长上下文越来越贵。"
 />
 
-# 第7章 KV Cache 与自回归推理实战
+# 第8章 KV Cache 与自回归推理实战
 
 很多人知道 `KV Cache` 很重要，但一旦问得更具体，就会开始模糊：
 
@@ -427,7 +427,7 @@ Agent 系统经常会：
 
 ## 下一步
 
-- 回到 [第6章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把这一页作为推理部分的展开理解
+- 回到 [第7章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把这一页作为推理部分的展开理解
 - 继续进入 [Agent 核心机制](../02-agent-core/)，你会更清楚为什么上下文与轨迹管理会直接影响系统成本
 
 ## 参考来源
