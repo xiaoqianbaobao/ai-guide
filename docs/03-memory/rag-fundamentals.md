@@ -1,4 +1,4 @@
-﻿﻿﻿---
+﻿﻿﻿﻿﻿﻿﻿---
 title: RAG 原理
 description: RAG 的价值不在于接上向量库，而在于让模型得到与当前任务相关的外部信息
 module: memory

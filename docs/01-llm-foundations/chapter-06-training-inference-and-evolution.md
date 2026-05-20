@@ -1,4 +1,4 @@
-﻿---
+﻿﻿﻿﻿---
 title: 第7章 训练、推理与现代 Transformer 演化
 description: 把 next-token 训练、KV Cache、RoPE、ALiBi、GQA、SwiGLU 与 MoE 放回同一条工程主线
 module: llm

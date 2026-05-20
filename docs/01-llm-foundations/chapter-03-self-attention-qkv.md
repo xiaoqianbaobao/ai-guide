@@ -1,4 +1,4 @@
-﻿---
+﻿﻿﻿﻿---
 title: 第3章 Self-Attention 与 QKV
 description: 从相关性匹配到加权聚合，真正看懂注意力如何在上下文中重写 token 表示
 module: llm

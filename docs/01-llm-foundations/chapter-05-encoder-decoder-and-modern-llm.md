@@ -1,4 +1,4 @@
-﻿---
+﻿﻿﻿﻿---
 title: 第6章 Encoder、Decoder 与现代 LLM
 description: 从原始 encoder-decoder Transformer 走到 BERT、GPT，理解主流模型家族为何分化
 module: llm
