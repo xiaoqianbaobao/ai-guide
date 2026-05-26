@@ -1,429 +1,639 @@
----
-title: LangGraph 状态图设计实战
-description: 不只理解节点和边，还要知道 state 怎么分层、reducer 怎么选、checkpoint 该保留什么
-module: tools
-tags:
-  - 工程
-  - LangGraph
-  - 实战
+# LangGraph 状态图设计实战：从"能跑"到"能维护"
+
+> **预计阅读时间：20 分钟**  
+> **前置知识：** 建议先读《LangGraph 原理》  
+> **一句话定位：** State 设计才是决定 LangGraph 系统能否长期维护的关键，而不是节点和边的数量。
+
 ---
 
-<KnowledgeMap current-module="tools" current-article="LangGraph 状态图设计实战" />
+## 开篇：为什么你的 State 设计是错的
 
-<ArticleHeader
-  module="工具与框架"
-  :tags="['工程', 'LangGraph', '实战']"
-  reading-time="12 分钟"
-  prerequisite="建议先读 LangGraph 原理"
-  summary="很多人以为 LangGraph 的难点是节点和边，其实真正决定系统能不能长期维护的是 state 设计。本篇专门讲 schema、reducer、private state、messages、checkpoint 和中断恢复的工程取舍。"
-/>
-
-# LangGraph 状态图设计实战
-
-很多人第一次接触 LangGraph，会把注意力放在：
-
-- 怎么加节点
-- 怎么连边
-- 怎么画图
-
-但项目一旦变复杂，真正先坏掉的往往不是边，而是 `state`。
-
-常见症状包括：
-
-- 什么都往 `messages` 里塞
-- 一个大字典从头传到尾
-- 并行节点互相覆盖结果
-- checkpoint 太重，恢复很痛苦
-- graph 能跑，但没有人敢改
-
-所以这篇文章的重点不是“怎么把图搭起来”，而是：
-
-`怎么把图设计成能长期维护的状态系统`
-
-## 最重要的事实
-
-LangGraph 的核心不是“把节点连成图”，而是：
-
-`节点返回 update，运行时用 reducer 把 update 合回 state，再由 state 驱动下一步`
-
-所以真正的工程问题变成了：
-
-- state 里该有哪些字段
-- 哪些字段允许覆盖
-- 哪些字段应该累积
-- 哪些字段根本不该持久化
-- 哪些字段只在局部节点之间传递
-
-## 一张状态驱动图
-
-```mermaid
-flowchart LR
-    A[当前 State] --> B[节点执行]
-    B --> C[返回 Update]
-    C --> D[Reducer 合并]
-    D --> E[新 State]
-    E --> F[决定下一步节点]
-```
-
-图的重点不是箭头，而是中间那句：
-
-`节点返回的不是整个世界，而是增量更新`
-
-## 先建立一个状态分层心智模型
-
-在实际项目里，可以把 state 大致分成四层：
-
-1. 对话层
-2. 控制层
-3. 结果层
-4. 临时层
-
-### 1. 对话层
-
-典型字段：
-
-- `messages`
-- `conversation_summary`
-
-它承载的是模型对当前任务上下文的理解现场。
-
-### 2. 控制层
-
-典型字段：
-
-- `current_step`
-- `status`
-- `retry_count`
-- `need_human_review`
-
-它承载的是图现在处在哪个控制阶段。
-
-### 3. 结果层
-
-典型字段：
-
-- `tool_results`
-- `draft_answer`
-- `validated_answer`
-- `artifacts`
-
-它承载的是系统已经产出的中间结果和最终结果。
-
-### 4. 临时层
-
-典型字段：
-
-- `temp_cache`
-- `raw_response`
-- `runtime_handles`
-
-这些字段通常不应该进 checkpoint。
-
-## 一张状态分层图
-
-```mermaid
-flowchart TD
-    A[Graph State]
-    A --> B[对话层 messages]
-    A --> C[控制层 status current_step retry_count]
-    A --> D[结果层 tool_results artifacts]
-    A --> E[临时层 temp_cache runtime_objects]
-```
-
-## 为什么“全塞 messages”会出问题
-
-初学者最常见的偷懒方式是：
-
-> 反正 messages 已经能传上下文了，那工具结果、路由判断、重试计数、系统状态全塞进去吧。
-
-短期确实能跑，长期会出现几个问题：
-
-- 控制语义和对话语义混在一起
-- 很难做结构化条件分支
-- checkpoint 不容易精确恢复
-- 评估时不知道系统到底为什么做出某个决策
-
-所以 `messages` 应该承担的是：
-
-`语言上下文`
-
-而不是：
-
-`所有系统状态`
-
-## Reducer 决定了状态是否可维护
-
-LangGraph 官方文档反复强调 reducer，不是因为它“高级”，而是因为它直接决定并行更新怎么合并。
-
-最常见的三类 reducer 心智模型：
-
-### 1. 覆盖型
-
-适合：
-
-- `status`
-- `current_step`
-- `selected_tool`
-
-特点是：后写入的值覆盖旧值。
-
-### 2. 追加型
-
-适合：
-
-- `messages`
-- `steps`
-- `tool_results`
-
-特点是：每次新结果都累积进来。
-
-### 3. 自定义聚合型
-
-适合：
-
-- 分数统计
-- 并行子任务结果汇总
-- 去重后的 artifact 列表
-
-特点是：你要明确写出如何合并。
-
-## 一张 reducer 选择图
-
-```mermaid
-flowchart TD
-    A[某个 State 字段] --> B{这个字段是单值状态吗}
-    B -->|是| C[用覆盖型 reducer]
-    B -->|否| D{这个字段需要累积吗}
-    D -->|是| E[用追加型 reducer]
-    D -->|否| F[写自定义 reducer]
-```
-
-## 一个更合理的 state 例子
+先看一个你可能写过的 State：
 
 ```python
-from typing import TypedDict, List, Optional
+# ❌ 初学者最常见的错误设计
+class AgentState(TypedDict):
+    messages: List[dict]   # 把所有东西都扔进来
+    everything: dict       # ← 这是一个危险信号
+```
 
+六个月后，这个系统会变成这样：
 
-class AgentState(TypedDict, total=False):
-    messages: List[dict]
+- `messages` 里混着：用户输入、工具结果、路由标志、重试计数、系统日志
+- 没有人敢改任何字段，因为不知道谁依赖它
+- 并行节点互相覆盖结果，行为变得不可预测
+- checkpoint 体积巨大，恢复速度极慢
+
+**这不是因为 LangGraph 不好，而是因为 State 设计得像个垃圾桶。**
+
+这篇文章的目标：让你设计出像精密钟表一样清晰的 State。
+
+---
+
+## 第一部分：State 的本质是什么
+
+### 1.1 一个重要的认知纠正
+
+很多人把 State 理解成"在节点间传递的字典"。这个理解不够准确。
+
+更准确的理解是：
+
+> **State 是整个图在某一时刻的"完整现场"。** 任何一个节点，只需要看 State，就应该知道自己该做什么、现在处于什么阶段、之前发生了什么。
+
+换句话说，State 要回答三个问题：
+1. **系统正在干什么**（控制流状态）
+2. **系统知道什么**（上下文信息）
+3. **系统做过什么**（历史结果）
+
+### 1.2 节点返回的是"增量更新"，不是新 State
+
+这是 LangGraph 最重要的机制之一，很多人搞错了：
+
+```python
+# ❌ 错误理解：返回完整 State
+def my_node(state: AgentState) -> AgentState:
+    state["status"] = "done"
+    return state  # 不要这样！
+
+# ✅ 正确做法：返回增量更新
+def my_node(state: AgentState) -> dict:
+    return {
+        "status": "done",
+        # 只返回你改变的字段
+        # 没改的字段不用管，运行时会保留旧值
+    }
+```
+
+这个机制的意义是：**节点不需要了解整个 State，只需要关心自己负责的那部分**。这就是为什么节点可以并行——它们各自只处理自己的字段。
+
+---
+
+## 第二部分：State 分层设计模型
+
+工程实践中，好的 State 可以分成四个职责层次：
+
+```
+┌─────────────────────────────────────┐
+│  对话层 (Dialogue Layer)             │
+│  messages, conversation_summary     │
+│  → 承载语言上下文，给模型看的        │
+├─────────────────────────────────────┤
+│  控制层 (Control Layer)              │
+│  current_step, status, retry_count  │
+│  → 承载执行状态，给图的路由看的      │
+├─────────────────────────────────────┤
+│  结果层 (Result Layer)               │
+│  tool_results, draft, final_answer  │
+│  → 承载产出物，给后续节点和用户看的  │
+├─────────────────────────────────────┤
+│  临时层 (Temp Layer)                 │
+│  temp_cache, raw_response           │
+│  → 节点内部中间值，不应进入 checkpoint│
+└─────────────────────────────────────┘
+```
+
+### 对话层：给 LLM 看的上下文
+
+```python
+# 对话层字段
+messages: Annotated[List[BaseMessage], add_messages]  # 用 LangChain 的 add_messages reducer
+conversation_summary: str  # 长对话摘要，防止 context 超长
+```
+
+**核心原则**：对话层只放**语言上下文**，不放系统状态。
+
+❌ 错误示范：
+```python
+# 不要把这些塞进 messages！
+messages.append({"role": "system", "content": "retry_count=3, status=failed"})
+```
+
+✅ 正确做法：系统状态有自己的字段。
+
+### 控制层：图的"仪表盘"
+
+```python
+# 控制层字段
+current_step: str          # 当前处于哪个阶段："planning", "executing", "reviewing"
+status: str                # 当前状态："running", "waiting_review", "failed", "done"
+retry_count: int           # 已重试次数
+need_human_review: bool    # 是否需要人工介入
+error_message: Optional[str]  # 如果失败，失败原因是什么
+```
+
+这些字段直接驱动条件边的路由逻辑：
+
+```python
+def route(state: AgentState) -> str:
+    if state["need_human_review"]:
+        return "human_review"
+    if state["retry_count"] >= 3:
+        return "escalate"
+    if state["status"] == "done":
+        return END
+    return "continue"
+```
+
+### 结果层：系统的"工作台"
+
+```python
+# 结果层字段
+search_results: List[dict]    # researcher 产出的原始资料
+draft_answer: Optional[str]   # 初稿
+validation_result: Optional[dict]  # 校验结果
+final_answer: Optional[str]   # 最终产物
+artifacts: List[dict]         # 生成的文件、代码等
+```
+
+### 临时层：运行时的"草稿纸"
+
+```python
+# 临时层字段（通常用 UntrackedValue 标记，不进 checkpoint）
+temp_cache: Optional[dict]    # 单节点内临时数据
+raw_llm_response: Optional[str]  # 原始模型输出，调试用
+```
+
+---
+
+## 第三部分：Reducer 深度解析
+
+### 3.1 为什么 Reducer 这么重要
+
+设想这个场景：你有两个并行的研究节点，都要往 `search_results` 写结果：
+
+```
+researcher_A 返回: {"search_results": [{"topic": "A", "content": "..."}]}
+researcher_B 返回: {"search_results": [{"topic": "B", "content": "..."}]}
+```
+
+**没有 Reducer**：B 的结果覆盖 A，你损失了一半数据。  
+**有追加型 Reducer**：两份结果都保留。  
+**有自定义 Reducer**：按照你的业务逻辑合并。
+
+### 3.2 三种 Reducer 的实现
+
+```python
+import operator
+from typing import Annotated
+from langgraph.graph.message import add_messages
+
+# === 追加型（最常用于 messages） ===
+messages: Annotated[List[BaseMessage], add_messages]
+# add_messages 是 LangGraph 内置的，还能处理消息去重和更新
+
+# === 简单追加型（适合普通列表） ===
+logs: Annotated[List[str], operator.add]
+search_results: Annotated[List[dict], operator.add]
+
+# === 覆盖型（默认，适合单值状态） ===
+status: str           # 没有 Annotated，默认覆盖
+current_step: str
+
+# === 自定义聚合型 ===
+def merge_scores(old: List[int], new: List[int]) -> List[int]:
+    """保留最高分"""
+    combined = old + new
+    return sorted(combined, reverse=True)[:5]  # 只保留前5
+
+top_scores: Annotated[List[int], merge_scores]
+
+# === 去重合并型 ===
+def merge_unique(old: List[str], new: List[str]) -> List[str]:
+    seen = set(old)
+    result = list(old)
+    for item in new:
+        if item not in seen:
+            result.append(item)
+            seen.add(item)
+    return result
+
+visited_urls: Annotated[List[str], merge_unique]
+```
+
+### 3.3 Reducer 选择决策树
+
+```
+这个字段的语义是什么？
+    │
+    ├─ 表示"当前状态/最新值"
+    │   → 覆盖型（默认，不加 Annotated）
+    │   例：status, current_step, selected_tool
+    │
+    ├─ 表示"历史记录/累积内容"
+    │   → 追加型（operator.add 或 add_messages）
+    │   例：messages, logs, search_results
+    │
+    ├─ 表示"合并多个来源的数据"
+    │   → 自定义聚合型
+    │   例：分数排行、去重 URL 列表
+    │
+    └─ 表示"运行时临时数据，不需要持久化"
+        → 考虑用 UntrackedValue 或不放进 State
+```
+
+---
+
+## 第四部分：Private State 和 Schema 分层
+
+### 4.1 为什么需要 Schema 分层
+
+不是所有状态都应该：
+- 暴露给外部调用者（input/output schema）
+- 在所有节点之间共享（private state）
+- 被持久化到 checkpoint（untreaked fields）
+
+LangGraph 支持为同一个图定义多种 schema：
+
+```python
+from langgraph.graph import StateGraph
+from typing import TypedDict
+from langchain_core.messages import BaseMessage
+
+# 外部输入 schema（用户看到的）
+class InputSchema(TypedDict):
+    user_query: str
+    user_id: str
+
+# 外部输出 schema（用户得到的）
+class OutputSchema(TypedDict):
+    final_answer: str
+    confidence: float
+    sources: List[str]
+
+# 内部完整 state（图内部用）
+class InternalState(TypedDict):
+    # 来自 InputSchema
+    user_query: str
+    user_id: str
+    # 内部运行时状态
+    messages: Annotated[List[BaseMessage], add_messages]
     current_step: str
+    status: str
     retry_count: int
-    tool_results: List[dict]
-    selected_tool: Optional[str]
+    search_results: Annotated[List[dict], operator.add]
+    draft_answer: Optional[str]
+    # 来自 OutputSchema
     final_answer: Optional[str]
+    confidence: Optional[float]
+    sources: List[str]
+
+# 构建图时指定 schema
+graph = StateGraph(
+    InternalState,
+    input=InputSchema,
+    output=OutputSchema
+)
 ```
 
-这个 state 设计的关键不是“字段够不够多”，而是：
+这样的好处：
+- 外部调用者只看到他们需要的
+- 内部节点可以使用完整状态
+- 接口契约清晰，重构更安全
 
-- `messages` 负责语言上下文
-- `current_step` 负责控制流
-- `tool_results` 负责结果累积
-- `final_answer` 负责最终产出
+### 4.2 Private State：节点间的私有通信
 
-## private state 和 input output schema 为什么重要
-
-LangGraph 官方文档一个很有价值的点，是支持：
-
-- 内部总 state
-- 输入 schema
-- 输出 schema
-- private state
-
-这能解决一个非常现实的问题：
-
-`不是所有状态都应该暴露给整个图，更不是所有状态都应该成为外部输入输出`
-
-### 一个典型设计
-
-- `input schema`: 用户输入、任务目标
-- `overall state`: 图内部运行全量状态
-- `private state`: 某几个节点之间传递的内部变量
-- `output schema`: 对外最终结果
-
-## 为什么这件事在工程上很重要
-
-如果没有状态分层，常见后果是：
-
-- 任意节点都能改任意字段
-- 图越来越像全局变量系统
-- 某个节点的内部中间值，被无意暴露成系统契约
-
-而 schema 分层的意义是：
-
-`把状态的可见性和责任边界做出来`
-
-## MessagesValue 适合什么，不适合什么
-
-LangGraph 官方提供 `MessagesValue`，它很方便，但不要神化。
-
-适合放进去的：
-
-- user message
-- assistant thought summary
-- tool call result
-- tool response
-
-不太适合放进去的：
-
-- retry counter
-- routing flag
-- checkpoint marker
-- metrics
-- runtime object
-
-因为这些内容并不属于“消息对话语义”。
-
-## Checkpoint 不是越多越好
-
-很多人一看到 LangGraph 有 persistence，就会想把所有状态全存下来。  
-这在短期很安心，但长期会导致：
-
-- checkpoint 变重
-- 恢复慢
-- 无关字段污染回放
-- 版本迁移困难
-
-更合理的思路是：
-
-`只把恢复执行所必需的状态持久化`
-
-### 一般建议持久化的
-
-- messages
-- 控制流状态
-- 关键中间结果
-- 人工中断恢复需要的上下文
-
-### 一般不建议持久化的
-
-- 数据库连接
-- 客户端句柄
-- 临时缓存
-- 可重新计算的大对象
-
-## 一张 checkpoint 取舍图
-
-```mermaid
-flowchart TD
-    A[某个字段] --> B{恢复执行时必须用到吗}
-    B -->|是| C[进入 checkpoint]
-    B -->|否| D{能否低成本重建}
-    D -->|能| E[不要持久化]
-    D -->|不能| F[重新评估是否需要保留]
-```
-
-## 中断恢复会反过来约束你的 state 设计
-
-如果图支持：
-
-- interrupt
-- human review
-- resume
-
-那你的 state 设计就必须满足：
-
-- 恢复后能判断现在处在哪一步
-- 恢复后知道前面做过什么
-- 恢复后能安全继续，不重复副作用
-
-这通常意味着至少需要：
-
-- 一个明确的 `status`
-- 一个明确的 `current_step`
-- 一份结构化的 `tool_results`
-
-而不是只靠对话消息去“猜”。
-
-## 一个常见坏设计
+某些信息只需要在特定几个节点之间传递，不需要全图可见：
 
 ```python
-state = {
-    "messages": [...],
-    "everything": {...}
-}
+# 只在 coder → reviewer 之间传递的内部信息
+class CodeReviewPrivate(TypedDict):
+    raw_ast: dict          # 代码的 AST，只有 reviewer 需要
+    complexity_score: int  # 复杂度分数，只用于 review 决策
+    test_coverage: float   # 测试覆盖率，内部评估用
+
+# 在节点定义时，通过参数类型注解声明使用 private state
+def reviewer_node(state: InternalState, private: CodeReviewPrivate) -> dict:
+    if private["complexity_score"] > 10:
+        return {"review_status": "needs_simplification"}
+    return {"review_status": "approved"}
 ```
 
-这种设计的问题不是丑，而是责任边界完全不清楚。
+---
 
-节点会开始：
+## 第五部分：Checkpoint 设计原则
 
-- 猜字段
-- 偷写字段
-- 依赖隐含约定
+### 5.1 Checkpoint 不是"全量存档"
 
-最后任何一个 reducer 的改动都可能让整图行为漂移。
+很多人看到 LangGraph 支持 persistence，就把所有字段都存下来。这是个陷阱：
 
-## 一个更实用的节点设计原则
+```
+checkpoint 体积过大 → 恢复速度慢 → 存储成本高 → 版本迁移困难
+```
 
-每个节点最好回答清楚三件事：
+### 5.2 什么应该进 checkpoint，什么不应该
 
-1. 我读取哪些 state 字段
-2. 我写回哪些 state 字段
-3. 我的输出应该覆盖、追加还是聚合
+| 类别 | 建议 | 原因 |
+|------|------|------|
+| `messages`（对话历史）| ✅ 持久化 | 恢复后模型需要上下文 |
+| `status`, `current_step` | ✅ 持久化 | 恢复后需要知道从哪里继续 |
+| `tool_results`（关键结果）| ✅ 持久化 | 恢复后不需要重新执行 |
+| `final_answer` | ✅ 持久化 | 最终产出 |
+| `temp_cache`（临时缓存）| ❌ 不持久化 | 重新计算即可 |
+| `db_connection`（连接对象）| ❌ 不持久化 | 无法序列化 |
+| `raw_llm_response`（原始输出）| ❌ 不持久化 | 体积大，价值低 |
+| `runtime_handles`（运行时句柄）| ❌ 不持久化 | 无法跨进程恢复 |
 
-如果这三件事说不清，通常说明：
+### 5.3 用 UntrackedValue 排除不需要持久化的字段
 
-- 节点职责太混
-- state 设计太乱
-- 或者 edge/router 拆分不合理
+```python
+from langgraph.channels import UntrackedValue
+from typing import Annotated
 
-## 状态图不只是“能跑起来”，还要能演化
+class AgentState(TypedDict):
+    # 这些字段会被 checkpoint 跟踪
+    messages: Annotated[List[BaseMessage], add_messages]
+    status: str
+    final_answer: Optional[str]
+    
+    # 这些字段不会进入 checkpoint
+    temp_search_cache: Annotated[Optional[dict], UntrackedValue]
+    debug_info: Annotated[Optional[str], UntrackedValue]
+```
 
-LangGraph 官方文档还强调 graph migration。  
-这背后的现实问题是：
+### 5.4 Checkpoint 存储后端选择
 
-- 你的 graph 不会永远不变
-- state schema 也不会永远不变
+| 后端 | 适用场景 | 特点 |
+|------|---------|------|
+| `MemorySaver` | 开发调试 | 内存存储，重启丢失 |
+| `SqliteSaver` | 单机生产 | 轻量，适合个人项目 |
+| `PostgresSaver` | 多机生产 | 高可用，支持并发 |
+| `RedisSaver` | 高频率任务 | 快速，适合短期状态 |
 
-所以设计时要尽量避免：
+```python
+# 开发阶段
+from langgraph.checkpoint.memory import MemorySaver
+checkpointer = MemorySaver()
 
-- 把临时实验字段写死成核心契约
-- 让太多节点依赖同一个模糊字段
-- checkpoint 强耦合到一版临时结构
+# 生产阶段（SQLite）
+from langgraph.checkpoint.sqlite import SqliteSaver
+checkpointer = SqliteSaver.from_conn_string("./checkpoints.db")
 
-工程上更稳的方式是：
+# 生产阶段（PostgreSQL）
+from langgraph.checkpoint.postgres import PostgresSaver
+checkpointer = PostgresSaver.from_conn_string("postgresql://user:pass@host/db")
+```
 
-- 字段名明确
-- 字段职责单一
-- schema 有层次
-- reducer 行为可解释
+---
 
-## 这篇文章真正想让你带走什么
+## 第六部分：实战案例——设计一个"研究助手"的 State
 
-很多人以为 LangGraph 的核心能力是“图”。  
-其实从工程角度看，它真正难也真正值钱的部分是：
+### 场景描述
 
-`状态如何被安全地更新、保存、恢复和路由`
+一个能自主研究问题的 Agent，流程：
+1. 分析用户问题，制定研究计划
+2. 并行搜索多个数据源
+3. 综合信息，写出草稿
+4. 自我校验质量
+5. 如果不够好，修改后重新校验（最多 3 轮）
+6. 输出最终答案
 
-当你把这层想明白之后：
+### State 设计过程
 
-- 节点会更清晰
-- 并行会更稳
-- checkpoint 会更可用
-- human-in-the-loop 会更自然
+**第一步：识别各层需要什么**
+
+```
+对话层：
+  - 用户原始问题
+  - 和用户的对话历史（如果有多轮交互）
+  
+控制层：
+  - 当前处于哪个阶段
+  - 已经修改了几轮
+  - 是否完成
+  
+结果层：
+  - 研究计划
+  - 各数据源的搜索结果
+  - 草稿
+  - 自我校验结果
+  - 最终答案
+```
+
+**第二步：确定每个字段的 Reducer**
+
+```python
+import operator
+from typing import TypedDict, List, Optional, Annotated
+from langchain_core.messages import BaseMessage
+from langgraph.graph.message import add_messages
+
+class ResearchState(TypedDict):
+    # ===== 对话层 =====
+    messages: Annotated[List[BaseMessage], add_messages]
+    user_query: str  # 覆盖型（不变的输入）
+    
+    # ===== 控制层 =====
+    current_phase: str        # "planning"|"searching"|"drafting"|"reviewing"|"done"
+    revision_round: int       # 覆盖型（每次加1，由节点负责）
+    is_complete: bool         # 覆盖型
+    
+    # ===== 结果层 =====
+    research_plan: Optional[str]     # 覆盖型（planner 的产出）
+    search_results: Annotated[       # 追加型（多个 searcher 并行写入）
+        List[dict], 
+        operator.add
+    ]
+    draft: Optional[str]             # 覆盖型（每轮修改覆盖上一版）
+    review_feedback: Optional[str]   # 覆盖型（最新一次的校验反馈）
+    quality_score: Optional[float]   # 覆盖型（最新质量评分）
+    final_answer: Optional[str]      # 覆盖型（最终产出）
+    
+    # ===== 元数据 =====
+    sources_used: Annotated[List[str], merge_unique]  # 去重合并的数据源列表
+```
+
+**第三步：验证设计**
+
+对每个字段问自己：
+- [ ] 这个字段的含义清晰吗？
+- [ ] Reducer 选对了吗（覆盖 vs 追加）？
+- [ ] 并行节点写这个字段安全吗？
+- [ ] 这个字段需要进 checkpoint 吗？
+- [ ] 恢复后能从这个字段判断该做什么吗？
+
+### 完整示例代码
+
+```python
+from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.memory import MemorySaver
+from langchain_openai import ChatOpenAI
+import operator
+
+# 自定义 reducer
+def merge_unique(old: List[str], new: List[str]) -> List[str]:
+    seen = set(old)
+    result = list(old)
+    for item in new:
+        if item not in seen:
+            result.append(item)
+            seen.add(item)
+    return result
+
+llm = ChatOpenAI(model="gpt-4o")
+
+# ===== 节点实现 =====
+
+def planner(state: ResearchState) -> dict:
+    response = llm.invoke([
+        {"role": "user", "content": f"为以下问题制定研究计划：{state['user_query']}"}
+    ])
+    return {
+        "research_plan": response.content,
+        "current_phase": "searching",
+        "messages": [response]
+    }
+
+def web_searcher(state: ResearchState) -> dict:
+    """模拟网络搜索"""
+    # 实际项目中这里调用搜索 API
+    results = [{"source": "web", "content": f"关于'{state['user_query']}'的网络资料..."}]
+    return {
+        "search_results": results,
+        "sources_used": ["web_search"]
+    }
+
+def paper_searcher(state: ResearchState) -> dict:
+    """模拟学术论文搜索"""
+    results = [{"source": "arxiv", "content": f"关于'{state['user_query']}'的学术论文..."}]
+    return {
+        "search_results": results,
+        "sources_used": ["arxiv"]
+    }
+
+def drafter(state: ResearchState) -> dict:
+    context = "\n".join([r["content"] for r in state["search_results"]])
+    response = llm.invoke([
+        {"role": "user", "content": f"基于以下资料，回答问题：{state['user_query']}\n\n资料：{context}"}
+    ])
+    return {
+        "draft": response.content,
+        "current_phase": "reviewing",
+        "messages": [response]
+    }
+
+def self_reviewer(state: ResearchState) -> dict:
+    response = llm.invoke([
+        {"role": "user", "content": f"评估这个回答的质量（1-10分），指出不足：\n问题：{state['user_query']}\n回答：{state['draft']}"}
+    ])
+    # 简化：假设评分在回答开头
+    score = 8.0  # 实际应该解析模型输出
+    
+    return {
+        "review_feedback": response.content,
+        "quality_score": score,
+        "revision_round": state["revision_round"] + 1,
+        "messages": [response]
+    }
+
+def finalizer(state: ResearchState) -> dict:
+    return {
+        "final_answer": state["draft"],
+        "is_complete": True,
+        "current_phase": "done"
+    }
+
+# ===== 路由函数 =====
+
+def route_after_review(state: ResearchState) -> str:
+    if state.get("quality_score", 0) >= 8.0:
+        return "finalize"
+    elif state.get("revision_round", 0) >= 3:
+        return "finalize"  # 超过最大轮次，强制结束
+    else:
+        return "drafter"  # 继续修改
+
+# ===== 构建图 =====
+
+graph = StateGraph(ResearchState)
+
+graph.add_node("planner", planner)
+graph.add_node("web_searcher", web_searcher)
+graph.add_node("paper_searcher", paper_searcher)
+graph.add_node("drafter", drafter)
+graph.add_node("self_reviewer", self_reviewer)
+graph.add_node("finalizer", finalizer)
+
+graph.set_entry_point("planner")
+graph.add_edge("planner", "web_searcher")
+graph.add_edge("planner", "paper_searcher")   # 并行搜索！
+graph.add_edge("web_searcher", "drafter")
+graph.add_edge("paper_searcher", "drafter")   # 两个搜索都完成后进 drafter
+graph.add_edge("drafter", "self_reviewer")
+graph.add_conditional_edges(
+    "self_reviewer",
+    route_after_review,
+    {"finalize": "finalizer", "drafter": "drafter"}
+)
+graph.add_edge("finalizer", END)
+
+app = graph.compile(checkpointer=MemorySaver())
+```
+
+---
+
+## 第七部分：State 演化和版本管理
+
+真实系统中，State schema 会随着业务演进而变化。一些实用建议：
+
+### 向前兼容设计
+
+```python
+class AgentState(TypedDict, total=False):  # total=False 让所有字段变为可选
+    messages: List[dict]
+    # ... 其他字段
+    
+    # 新增字段用 Optional + 默认值
+    confidence: Optional[float]  # v2.0 新增，老 checkpoint 没有这个字段
+```
+
+### 字段命名规范
+
+```python
+# ✅ 好的命名：动词+名词，含义清晰
+review_status: str        # "pending"|"approved"|"rejected"
+tool_call_count: int      # 调用工具的次数
+last_error_message: str   # 最后一次错误信息
+
+# ❌ 差的命名：模糊、歧义
+data: dict      # 什么数据？
+flag: bool      # 什么标志？
+info: str       # 什么信息？
+```
+
+---
 
 ## 本节总结
 
-- LangGraph 的核心不是连线，而是 state update 的组织方式
-- state 最好分成对话层、控制层、结果层、临时层
-- reducer 决定并行更新是否安全
-- `messages` 适合语言上下文，不适合承载全部系统状态
-- checkpoint 应只保存恢复执行真正需要的字段
+好的 State 设计就像好的数据库 schema 设计：
 
-## 下一步
+```
+✅ 好的 State 设计具备：
+  1. 分层清晰（对话/控制/结果/临时）
+  2. Reducer 选择匹配语义（覆盖/追加/自定义）
+  3. checkpoint 范围合理（只存必要字段）
+  4. 字段命名语义明确
+  5. schema 分层（input/output/internal/private）
 
-- 先回到 [LangGraph 原理](./langgraph-principles)，把这篇和整体机制对起来
-- 再读 [从零手写 Agent](./build-from-scratch)，对比“最小 loop”和“图式运行时”在状态管理上的差异
+❌ 糟糕的 State 设计：
+  1. 把所有东西塞进 messages
+  2. 用一个 "everything" dict 承载一切
+  3. 随意使用字段，没有所有权
+  4. 临时数据和持久数据混在一起
+```
 
-## 参考来源
+---
 
-- LangGraph 官方文档 Graph API overview  
-  https://docs.langchain.com/oss/javascript/langgraph/graph-api
-- LangGraph 官方文档 Use the graph API  
-  https://docs.langchain.com/oss/javascript/langgraph/use-graph-api
-- LangGraph 官方文档 Persistence  
-  https://docs.langchain.com/oss/javascript/langgraph/persistence
-- LangGraph 官方文档 Thinking in LangGraph  
-  https://docs.langchain.com/oss/javascript/langgraph/thinking-in-langgraph
-- Pregel: A System for Large-Scale Graph Processing  
-  https://research.google/pubs/pregel-a-system-for-large-scale-graph-processing/
+## 动手练习
+
+1. **重构练习**：拿一个你现有的 Agent 代码，识别出它"隐含"的状态字段，把它们显式化成 TypedDict
+2. **Reducer 选题**：为以下字段选择合适的 Reducer：`error_logs`（错误日志列表）、`current_model`（当前使用的模型名）、`visited_pages`（已访问网页的 URL 列表，不能重复）
+3. **Checkpoint 设计**：分析你的 State，标出哪些字段需要持久化，哪些不需要，并解释原因
+
+---
+
+## 参考资料
+
+- [LangGraph State Management 官方文档](https://langchain-ai.github.io/langgraph/concepts/low_level/)
+- [LangGraph Persistence 文档](https://langchain-ai.github.io/langgraph/concepts/persistence/)
+- [Google Pregel 论文](https://research.google/pubs/pregel-a-system-for-large-scale-graph-processing/)：理解 reducer 和 super-step 的原始来源
+- [Redux 的 Reducer 概念](https://redux.js.org/tutorials/fundamentals/part-3-state-actions-reducers)：前端框架中类似的状态管理思想

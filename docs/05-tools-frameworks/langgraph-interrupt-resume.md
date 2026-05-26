@@ -1,448 +1,668 @@
----
-title: LangGraph Interrupt Resume 与 Human Review 实战
-description: 把中断恢复和人工审核真正放进图里，理解 thread、checkpoint、interrupt、resume 与副作用边界
-module: tools
-tags:
-  - 工程
-  - LangGraph
-  - 实战
+# LangGraph Interrupt & Resume：让 Agent 学会"暂停一下"
+
+> **预计阅读时间：22 分钟**  
+> **前置知识：** 建议先读《LangGraph 原理》和《状态图设计实战》  
+> **一句话定位：** Human-in-the-Loop 不是 Agent 失败的补救措施，而是生产级系统的正式组成部分。
+
 ---
 
-<KnowledgeMap current-module="tools" current-article="LangGraph Interrupt Resume 与 Human Review 实战" />
+## 开篇：一个让你崩溃的场景
 
-<ArticleHeader
-  module="工具与框架"
-  :tags="['工程', 'LangGraph', '实战']"
-  reading-time="13 分钟"
-  prerequisite="建议先读 LangGraph 原理 与 LangGraph 状态图设计实战"
-  summary="很多人知道 LangGraph 支持 interrupt 和 resume，但真正难的是把人工审核、安全暂停、外部确认和副作用边界一起设计好。这一页专门讲一个可恢复工作流应该怎么拆。"
-/>
+你构建了一个"自动部署"Agent，它能：
+- 分析代码变更
+- 生成部署方案
+- 自动执行部署
 
-# LangGraph Interrupt Resume 与 Human Review 实战
+上线第一天，它把一个有 bug 的版本部署到了生产环境，导致服务宕机 2 小时。
 
-很多 Agent 工作流在 demo 阶段都很顺：
+**问题出在哪？**
 
-- 模型规划
-- 调工具
-- 产出结果
+不是模型不够聪明，也不是代码有 bug。而是这个系统被设计成了"全自动，一路到底"——没有给人介入的机会。
 
-但一旦进入真实场景，很快就会出现这些需求：
+**真正成熟的 Agent 系统知道：某些决策需要人来拍板。**
 
-- 高风险操作前要人工确认
-- 某一步需要等用户补信息
-- 外部系统返回慢，任务要先挂起
-- 图跑到一半崩了，不能从头全跑
+这篇文章讲的，就是怎么把"暂停-人工审核-继续"这个机制优雅地嵌入你的图里。
 
-这时，普通的线性流程就不够了。  
-你需要的不是“重试一次”，而是：
+---
 
-`让图在合适的位置停住，并且能带着现场继续回来`
+## 第一部分：三个概念，先分清楚
 
-这正是 `interrupt`、`resume` 和 `human review` 的工程价值。
+### Interrupt：主动踩刹车
 
-## 先把三个概念分开
+`interrupt` 是图在运行中**主动**暂停，把当前状态交给外部处理。
 
-### interrupt
+不是报错，不是崩溃，是"我故意停在这里，等你"。
 
-`interrupt` 的本质是：
+### Human Review：业务场景，不是 API
 
-`在图运行中的某个点主动暂停，并把当前状态交给外部处理`
+`human review` 不是 LangGraph 的某个函数，而是一个**业务需求**：有些决策不该完全自动化。
 
-### human review
+实现方式可以是：人工在 UI 界面点击审批、发 Slack 消息确认、填写表单等。
 
-`human review` 不是一个 API，而是一种业务场景：
+### Resume：带着记忆继续
 
-`某些决策不能完全自动化，需要人介入确认或修改`
+`resume` 不是"重新发一次请求"，而是**带着原来的 thread 和 checkpoint，从中断点之后继续执行**。
 
-### resume
+区别很关键：
+- **重跑**：从头开始，忘记之前做过什么
+- **Resume**：记得之前做过什么，从断点继续
 
-`resume` 的本质是：
+---
 
-`在保留线程上下文和状态的前提下，从中断点之后继续执行`
+## 第二部分：Thread 和 Checkpoint——恢复的两个前提
 
-这三个概念通常连在一起出现，但不要混成一句模糊的话。
-
-## 一个最常见的工作流
-
-比如你在做一个“自动修改配置并发布”的 Agent：
-
-1. 先分析需求
-2. 生成修改计划
-3. 识别高风险变更
-4. 等人工批准
-5. 执行修改
-6. 做验证
-7. 输出结果
-
-这里最自然的做法不是把人工审批写在图外面，而是把它正式纳入图中。
-
-## 一张最小流程图
-
-```mermaid
-flowchart TD
-    A[接收任务] --> B[planner]
-    B --> C[risk check]
-    C --> D{是否高风险}
-    D -->|是| E[interrupt 等待人工审核]
-    D -->|否| F[executor]
-    E --> G[resume with review result]
-    G --> F
-    F --> H[validator]
-    H --> I[输出结果]
-```
-
-这张图表达的核心是：
-
-`人工审核不是图外的电话沟通，而是图内正式控制流的一部分`
-
-## thread 为什么是第一前提
-
-只要讲中断恢复，就必须先讲 `thread`。
-
-你可以把 `thread` 理解成：
-
-`一次持续工作流的主线身份`
-
-围绕这个 thread，系统才能知道：
-
-- 这是谁的任务
-- 现在卡在哪一步
-- 当前状态是什么
-- 上次中断时留下了什么上下文
-
-如果没有 thread，resume 就容易退化成：
-
-`重新发一次请求，希望系统自己猜到之前发生过什么`
-
-这在真实系统里几乎不可靠。
-
-## checkpoint 不是附属能力，而是恢复基础
-
-要想 resume，就必须有某种形式的 checkpoint。  
-也就是：
-
-`在关键步骤后，把足够恢复执行的状态保存下来`
-
-这通常至少包括：
-
-- 当前 `messages`
-- 当前 `status`
-- 当前 `current_step`
-- 已有 `tool_results`
-- 审核相关上下文
-
-如果这些没有结构化保存，人工回来后你就只能重新跑。
-
-## 一张恢复链路图
-
-```mermaid
-flowchart LR
-    A[运行到审核点] --> B[写 checkpoint]
-    B --> C[interrupt]
-    C --> D[人工查看当前现场]
-    D --> E[补充意见或批准结果]
-    E --> F[resume]
-    F --> G[从 checkpoint 后继续]
-```
-
-## 一个更合理的 state 设计
-
-如果你的图涉及人工审核，state 里通常至少要把下面这些字段显式化：
+### 2.1 Thread：任务的"身份证号"
 
 ```python
-from typing import TypedDict, List, Optional
+# 每次运行时传入 thread_id
+config = {"configurable": {"thread_id": "deploy-task-2024-001"}}
 
+# 第一次运行（图会在 interrupt 点停下）
+state = app.invoke(initial_state, config=config)
 
-class ReviewState(TypedDict, total=False):
-    messages: List[dict]
-    current_step: str
-    status: str
-    plan: str
-    risk_level: str
+# 人工审核完成后，用同一个 thread_id 继续
+app.invoke(None, config=config)  # None 表示继续执行，不修改状态
+```
+
+Thread 让系统知道"这是同一件任务的延续"，而不是全新的任务。
+
+### 2.2 Checkpoint：断点的"现场照片"
+
+每个重要节点执行后，LangGraph 会自动保存状态快照（如果你配置了 checkpointer）：
+
+```
+执行时间线：
+planner ──┤ checkpoint ├── risk_check ──┤ checkpoint ├── [INTERRUPT] ──┤ checkpoint ├── executor
+         t=1                           t=2                             t=3
+```
+
+当人工审核完毕，resume 时系统从 t=3 的 checkpoint 继续，不需要重跑 planner 和 risk_check。
+
+### 2.3 查看和操作 Checkpoint
+
+```python
+# 查看当前状态
+current_state = app.get_state(config)
+print(current_state.values)         # 当前 state 的所有字段
+print(current_state.next)           # 下一步要执行哪个节点
+print(current_state.metadata)       # checkpoint 元数据
+
+# 查看历史所有 checkpoint（时光机！）
+for checkpoint in app.get_state_history(config):
+    print(f"时间：{checkpoint.metadata.get('created_at')}")
+    print(f"节点：{checkpoint.metadata.get('step')}")
+    print(f"状态：{checkpoint.values.get('status')}")
+    print("---")
+
+# 回到某个历史 checkpoint（调试用）
+historical_state = list(app.get_state_history(config))[2]  # 第3个历史状态
+app.invoke(None, config={
+    "configurable": {
+        "thread_id": "deploy-task-2024-001",
+        "checkpoint_id": historical_state.config["configurable"]["checkpoint_id"]
+    }
+})
+```
+
+---
+
+## 第三部分：Interrupt 的三种实现方式
+
+### 方式一：编译时声明（最简单）
+
+```python
+# 在编译时声明哪些节点前/后需要中断
+app = graph.compile(
+    checkpointer=checkpointer,
+    interrupt_before=["execute_deployment"],    # 执行部署前中断
+    interrupt_after=["risk_assessment"],         # 风险评估后中断
+)
+```
+
+适用场景：固定的、可预知的中断点。
+
+### 方式二：节点内动态决策（更灵活）
+
+```python
+from langgraph.types import interrupt
+
+def risk_check_node(state: DeployState) -> dict:
+    """根据实际风险级别决定是否中断"""
+    risk_level = assess_risk(state["deployment_plan"])
+    
+    if risk_level == "high":
+        # 这里会触发中断，value 是传给外部的上下文信息
+        human_decision = interrupt({
+            "message": "检测到高风险变更，需要人工确认",
+            "risk_details": state["risk_analysis"],
+            "deployment_plan": state["deployment_plan"],
+            "action_required": "请选择：approve / reject / request_more_info"
+        })
+        # interrupt 之后的代码，在 resume 时才会执行
+        return {
+            "human_decision": human_decision,
+            "status": "reviewed"
+        }
+    
+    # 低风险直接通过
+    return {"status": "auto_approved", "human_decision": "approve"}
+```
+
+适用场景：需要根据运行时状态动态决定是否中断。
+
+### 方式三：Command 模式（最灵活）
+
+```python
+from langgraph.types import Command, interrupt
+
+def approval_gate(state: DeployState) -> Command:
+    """门控节点：决定是中断还是继续"""
+    if state.get("need_approval"):
+        decision = interrupt("等待人工审批...")
+        
+        if decision == "approve":
+            return Command(goto="executor", update={"approved": True})
+        elif decision == "reject":
+            return Command(goto="planner", update={"approved": False, "rejection_reason": decision})
+        else:
+            return Command(goto="clarify", update={"clarification_needed": decision})
+    
+    # 不需要审批，直接继续
+    return Command(goto="executor", update={"approved": True})
+```
+
+---
+
+## 第四部分：完整的 Human-in-the-Loop 工作流
+
+让我们用一个真实的"AI 代码审查 + 部署"系统来展示完整流程：
+
+### 4.1 State 设计
+
+```python
+from typing import TypedDict, List, Optional, Annotated
+import operator
+from langchain_core.messages import BaseMessage
+from langgraph.graph.message import add_messages
+
+class DeployState(TypedDict):
+    # 对话层
+    messages: Annotated[List[BaseMessage], add_messages]
+    
+    # 控制层
+    current_phase: str      # planning|risk_check|waiting_approval|executing|validating|done
+    status: str             # running|waiting_human|approved|rejected|done|failed
+    
+    # 任务信息
+    code_diff: str          # 要部署的代码变更
+    deployment_env: str     # 目标环境：dev|staging|production
+    
+    # 分析结果
+    risk_level: str         # low|medium|high|critical
+    risk_analysis: str      # 详细风险分析
+    deployment_plan: str    # 具体部署步骤
+    
+    # 审核信息
     review_required: bool
+    reviewer_id: Optional[str]    # 谁来审核
+    review_decision: Optional[str]  # approve|reject|request_info
     review_comment: Optional[str]
-    review_decision: Optional[str]
-    tool_results: List[dict]
-    final_answer: Optional[str]
+    
+    # 执行结果
+    execution_log: Annotated[List[str], operator.add]
+    deployment_result: Optional[str]
+    rollback_plan: Optional[str]
 ```
 
-这个结构的重点不是“字段越多越好”，而是要把人工审核真正需要的状态抽出来。
-
-尤其要注意：
-
-- `review_required` 用来决定是否中断
-- `review_decision` 用来决定恢复后走哪条路
-- `review_comment` 用来保存人类反馈，而不是把它混在普通对话里
-
-## 为什么不要把审核结果只塞进 messages
-
-当然可以把人工意见也写成一条消息。  
-但如果完全只靠消息文本承载审核语义，后续会出现几个问题：
-
-- 路由判断变得模糊
-- 审核状态难以做结构化统计
-- 不容易清晰区分批准、拒绝、要求重试
-
-所以更稳的方式通常是：
-
-- `messages` 保存语言上下文
-- 独立字段保存审核结构化结果
-
-## interrupt 最该放在哪
-
-不是所有地方都适合 interrupt。  
-最适合放中断点的位置通常有三类：
-
-1. 高风险副作用之前
-2. 需要人工补充关键信息之前
-3. 长耗时外部动作等待期间
-
-### 高风险副作用之前
-
-例如：
-
-- 删除资源
-- 修改生产配置
-- 批量写数据库
-- 发出不可撤销指令
-
-这类节点前 interrupt 的意义最大，因为一旦执行，后果就不是“重新 resume 一下”能解决的。
-
-### 需要人工补充信息之前
-
-例如：
-
-- 用户需求不完整
-- 缺少审批编号
-- 缺少变更窗口信息
-
-### 等待外部事件期间
-
-例如：
-
-- 等审批系统异步回调
-- 等人工标注结果
-- 等第三方系统状态变化
-
-## 一条最重要的工程纪律
-
-`interrupt 最好发生在副作用之前，而不是副作用之后`
-
-原因很简单：
-
-- 如果副作用已经发生，再去中断，恢复时很难判断是否应重放
-- 如果中断发生在副作用之前，resume 时边界会清晰很多
-
-这其实和幂等设计是同一个问题。
-
-## 一张副作用边界图
-
-```mermaid
-flowchart TD
-    A[plan] --> B[risk check]
-    B --> C[interrupt before action]
-    C --> D[resume]
-    D --> E[execute side effect]
-    E --> F[validate]
-```
-
-这张图比“先执行再审计”更稳，因为恢复点落在真正危险动作之前。
-
-## 一个最小节点设计示意
+### 4.2 节点实现
 
 ```python
-def planner_node(state):
+from langgraph.types import interrupt
+from langchain_openai import ChatOpenAI
+
+llm = ChatOpenAI(model="gpt-4o")
+
+def planner_node(state: DeployState) -> dict:
+    """制定部署计划"""
+    response = llm.invoke([
+        {"role": "system", "content": "你是部署专家，分析代码变更并制定部署计划"},
+        {"role": "user", "content": f"分析这个代码变更并制定部署计划：\n{state['code_diff']}\n目标环境：{state['deployment_env']}"}
+    ])
+    
     return {
-        "plan": "准备修改配置并发布",
-        "current_step": "risk_check",
-        "status": "planned",
+        "deployment_plan": response.content,
+        "current_phase": "risk_check",
+        "messages": [response]
     }
 
-
-def risk_check_node(state):
-    high_risk = "生产" in state.get("plan", "")
+def risk_assessor_node(state: DeployState) -> dict:
+    """评估风险级别"""
+    response = llm.invoke([
+        {"role": "system", "content": "评估部署风险，输出格式：风险级别: [low/medium/high/critical]\n详细分析: ..."},
+        {"role": "user", "content": f"评估以下部署的风险：\n计划：{state['deployment_plan']}\n环境：{state['deployment_env']}"}
+    ])
+    
+    content = response.content
+    # 简化解析
+    risk_level = "high" if state["deployment_env"] == "production" else "medium"
+    
     return {
-        "risk_level": "high" if high_risk else "low",
-        "review_required": high_risk,
-        "current_step": "review" if high_risk else "execute",
-        "status": "waiting_review" if high_risk else "approved",
+        "risk_level": risk_level,
+        "risk_analysis": content,
+        "review_required": risk_level in ["high", "critical"],
+        "current_phase": "approval_gate",
+        "messages": [response]
     }
-```
 
-这里的关键不是 API，而是建模方式：
+def approval_gate_node(state: DeployState) -> dict:
+    """人工审核门控节点"""
+    if not state.get("review_required"):
+        # 低风险，自动通过
+        return {
+            "review_decision": "approve",
+            "status": "approved",
+            "current_phase": "executing"
+        }
+    
+    # 高风险，触发中断等待人工审核
+    # interrupt() 的参数会被传递给等待的调用方
+    human_input = interrupt({
+        "message": f"⚠️ 检测到{state['risk_level']}风险部署，需要人工确认",
+        "deployment_plan": state["deployment_plan"],
+        "risk_analysis": state["risk_analysis"],
+        "target_env": state["deployment_env"],
+        "options": {
+            "approve": "批准并继续部署",
+            "reject": "拒绝，退回重新规划",
+            "modify": "需要修改方案后再审"
+        }
+    })
+    
+    # Resume 后从这里继续，human_input 是人工传入的决定
+    decision = human_input.get("decision", "reject")
+    comment = human_input.get("comment", "")
+    reviewer = human_input.get("reviewer_id", "unknown")
+    
+    return {
+        "review_decision": decision,
+        "review_comment": comment,
+        "reviewer_id": reviewer,
+        "status": "approved" if decision == "approve" else "rejected",
+        "current_phase": "executing" if decision == "approve" else "planning"
+    }
 
-- 风险判断写成独立节点
-- 是否需要人工审核写成显式状态
-- 后续路由由状态决定
+def executor_node(state: DeployState) -> dict:
+    """执行部署（副作用节点，中断点必须在它之前）"""
+    # ⚠️ 关键：副作用在这里发生，所以 interrupt 在 approval_gate 而不是在这里
+    logs = [
+        f"[{state['deployment_env']}] 开始部署...",
+        "拉取最新代码...",
+        "执行数据库迁移...",
+        "重启服务...",
+        "部署完成！"
+    ]
+    
+    return {
+        "execution_log": logs,
+        "deployment_result": "success",
+        "current_phase": "validating"
+    }
 
-## resume 后到底怎么继续
+def validator_node(state: DeployState) -> dict:
+    """验证部署结果"""
+    success = state.get("deployment_result") == "success"
+    
+    return {
+        "status": "done" if success else "failed",
+        "current_phase": "done"
+    }
 
-resume 之后，不是把整张图重新从头执行。  
-更合理的方式是：
+# ===== 路由函数 =====
 
-1. 读取 thread 对应的 checkpoint
-2. 合并人工补充输入
-3. 更新审核状态字段
-4. 从设计好的恢复节点继续
-
-所以 resume 不是“再来一遍”，而是：
-
-`拿着旧现场和新输入，沿着原来的控制流继续往前走`
-
-## 一张恢复后的路由图
-
-```mermaid
-flowchart LR
-    A[resume 输入] --> B[更新 review_decision]
-    B --> C{审核结果}
-    C -->|批准| D[executor]
-    C -->|拒绝| E[planner revise]
-    C -->|补信息| F[clarify]
-```
-
-这张图说明 human review 真正的价值不是“有人看一眼”，而是：
-
-`人的反馈会改变图的后续路由`
-
-## 一个更完整的伪代码
-
-```python
-def review_router(state):
-    if state.get("review_required") and not state.get("review_decision"):
-        return "interrupt"
-
-    decision = state.get("review_decision")
-
-    if decision == "approved":
+def route_after_approval(state: DeployState) -> str:
+    decision = state.get("review_decision", "reject")
+    if decision == "approve":
         return "executor"
-    if decision == "rejected":
-        return "planner_revise"
-    return "clarify"
+    elif decision == "reject":
+        return "planner"
+    else:
+        return "planner"  # 需要修改方案，回到规划
+
+def route_final(state: DeployState) -> str:
+    return END if state["current_phase"] == "done" else "validator"
 ```
 
-这段伪代码抓住了审核路由的三种常见分支：
-
-- 通过
-- 驳回
-- 要求补信息
-
-## 人工审核真正难的不是暂停，而是恢复后的副作用一致性
-
-很多人第一次做 interrupt，以为难点在暂停语法。  
-其实真正麻烦的是：
-
-`resume 之后，系统怎么避免重复做已经做过的事`
-
-例如：
-
-- 已经发过一次邮件，恢复后不能再发一次
-- 已经改过一次配置，恢复后不能再写第二遍
-- 已经调用过一次收费 API，恢复后不能重复扣费
-
-这就要求你在设计节点时明确区分：
-
-- 纯计算节点
-- 副作用节点
-
-并尽量做到：
-
-- 中断前停在副作用之前
-- 副作用节点具备幂等保护
-- 执行结果能被结构化记录
-
-## 一个常见坏设计
+### 4.3 构建图
 
 ```python
-def giant_node(state):
-    plan()
-    call_llm()
-    execute_tool()
-    send_message()
-    return {"status": "done"}
+from langgraph.graph import StateGraph, END
+from langgraph.checkpoint.memory import MemorySaver
+
+graph = StateGraph(DeployState)
+
+graph.add_node("planner", planner_node)
+graph.add_node("risk_assessor", risk_assessor_node)
+graph.add_node("approval_gate", approval_gate_node)
+graph.add_node("executor", executor_node)
+graph.add_node("validator", validator_node)
+
+graph.set_entry_point("planner")
+graph.add_edge("planner", "risk_assessor")
+graph.add_edge("risk_assessor", "approval_gate")
+graph.add_conditional_edges(
+    "approval_gate",
+    route_after_approval,
+    {"executor": "executor", "planner": "planner"}
+)
+graph.add_edge("executor", "validator")
+graph.add_edge("validator", END)
+
+checkpointer = MemorySaver()
+app = graph.compile(checkpointer=checkpointer)
 ```
 
-这种节点看起来省事，但一旦中间想 interrupt，就会特别痛苦，因为你根本说不清：
+### 4.4 完整的运行流程
 
-- 现在停在了哪一步
-- 哪些副作用已经发生
-- 恢复后能不能安全重放
+```python
+import json
 
-## 更好的拆法
+# 初始状态
+initial_state = {
+    "messages": [],
+    "current_phase": "planning",
+    "status": "running",
+    "code_diff": "修改了用户登录逻辑，涉及权限验证",
+    "deployment_env": "production",
+    "risk_level": "",
+    "risk_analysis": "",
+    "deployment_plan": "",
+    "review_required": False,
+    "reviewer_id": None,
+    "review_decision": None,
+    "review_comment": None,
+    "execution_log": [],
+    "deployment_result": None,
+    "rollback_plan": None
+}
 
-把工作流拆成：
+config = {"configurable": {"thread_id": "deploy-prod-2024-0126"}}
 
-1. 规划节点
-2. 风险检查节点
-3. 审核等待节点
-4. 执行节点
-5. 校验节点
+# Step 1: 开始执行（图会在 approval_gate 的 interrupt() 处暂停）
+print("=== 开始执行部署流程 ===")
+state = app.invoke(initial_state, config=config)
 
-这种拆法的意义不是“图更好看”，而是每一步的恢复边界更清楚。
+# 图暂停了，查看当前状态
+current = app.get_state(config)
+print(f"状态：{current.values['status']}")
+print(f"当前阶段：{current.values['current_phase']}")
+print(f"风险级别：{current.values['risk_level']}")
+print(f"下一步：{current.next}")  # 输出: ('approval_gate',)
 
-## Human Review 不是失败兜底，而是正式治理机制
+# Step 2: 人工审核（这里可以是 API 调用、UI 交互、Slack Bot 等）
+print("\n=== 等待人工审核 ===")
+# 模拟人工填写审核表单
+human_review = {
+    "decision": "approve",
+    "comment": "已确认变更范围，风险可控，批准部署",
+    "reviewer_id": "alice@company.com"
+}
 
-很多团队会把人工审核只当成：
+# Step 3: 把人工输入注入到图中，然后继续执行
+print("\n=== 人工批准，继续执行 ===")
+# 方法一：直接更新状态后 resume
+app.update_state(
+    config,
+    {
+        "review_decision": human_review["decision"],
+        "review_comment": human_review["comment"],
+        "reviewer_id": human_review["reviewer_id"]
+    },
+    as_node="approval_gate"  # 指定是从哪个节点更新的
+)
 
-`模型不行了，再拉个人救火`
+# 方法二：resume 时传入人工输入（推荐，配合 interrupt() 的返回值）
+final_state = app.invoke(
+    Command(resume=human_review),  # 这会作为 interrupt() 的返回值
+    config=config
+)
 
-这会让系统长期处于半自动半手工的混乱状态。
+print(f"\n=== 部署完成 ===")
+print(f"最终状态：{final_state['status']}")
+print(f"执行日志：{json.dumps(final_state['execution_log'], ensure_ascii=False, indent=2)}")
+```
 
-更稳的做法是承认：
+---
 
-- 有些动作天然需要审批
-- 有些风险天然不能全自动化
-- 有些决策必须有人负责
+## 第五部分：副作用边界——最重要的工程纪律
 
-那么 human review 就不是失败补丁，而是图里的正式节点类型。
+### 5.1 黄金法则
 
-## 它和 Harness 的关系
+> **中断点必须在副作用之前，而不是副作用之后。**
 
-这一页讲的是 LangGraph 运行时层面如何处理中断和恢复。  
-Harness 关注的则是更高一层的运行纪律，例如：
+```
+❌ 错误顺序：
+  执行部署 → 中断等待确认 → 已经部署了，确认也晚了
 
-- 权限策略
-- 交接规则
-- 恢复策略
-- 验证闭环
+✅ 正确顺序：
+  分析风险 → 中断等待确认 → 人工批准 → 执行部署
+```
 
-两者的关系可以理解成：
+### 5.2 节点分类：纯计算 vs 副作用
 
-- LangGraph 解决“图怎么停、怎么续、怎么保状态”
-- Harness 解决“什么时候该停、谁能继续、继续前后要做什么检查”
+```python
+# 纯计算节点（可以安全重放）
+def analyze_risk(state):
+    # 只读状态，只调用 LLM，没有外部写操作
+    return {"risk_level": "high"}
 
-## 它和 Eval 的关系
+# 副作用节点（一旦执行就无法撤销，必须做幂等保护）
+def deploy_to_production(state):
+    # 调用外部 API，修改数据库，发送邮件...
+    # ⚠️ 这类节点前面必须有中断点
+    send_deployment_request(state["deployment_plan"])
+    return {"deployment_started": True}
+```
 
-一旦系统支持 interrupt 与 resume，就可以评估更真实的能力：
+### 5.3 幂等性设计
 
-- 是否在正确时机请求人工审核
-- 是否把审核上下文记录完整
-- 是否在恢复后走了正确路径
-- 是否避免了重复副作用
+即使你在副作用节点前设置了中断，也要为意外情况做幂等保护：
 
-所以 human review 不是只影响运行时，也会直接影响评估设计。
+```python
+def executor_node(state: DeployState) -> dict:
+    """幂等的执行节点"""
+    
+    # 检查是否已经执行过（通过 deployment_id 去重）
+    deployment_id = state.get("deployment_id")
+    if not deployment_id:
+        import uuid
+        deployment_id = str(uuid.uuid4())
+    
+    # 幂等检查：如果已经执行过，直接返回之前的结果
+    existing_result = check_deployment_status(deployment_id)
+    if existing_result and existing_result["status"] == "completed":
+        return {
+            "deployment_result": "success",
+            "execution_log": [f"部署 {deployment_id} 已完成（幂等检查）"]
+        }
+    
+    # 执行实际部署
+    result = execute_deployment(deployment_id, state["deployment_plan"])
+    
+    return {
+        "deployment_id": deployment_id,
+        "deployment_result": result["status"],
+        "execution_log": result["logs"]
+    }
+```
+
+### 5.4 副作用清单检查
+
+在设计图时，为每个节点填写这张表：
+
+| 节点 | 有副作用? | 副作用类型 | 是否幂等 | 中断点位置 |
+|------|---------|----------|---------|----------|
+| planner | 否 | - | - | 不需要 |
+| risk_assessor | 否 | - | - | 不需要 |
+| approval_gate | 否 | - | - | interrupt() |
+| executor | **是** | 调用部署 API | 需要做 | 在 approval_gate |
+| notify_team | **是** | 发 Slack 消息 | 需要做 | 在 executor 之后 |
+
+---
+
+## 第六部分：Resume 后如何避免重复执行
+
+### 问题场景
+
+```
+执行顺序：
+1. planner ✓（完成）
+2. risk_assessor ✓（完成）
+3. approval_gate ✓（暂停，等待人工）
+4. [人工审核] ✓（批准）
+5. executor ？（resume 后是否从 executor 开始？）
+```
+
+**正确答案：** LangGraph 会从中断节点（approval_gate）之后继续，**不会重复执行** planner 和 risk_assessor。
+
+但如果你的节点设计不当，可能会触发重复执行：
+
+```python
+# ❌ 危险：节点内有无法幂等的操作
+def approval_gate_node(state):
+    send_notification_email("需要审核")  # 每次经过这个节点都会发邮件！
+    human_input = interrupt(...)
+    return {...}
+
+# ✅ 安全：把发邮件移到专门的通知节点
+def send_approval_notification(state):
+    if not state.get("notification_sent"):  # 幂等检查
+        send_notification_email("需要审核")
+        return {"notification_sent": True}
+    return {}
+
+def approval_gate_node(state):
+    human_input = interrupt(...)  # 只做中断
+    return {...}
+```
+
+---
+
+## 第七部分：实际业务场景映射
+
+### 场景一：审批工作流（OA 系统）
+
+```python
+# 报销申请 Agent
+interrupt_points = {
+    "team_lead_approval": "金额 > 1000 元",
+    "finance_approval": "金额 > 10000 元",
+    "cfo_approval": "金额 > 100000 元"
+}
+
+def route_by_amount(state):
+    amount = state["expense_amount"]
+    if amount > 100000:
+        return "cfo_approval_gate"
+    elif amount > 10000:
+        return "finance_approval_gate"
+    elif amount > 1000:
+        return "team_lead_approval_gate"
+    else:
+        return "auto_approve"
+```
+
+### 场景二：内容审核（媒体平台）
+
+```python
+# AI 生成内容 + 人工审核
+def content_review_gate(state):
+    # AI 先做初步过滤
+    ai_score = state["safety_score"]
+    
+    if ai_score < 0.3:
+        # 明显违规，直接拒绝
+        return {"decision": "reject", "reason": "AI 检测违规"}
+    elif ai_score > 0.9:
+        # 明显安全，自动通过
+        return {"decision": "approve"}
+    else:
+        # 边界情况，人工审核
+        human_decision = interrupt({
+            "content": state["generated_content"],
+            "ai_score": ai_score,
+            "flagged_reasons": state["flagged_reasons"]
+        })
+        return {"decision": human_decision["verdict"]}
+```
+
+### 场景三：数据库迁移（DevOps）
+
+```python
+# 数据库 Schema 变更前必须人工确认
+app = graph.compile(
+    checkpointer=checkpointer,
+    interrupt_before=["execute_migration"]  # 迁移前必须暂停
+)
+```
+
+---
+
+## 第八部分：与 Harness 和评估体系的联系
+
+### 和 Harness 的分工
+
+| | LangGraph Interrupt/Resume | Harness |
+|---|---|---|
+| **关注点** | 图怎么停、怎么续、怎么保状态 | 什么时候该停、谁能继续、合规规则 |
+| **层次** | 运行时机制 | 治理策略 |
+| **例子** | `interrupt()` API | "生产部署需要两人批准" 的策略定义 |
+
+### 对评估体系的影响
+
+支持 interrupt/resume 后，你可以评估更细粒度的能力：
+
+```python
+# 评估指标示例
+evaluation_metrics = {
+    "interrupt_precision": "是否在该中断时才中断（不过度打扰人）",
+    "context_preservation": "resume 后，Agent 是否记得之前的上下文",
+    "duplicate_prevention": "resume 后是否避免了重复执行副作用",
+    "human_ui_quality": "传给人工的上下文信息是否清晰、够用"
+}
+```
+
+---
 
 ## 本节总结
 
-- `interrupt` 是主动暂停并交出当前状态
-- `resume` 是带着 thread 和 checkpoint 继续执行，而不是从头重跑
-- human review 应该被正式建模为图内控制流，而不是图外补丁
-- 中断点最好落在高风险副作用之前
-- 可恢复工作流的关键不在语法，而在状态设计和副作用边界
+```
+Interrupt/Resume 的核心设计原则：
 
-## 下一步
+1. Thread = 任务身份证（必须有，否则无法 resume）
+2. Checkpoint = 断点现场照片（自动保存，无需手动管理）
+3. Interrupt 位置 = 副作用之前（黄金法则，不能违反）
+4. Resume = 带着记忆继续，不是重跑（从断点后继续）
+5. 幂等性 = 即使意外重跑也安全（工程纪律，必须遵守）
 
-- 回到 [LangGraph 状态图设计实战](./langgraph-state-design)，把这一页和 schema、reducer、checkpoint 的设计原则对应起来
-- 继续阅读 [Harness 设计](./harness-design)，理解运行时治理如何决定哪些节点该中断、哪些动作必须审批
+Human Review 的设计哲学：
+  不是"模型不够好时才找人"
+  而是"某些决策天然需要人类负责"
+```
 
-## 参考来源
+---
 
-- LangGraph 官方文档 Persistence  
-  https://docs.langchain.com/oss/javascript/langgraph/persistence
-- LangGraph 官方文档 Thinking in LangGraph  
-  https://docs.langchain.com/oss/javascript/langgraph/thinking-in-langgraph
-- LangGraph 官方文档 Interrupts  
-  https://docs.langchain.com/oss/python/langgraph/interrupts
-- LangGraph 官方文档 Durable execution  
-  https://docs.langchain.com/oss/python/langgraph/durable-execution
-- LangGraph 官方文档 Human in the loop  
-  https://docs.langchain.com/oss/python/langgraph/human-in-the-loop
+## 动手练习
+
+1. **最小中断实验**：写一个 3 节点的图，在第 2 个节点加入 `interrupt()`，验证图确实会暂停，以及 `resume` 后从正确位置继续
+2. **副作用分析**：画出你现有 Agent 的流程，标出所有副作用节点，在每个副作用之前设计合适的中断点
+3. **幂等改造**：选一个你的副作用节点，加入幂等检查逻辑（用 uuid 或任务 ID 去重）
+
+---
+
+## 参考资料
+
+- [LangGraph Human-in-the-Loop 官方文档](https://langchain-ai.github.io/langgraph/concepts/human_in_the_loop/)
+- [LangGraph Interrupt 文档](https://langchain-ai.github.io/langgraph/reference/types/#langgraph.types.interrupt)
+- [LangGraph Persistence 官方文档](https://langchain-ai.github.io/langgraph/concepts/persistence/)
+- Anthropic 的 Constitutional AI 文章：关于人类监督 AI 决策的重要性
+- [Google SRE Book](https://sre.google/sre-book/table-of-contents/)：关于生产系统变更管理的最佳实践，人工审批的设计思路来源之一

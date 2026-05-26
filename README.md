@@ -14,8 +14,8 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 - 语言模型基础：解释 LLM、本质、上下文窗口，并以分章专题系统讲解 Transformer、QKV、Block、BERT/GPT 与现代演化
 - Agent 核心机制：覆盖 Tool Use、Context Engineering 等核心主题
 - Memory 体系：承接记忆设计与 RAG
-- 多 Agent 系统：进入复杂任务分工与 MCP
-- 工具与框架：补齐工具层与实现层视角
+- 多 Agent 系统：进入复杂任务分工、协作边界与系统关系
+- 工具与框架：补齐工具层、协议层与实现层视角
 - 评估与进化：作为系统优化与迭代闭环
 
 ## 本次更新
@@ -41,7 +41,7 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 - 已新增 `LangGraph 原理` 与 `Spring AI 框架原理`，把图式编排、节点/边/共享状态、有向图、ChatModel、ChatClient、Advisors、Tool Calling、RAG 等框架层知识正式纳入站点
 - 已同步更新 `语言模型基础`、`工具与框架`、`学习路线图` 和侧边栏，使底层模型原理与框架原理进入正式学习路径
 - 已修复首页卡片与知识地图组件中的根路径写死问题，改为 base 感知链接，避免部署在子路径或代理域名下时跳转到 `/00-preface/`、`/01-llm-foundations/` 这类错误地址
-- 已将 `语言模型基础` 模块重构为分章分节的小册子结构，形成 `6 章主线 + 1 篇第 3.5 章桥接页` 的 Transformer 专题，系统覆盖：
+- 已将 `语言模型基础` 模块重构为连续的 `第1章` 到 `第10章` 小册子结构，系统覆盖：
   - 为什么 Transformer 取代 RNN
   - Token、Embedding 与位置编码
   - Self-Attention 与 QKV
@@ -69,6 +69,8 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 - 已把 `MCP 协议` 从 `多 Agent 系统` 模块迁入 `工具与框架` 模块，明确它是标准化能力接入协议而不是多 Agent 子概念；同时把工程阅读顺序调整为 `Skill` 在前、`Harness` 在后
 - 已同步更新 `语言模型基础`、`Transformer 专题导读`、`工具与框架` 模块页以及侧边栏，把新增的推理结构优化、多角色协作图、长上下文原理和 Spring AI 实战内容纳入正式学习路径
 - 已继续修复 Mermaid 线上兼容问题，修正 `docs/02-agent-core/context-engineering.md` 中一处 Mermaid 代码块缺少结束 fence 导致后续标题被当成图语法解析的 Chrome / GitHub Pages 运行时报错
+- 已将 `D:\workspace\superpowers-main\superpowers-main\skills` 整体导入到当前项目的 `.trae/skills/`，后续执行任务时优先判断这些项目级 skills 是否适合先调用
+- 已新增 `.trae/skills/README.md`，记录 imported skills 的来源、当前清单与后续维护方式
 - 本轮内容补强参考了公开工程资料中的共识方向，例如上下文工程、工具设计与评估、长期记忆分类、Agent 运行时与标准化接入，但已统一改写为更适合本站知识体系的中文教程表达
 - 已将 Python 教程从首页、导航和主侧边栏中移除，不再作为站点主入口展示，但内容文件仍保留在仓库中
 - 保留阅读增强功能：侧边栏折叠、目录隐藏、专注阅读与状态记忆
