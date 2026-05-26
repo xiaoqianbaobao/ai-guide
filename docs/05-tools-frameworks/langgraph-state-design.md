@@ -1,3 +1,13 @@
+---
+title: LangGraph 状态图设计实战
+description: LangGraph 状态图设计实战：从"能跑"到"能维护"
+module: tools
+tags:
+  - 核心
+---
+
+<KnowledgeMap current-module="tools" current-article="langgraph-state-design" />
+
 # LangGraph 状态图设计实战：从"能跑"到"能维护"
 
 > **预计阅读时间：20 分钟**  

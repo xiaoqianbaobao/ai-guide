@@ -1,4 +1,15 @@
-﻿﻿# LangGraph 原理：为什么 Agent 系统适合用图来组织
+﻿﻿---
+title: LangGraph 原理
+description: LangGraph 原理：为什么 Agent 系统适合用图来组织
+module: tools
+tags:
+  - 核心
+---
+
+<KnowledgeMap current-module="tools" current-article="langgraph-principles" />
+
+
+# LangGraph 原理：为什么 Agent 系统适合用图来组织
 
 > **预计阅读时间：25 分钟**  
 > **前置知识：** 理解 Agent loop、Tool Use 基础概念  

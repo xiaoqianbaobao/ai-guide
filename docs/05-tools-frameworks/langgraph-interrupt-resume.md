@@ -1,3 +1,14 @@
+---
+title: LangGraph Interrupt & Resume
+description: LangGraph Interrupt & Resume：让 Agent 学会"暂停一下"
+module: tools
+tags:
+  - 核心
+---
+
+<KnowledgeMap current-module="tools" current-article="langgraph-interrupt-resume" />
+
+
 # LangGraph Interrupt & Resume：让 Agent 学会"暂停一下"
 
 > **预计阅读时间：22 分钟**  

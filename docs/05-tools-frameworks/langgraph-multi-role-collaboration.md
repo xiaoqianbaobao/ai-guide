@@ -1,3 +1,14 @@
+---
+title: LangGraph 多角色协作图实战
+description: LangGraph 多角色协作图实战：让 Agent 团队真正协作起来
+module: tools
+tags:
+  - 核心
+---
+
+<KnowledgeMap current-module="tools" current-article="langgraph-multi-role-collaboration" />
+
+
 # LangGraph 多角色协作图实战：让 Agent 团队真正协作起来
 
 > **预计阅读时间：25 分钟**  
