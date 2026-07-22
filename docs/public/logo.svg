@@ -1,13 +1,23 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128" role="img" aria-labelledby="title desc">
-  <title>AI Guide Logo</title>
-  <desc>Gradient rounded square with AI text.</desc>
-  <defs>
-    <linearGradient id="bg" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" stop-color="#2563eb" />
-      <stop offset="100%" stop-color="#7c3aed" />
-    </linearGradient>
-  </defs>
-  <rect x="8" y="8" width="112" height="112" rx="28" fill="url(#bg)" />
-  <path d="M43 84h-9l19-40h9l19 40h-9l-4-9H47l-4 9Zm7.8-16h14.4L58 51.5 50.8 68Z" fill="#fff" />
-  <path d="M87 44h9v40h-9z" fill="#fff" />
+<svg width="32" height="32" viewBox="0 0 32 32" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- 
+    极简线性图标，融合了"打开的书籍"与"知识网络图谱"意象。
+    使用克制的单色（深墨色 #2C2C2C），粗细统一（stroke-width="2"），
+    线条末端和连接处圆润（stroke-linecap="round", stroke-linejoin="round"），
+    传递专业、克制、工程感。
+  -->
+  
+  <!-- "打开的书籍"抽象底座，也象征体系化的基础 -->
+  <path d="M4 10C4 8.89543 4.89543 8 6 8H26C27.1046 8 28 8.89543 28 10V22C28 23.1046 27.1046 24 26 24H6C4.89543 24 4 23.1046 4 22V10Z" stroke="#2C2C2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  
+  <!-- "知识网络"核心结构，三个节点及连线 -->
+  <!-- 左上节点 -->
+  <circle cx="10" cy="13" r="1.5" fill="#2C2C2C"/>
+  <!-- 顶部中心节点（也象征书籍的装订线/中心点） -->
+  <circle cx="16" cy="10" r="1.5" fill="#2C2C2C"/>
+  <!-- 右上节点 -->
+  <circle cx="22" cy="13" r="1.5" fill="#2C2C2C"/>
+  
+  <!-- 连接线条，形成图谱结构 -->
+  <path d="M10 13L16 10L22 13" stroke="#2C2C2C" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+  <path d="M16 10V24" stroke="#2C2C2C" stroke-width="2" stroke-linecap="round"/>
 </svg>
