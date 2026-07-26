@@ -1326,9 +1326,9 @@ Page Component
 
 ## 19. Checkpoint 迁移到 MySQL 方案
 
-### 19.1 MySQL 方案是否可行？——我的判断修正
+### 19.1 MySQL 方案是否可行？
 
-之前我推荐了 Postgres 而否定了 MySQL，这个判断有偏差。你提出的"公司有成熟的 MySQL 运维"是合理的架构决策——引入额外 PG 实例的运维成本，可能比写一个 MySQL adapter 更高。
+之前推荐了 Postgres 而否定了 MySQL，这个判断有偏差。如果"公司有成熟的 MySQL 运维"是合理的架构决策——引入额外 PG 实例的运维成本，可能比写一个 MySQL adapter 更高。
 
 **关键判断依据：**
 
@@ -1485,7 +1485,7 @@ blob_data = zlib.compress(pickle.dumps(checkpoint), level=6)
 
 ### 19.6 结论
 
-之前的文档我直接推荐了 Postgres 否定了 MySQL，这个判断过于片面。**合理的决策思路应该是：**
+**合理的决策思路应该是：**
 
 ```
 公司已有 PG 运维能力 → PostgresSaver（零代码，官方维护）
