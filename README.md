@@ -24,6 +24,8 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 
 ## 本次更新
 
+- 修复全站文章顶部 [KnowledgeMap.vue](file:///Users/qian/Documents/workspace/ai-guide/docs/.vitepress/theme/components/KnowledgeMap.vue) 的路径图遗漏问题，补入 `07-ontology`、`08-self-evolving-skills`、`09-data-governance` 与 `实战案例` 节点
+- 为 [agent/index.md](file:///Users/qian/Documents/workspace/ai-guide/docs/agent/index.md)、[coding-assistant.md](file:///Users/qian/Documents/workspace/ai-guide/docs/agent/cases/coding-assistant.md) 和 [deerflow-harness-deep-dive/index.md](file:///Users/qian/Documents/workspace/ai-guide/docs/agent/cases/deerflow-harness-deep-dive/index.md) 补上文章顶部路径图，统一所有文章的导航体验
 - 新增 [DeerFlow Harness 深度拆解](./docs/agent/cases/deerflow-harness-deep-dive/index.md) 案例文章，并同时接入「实战案例」与「工具与框架」入口，避免它只挂在 `agent/cases` 下导致在 Harness 主线里不易发现
 - 修复 03-memory / 04-multi-agent 侧边栏挂载问题：此前新增的 6 篇文章只在模块 index 页列表里，没有挂到 `config.mjs` 的 sidebarMemory() 和 sidebarMultiAgent()，导致侧边栏看不到入口，现在已全部接入
 - 03-memory 侧边栏新增 3 篇：`记忆的写入时机与遗忘策略`、`向量库与图存储的选型对比`、`从 Episodic 到 Semantic 的蒸馏流程实战`

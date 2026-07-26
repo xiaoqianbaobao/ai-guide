@@ -2,6 +2,8 @@
 title: Agent 智能体系统
 ---
 
+<KnowledgeMap current-module="cases" current-article="Agent 智能体系统" />
+
 # Agent 智能体系统
 
 智能体（Agent）是人工智能领域的重要概念，指的是能够感知环境、做出决策并执行行动的自主实体。

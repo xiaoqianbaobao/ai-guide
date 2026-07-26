@@ -44,6 +44,10 @@ const modules: ModuleItem[] = [
   { id: 'memory', name: 'Memory 体系', link: '/03-memory/' },
   { id: 'multi-agent', name: '多 Agent', link: '/04-multi-agent/' },
   { id: 'tools', name: '工具与框架', link: '/05-tools-frameworks/' },
-  { id: 'eval', name: '评估与进化', link: '/06-eval-evolution/' }
+  { id: 'eval', name: '评估与进化', link: '/06-eval-evolution/' },
+  { id: 'ontology', name: '本体论与知识表示', link: '/07-ontology/' },
+  { id: 'self-evolving-skills', name: '自进化 Skills', link: '/08-self-evolving-skills/' },
+  { id: 'data-governance', name: '数据治理', link: '/09-data-governance/' },
+  { id: 'cases', name: '实战案例', link: '/agent/' }
 ]
 </script>

@@ -2,6 +2,8 @@
 title: 编程助手 Agent 实战
 ---
 
+<KnowledgeMap current-module="cases" current-article="编程助手 Agent 实战" />
+
 # 编程助手 Agent 实战
 
 在实际开发中，我们经常需要一个智能的编程助手来协助完成各种开发任务。本文将介绍如何构建一个实用的编程助手 Agent。

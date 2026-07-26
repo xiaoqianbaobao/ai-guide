@@ -3,6 +3,8 @@ title: "DeerFlow Harness 深度拆解：Agent 运行时引擎的完整架构设�
 description: "基于 deer-flow-by-cc 仓库源码、设计文档、白皮书，从 Harness 引擎到中间件链、从 Checkpoint 持久化到 M5 身份透传，全面拆解 DeerFlow Agent 运行时引擎的架构设计。"
 ---
 
+<KnowledgeMap current-module="cases" current-article="DeerFlow Harness 深度拆解" />
+
 ## 目录
 
 **上篇：Harness — Agent 运行时引擎**
