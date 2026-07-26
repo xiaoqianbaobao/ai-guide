@@ -1053,7 +1053,7 @@ pop_current_app_config()         # 退出
 
 ## 16. 身份与多租户子系统
 
-位于 `backend/app/gateway/identity/`，是你在 DeerFlow 2.0 基础上新增的核心模块。
+位于 `backend/app/gateway/identity/`，是我们在 DeerFlow 2.0 基础上新增的核心模块。
 
 ### 16.1 设计原则
 
@@ -2217,7 +2217,7 @@ def resolve_class(path: str, base_type: type | None = None) -> type:
 
 #### 为什么不用担心 SQLite 的容量？
 
-**你提到的场景**："80G 物理内存存 100 人团队的 checkpoint.db 很快就满了"
+**场景**："80G 物理内存存 100 人团队的 checkpoint.db 很快就满了"
 
 这个推理有一个核心假设错误——**checkpoint 数据存在 SQLite 文件中（磁盘），不是物理内存中**。
 
@@ -2352,7 +2352,7 @@ def _make_agent_node(model, tools, middleware, system_prompt, name):
 
 ## 27. Checkpoint 磁盘膨胀问题：原因与解决方案
 
-> 这是你遇到的**真实生产问题**——80GB 磁盘被 checkpoint.db 填满。原因不是 SQLite 本身，而是 base64 图片数据被**双重存储**在 checkpoint 中且从未清理。
+> 这是我们遇到的**真实生产问题**——80GB 磁盘被 checkpoint.db 填满。原因不是 SQLite 本身，而是 base64 图片数据被**双重存储**在 checkpoint 中且从未清理。
 
 ### 27.1 根因分析：图片数据的完整生命周期
 
@@ -2515,7 +2515,7 @@ def check_thread_quota(thread_id, max_mb=500):
 | **P4** | E: 磁盘配额 | 中等改造 | — | 防止单个用户耗尽磁盘 |
 
 **推荐**：先上 **P0**（一行代码改 ViewImageMiddleware），1 小时内见效。  
-如果后续还觉得空间不够，再根据你公司的数据库生态选 **P1（MySQL）** 或 **P1-alternative（Postgres）**。  
+如果后续还觉得空间不够，再根据公司的数据库生态选 **P1（MySQL）** 或 **P1-alternative（Postgres）**。  
 只要 P0 做了，P1/P2/P3/P4 可以从容安排——P0 本身已经解决了最大的问题（双重存储）。
 
 ![架构图](disk-space-solutions.png)
