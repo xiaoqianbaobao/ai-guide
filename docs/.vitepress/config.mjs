@@ -275,7 +275,7 @@ function sidebarTools() {
       collapsed: false,
       items: [
         { text: '模块概述', link: '/05-tools-frameworks/' },
-        { text: 'Cursor vs Claude Code vs Trae', link: '/05-tools-frameworks/cursor-vs-claude-code/' },
+        { text: 'Harness 正在商品化：从 Claude Code 与 Codex 的多端布局说起', link: '/05-tools-frameworks/cursor-vs-claude-code/' },
         { text: '从零手写 Agent', link: '/05-tools-frameworks/build-from-scratch/' },
         { text: 'MCP 协议', link: '/05-tools-frameworks/mcp-protocol/' },
         { text: 'LangGraph 原理', link: '/05-tools-frameworks/langgraph-principles/' },

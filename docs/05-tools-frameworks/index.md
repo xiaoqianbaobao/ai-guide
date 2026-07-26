@@ -37,7 +37,7 @@ module: tools
 
 ## 推荐顺序
 
-1. 先读 [Cursor vs Claude Code vs Trae](./cursor-vs-claude-code)，从真实工具体验进入工程判断。
+1. 先读 [Harness 正在商品化：从 Claude Code 与 Codex 的多端布局说起](./cursor-vs-claude-code)，从产品竞争格局进入 harness 视角。
 2. 再读 [从零手写 Agent](./build-from-scratch)，理解不依赖框架时系统最小实现应该长什么样。
 3. 再读 [MCP 协议](./mcp-protocol)，理解工具、资源和提示为什么需要标准化能力接入层。
 4. 接着读 [LangGraph 原理](./langgraph-principles)，理解节点、边、状态和有向图为什么适合 Agent。
@@ -54,7 +54,7 @@ module: tools
 
 | 文章 | 类型 | 简介 |
 | --- | --- | --- |
-| [Cursor vs Claude Code vs Trae](./cursor-vs-claude-code) | 实战 | 从真实使用体验看三类工具的差异 |
+| [Harness 正在商品化：从 Claude Code 与 Codex 的多端布局说起](./cursor-vs-claude-code) | 实战/工程 | 理解 harness 清单趋同后，差异化往哪里迁移 |
 | [从零手写 Agent](./build-from-scratch) | 实战 | 不依赖框架理解 Agent 的最小实现 |
 | [MCP 协议](./mcp-protocol) | 核心 | 理解工具、资源和提示为什么需要标准化能力接入 |
 | [LangGraph 原理](./langgraph-principles) | 工程 | 理解节点、边、共享状态和有向图编排 |

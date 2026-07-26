@@ -24,6 +24,8 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 
 ## 本次更新
 
+- 用新文章 [cursor-vs-claude-code.md](file:///Users/qian/Documents/workspace/ai-guide/docs/05-tools-frameworks/cursor-vs-claude-code.md) 替换原 `Cursor vs Claude Code vs Trae`，主题更新为 `Harness 正在商品化：从 Claude Code 与 Codex 的多端布局说起`，并保持原链接路径不变，避免旧入口失效
+- 同步更新 [config.mjs](file:///Users/qian/Documents/workspace/ai-guide/docs/.vitepress/config.mjs) 侧边栏、[05-tools-frameworks/index.md](file:///Users/qian/Documents/workspace/ai-guide/docs/05-tools-frameworks/index.md) 模块首页和 README 中的入口文案，确保全站展示标题一致
 - 修复全站文章顶部 [KnowledgeMap.vue](file:///Users/qian/Documents/workspace/ai-guide/docs/.vitepress/theme/components/KnowledgeMap.vue) 的路径图遗漏问题，补入 `07-ontology`、`08-self-evolving-skills`、`09-data-governance` 与 `实战案例` 节点
 - 为 [agent/index.md](file:///Users/qian/Documents/workspace/ai-guide/docs/agent/index.md)、[coding-assistant.md](file:///Users/qian/Documents/workspace/ai-guide/docs/agent/cases/coding-assistant.md) 和 [deerflow-harness-deep-dive/index.md](file:///Users/qian/Documents/workspace/ai-guide/docs/agent/cases/deerflow-harness-deep-dive/index.md) 补上文章顶部路径图，统一所有文章的导航体验
 - 新增 [DeerFlow Harness 深度拆解](./docs/agent/cases/deerflow-harness-deep-dive/index.md) 案例文章，并同时接入「实战案例」与「工具与框架」入口，避免它只挂在 `agent/cases` 下导致在 Harness 主线里不易发现
@@ -59,14 +61,14 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 - 新建了 `00-preface` 到 `06-eval-evolution` 的模块首页与首批关键文章
 - 统一强化了 7 个模块首页结构，补齐模块定位、适合谁读、进入前建议、推荐顺序和后续跳转
 - 已按 P0 优先级扩写首批核心正文，包括范式转移、LLM、本体 Agent、Tool Use、Context Engineering 与 Memory 四种形态
-- 已继续扩写第二批核心正文，包括 `RAG 原理`、`Orchestrator-Subagent`、`MCP 协议`、`Cursor vs Claude Code vs Trae` 与 `Agentic Eval 设计`
+- 已继续扩写第二批核心正文，包括 `RAG 原理`、`Orchestrator-Subagent`、`MCP 协议`、`Harness 正在商品化：从 Claude Code 与 Codex 的多端布局说起` 与 `Agentic Eval 设计`
 - 已补齐 `从零手写 Agent` 与 `奖励函数设计` 两篇实现层/评估层关键正文，覆盖最小结构、常见误区、奖励组合与工程判断
 - 已补齐序章中的 `AI 原生开发者思维` 与 `学习路径指南`，把站点入口从“知道有哪些文章”推进到“知道该怎么学、为什么这样学”
 - 已为站点接入 Mermaid 图示能力，可在正文中直接编写流程图、时序图与脑图
 - 已扩写 `Tool Use 完整机制`、`Context Engineering`、`Memory 的四种形态`、`MCP 协议` 四篇文章，补充系统图示、典型误区、工程判断与更完整的概念边界
 - 已继续扩写 `RAG 原理`、`Agentic Eval 设计`、`从零手写 Agent`，补充检索链路、评估闭环、运行时结构、适用边界与图示化解释
 - 已重写 `Harness 设计` 与 `Agent Skills` 两篇文章：前者改为从控制平面、query loop、权限、中断、上下文治理、恢复与验证来讲 harness engineering；后者改为贴近 Claude Code 官方 skills 语境，系统讲解 `SKILL.md`、frontmatter、自动发现、调用控制、支持文件与生命周期
-- 已更新工具与框架模块导航，并补强 `Cursor vs Claude Code vs Trae`、`Orchestrator-Subagent`、`奖励函数设计` 等页面与 harness / skill 新概念的衔接
+- 已更新工具与框架模块导航，并补强 `Harness 正在商品化：从 Claude Code 与 Codex 的多端布局说起`、`Orchestrator-Subagent`、`奖励函数设计` 等页面与 harness / skill 新概念的衔接
 - 已新增 `Harness 与 Skill 的评估体系` 和 `Tool / MCP / Skill / Harness / Workflow / Agent 关系图` 两篇页面，把新知识点正式接入评估主线和系统概念地图
 - 已新增 `Transformer、Attention 与 QKV`，系统解释 token、embedding、self-attention、多头注意力、FFN、因果掩码与 KV Cache 这些语言模型底层机制
 - 已新增 `LangGraph 原理` 与 `Spring AI 框架原理`，把图式编排、节点/边/共享状态、有向图、ChatModel、ChatClient、Advisors、Tool Calling、RAG 等框架层知识正式纳入站点
