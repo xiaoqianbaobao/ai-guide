@@ -36,7 +36,7 @@ description: "基于 deer-flow-by-cc 仓库源码、设计文档、白皮书，�
 19. [Checkpoint 迁移到 MySQL 方案](#19-checkpoint-迁移到-mysql-方案)
 20. [部署影响分析](#20-部署影响分析)
 21. [核心请求流 Deep Dive](#21-核心请求流-deep-dive)
-22. [Agent JD 知识点映射](#22-agent-面试--jd-知识点映射)
+22. [Agent JD 知识点映射](#22-agent-jd-知识点映射)
 23. [深入追问与自测](#23-深入追问与自测)
 
 ---
@@ -1322,7 +1322,7 @@ Page Component
 
 ---
 
-# 下篇：部署与面试
+# 下篇：部署与反问
 
 ---
 
@@ -1650,11 +1650,11 @@ Tn  Complete           → RunStatus.success
 
 ---
 
-## 22. Agent 面试 / JD 知识点映射
+## 22. JD 知识点映射
 
 ### 23.1 LangGraph / Agent 框架
 
-| 知识点 | DeerFlow 体现 | 面试可讲 |
+| 知识点 | DeerFlow 体现 | 反问可讲 |
 |--------|---------------|----------|
 | **State Schema** | `ThreadState` (messages, sandbox, thread_data, identity) | State 设计原则，字段分割 |
 | **中间件机制** | 4 个 hook (before/after agent, wrap_tool_call) | 非侵入式横切关注点 |
