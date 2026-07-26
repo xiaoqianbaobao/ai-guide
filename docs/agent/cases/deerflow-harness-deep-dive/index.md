@@ -1055,7 +1055,7 @@ pop_current_app_config()         # 退出
 
 ## 16. 身份与多租户子系统
 
-位于 `backend/app/gateway/identity/`，是我们在 DeerFlow 2.0 基础上新增的核心模块。
+位于 `backend/app/gateway/identity/`，是社区在 DeerFlow 2.0 基础上新增的核心模块。
 
 ### 16.1 设计原则
 
