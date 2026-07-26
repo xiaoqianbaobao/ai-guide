@@ -48,6 +48,7 @@ module: tools
 9. 再读 [Spring AI ChatClient Advisor 与 Structured Output 实战](./spring-ai-chatclient-advisors-practice)，把调用入口、Advisor 链、结构化输出与 Tool Calling 落到业务代码里。
 10. 接着读 [Agent Skills](./agent-skills)，理解流程知识、模板和脚本怎样被打包成可发现、可加载、可复用能力。
 11. 最后读 [Harness 设计](./harness-design)，理解运行时控制结构怎样治理 skills、工具权限、上下文和恢复路径。
+12. 如果你想看真实项目源码拆解，再读 [DeerFlow Harness 深度拆解](../agent/cases/deerflow-harness-deep-dive/)，把前面的概念放回一个完整运行时引擎里。
 
 ## 本模块文章
 
@@ -64,6 +65,7 @@ module: tools
 | [Spring AI ChatClient Advisor 与 Structured Output 实战](./spring-ai-chatclient-advisors-practice) | 工程 | 理解 ChatClient、Advisor 顺序、结构化输出与工具调用的落地方式 |
 | [Agent Skills](./agent-skills) | 工程 | 理解可发现、可加载、可复用的流程知识包 |
 | [Harness 设计](./harness-design) | 工程 | 理解运行时控制结构如何治理长任务、权限与恢复 |
+| [DeerFlow Harness 深度拆解](../agent/cases/deerflow-harness-deep-dive/) | 案例/源码拆解 | 把 Harness、运行时、中间件链、检查点与多租户设计放回真实项目源码 |
 
 ## 学完后去哪里
 

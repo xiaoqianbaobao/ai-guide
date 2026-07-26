@@ -1109,6 +1109,8 @@ Q6: 验证与分工如何压住模型不稳定性？
 
 ## 下一步
 
+- 也可直接读 [DeerFlow Harness 深度拆解：一个完整 Agent 运行时引擎的源码分析](../agent/cases/deerflow-harness-deep-dive/) —— 这套原则在真实项目中的落地回放
+
 - 如果你还没系统理解过 Skills，先阅读 [Agent Skills](./agent-skills)
 - 或回到 [系统概念关系图](../04-multi-agent/system-relations) 对照理解 Harness 在整套体系里的层级
 

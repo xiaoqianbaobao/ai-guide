@@ -285,7 +285,8 @@ function sidebarTools() {
         { text: 'Spring AI 框架原理', link: '/05-tools-frameworks/spring-ai-framework/' },
         { text: 'Spring AI ChatClient Advisor 与 Structured Output 实战', link: '/05-tools-frameworks/spring-ai-chatclient-advisors-practice/' },
         { text: 'Agent Skills', link: '/05-tools-frameworks/agent-skills/' },
-        { text: 'Harness 设计', link: '/05-tools-frameworks/harness-design/' }
+        { text: 'Harness 设计', link: '/05-tools-frameworks/harness-design/' },
+        { text: 'DeerFlow Harness 深度拆解', link: '/agent/cases/deerflow-harness-deep-dive/' }
       ]
     }
   ]
@@ -349,7 +350,8 @@ function sidebarAgent() {
       collapsed: false,
       items: [
         { text: 'Agent 概念总览', link: '/agent/' },
-        { text: '编程助手 Agent 实战', link: '/agent/cases/coding-assistant/' }
+        { text: '编程助手 Agent 实战', link: '/agent/cases/coding-assistant/' },
+        { text: 'DeerFlow Harness 深度拆解', link: '/agent/cases/deerflow-harness-deep-dive/' },
       ]
     }
   ]

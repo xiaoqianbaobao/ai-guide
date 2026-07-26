@@ -12,6 +12,8 @@ dist/
 .DS_Store
 *.local
 
+/.vitepress/
+
 # VitePress cache
 docs/.vitepress/cache/
 
