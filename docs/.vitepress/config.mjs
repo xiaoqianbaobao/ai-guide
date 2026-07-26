@@ -63,6 +63,20 @@ export default withMermaid(defineConfig({
           { text: '工具与框架', link: '/05-tools-frameworks/' },
           { text: '评估与进化', link: '/06-eval-evolution/' }
         ]
+      },
+      {
+        text: '进阶主题',
+        items: [
+          { text: '本体论与知识表示', link: '/07-ontology/' },
+          { text: '自进化 Skills', link: '/08-self-evolving-skills/' },
+          { text: '数据治理', link: '/09-data-governance/' }
+        ]
+      },
+      {
+        text: '实战案例',
+        items: [
+          { text: 'Agent 实战', link: '/agent/' }
+        ]
       }
     ],
     sidebar: buildSidebar(),
@@ -142,7 +156,11 @@ function buildSidebar() {
     '/03-memory/': sidebarMemory(),
     '/04-multi-agent/': sidebarMultiAgent(),
     '/05-tools-frameworks/': sidebarTools(),
-    '/06-eval-evolution/': sidebarEval()
+    '/06-eval-evolution/': sidebarEval(),
+    '/07-ontology/': sidebarOntology(),
+    '/08-self-evolving-skills/': sidebarSelfEvolving(),
+    '/09-data-governance/': sidebarDataGovernance(),
+    '/agent/': sidebarAgent()
   }
 }
 
@@ -277,6 +295,55 @@ function sidebarEval() {
         { text: 'Agentic Eval 设计', link: '/06-eval-evolution/agentic-eval-design/' },
         { text: '奖励函数设计', link: '/06-eval-evolution/reward-function-design/' },
         { text: 'Harness 与 Skill 的评估体系', link: '/06-eval-evolution/harness-skill-evaluation/' }
+      ]
+    }
+  ]
+}
+
+function sidebarOntology() {
+  return [
+    {
+      text: '本体论与知识表示',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/07-ontology/' }
+      ]
+    }
+  ]
+}
+
+function sidebarSelfEvolving() {
+  return [
+    {
+      text: '自进化 Skills 与 Agent 自我改进',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/08-self-evolving-skills/' }
+      ]
+    }
+  ]
+}
+
+function sidebarDataGovernance() {
+  return [
+    {
+      text: '数据治理',
+      collapsed: false,
+      items: [
+        { text: '模块概述', link: '/09-data-governance/' }
+      ]
+    }
+  ]
+}
+
+function sidebarAgent() {
+  return [
+    {
+      text: 'Agent 实战',
+      collapsed: false,
+      items: [
+        { text: 'Agent 概念总览', link: '/agent/' },
+        { text: '编程助手 Agent 实战', link: '/agent/cases/coding-assistant/' }
       ]
     }
   ]

@@ -37,16 +37,16 @@ features:
 
 <div class="home-stat-grid">
   <div class="home-stat-card">
-    <strong>7 个模块</strong>
-    <span>从序章到评估与进化，覆盖 AI Agent 的完整知识主线。</span>
+    <strong>10 个模块</strong>
+    <span>从序章到数据治理，覆盖 AI Agent 的完整知识主线。</span>
   </div>
   <div class="home-stat-card">
     <strong>P0 / P1 / P2</strong>
     <span>按优先级逐步补齐重点内容，先保证主线可读，再向外扩展。</span>
   </div>
   <div class="home-stat-card">
-    <strong>目标 52 篇</strong>
-    <span>以体系化文章而不是零散笔记构建长期可维护的知识站。</span>
+    <strong>路线图看板</strong>
+    <span>以 <code>ROADMAP.md</code> 追踪 59 篇目标文章的发布状态。</span>
   </div>
   <div class="home-stat-card">
     <strong>阅读增强</strong>
@@ -81,7 +81,9 @@ features:
 2. 进入 [大语言模型基础](/01-llm-foundations/)，先把 LLM 和上下文窗口理解稳定。
 3. 再读 [Agent 核心机制](/02-agent-core/)，理解 Tool Use、上下文工程与闭环系统。
 4. 接着进入 [Memory 体系](/03-memory/) 和 [多 Agent 系统](/04-multi-agent/)，看复杂任务如何扩展。
-5. 最后再看 [工具与框架](/05-tools-frameworks/) 和 [评估与进化](/06-eval-evolution/)，把认知落回工程选择与系统优化。
+5. 然后看 [工具与框架](/05-tools-frameworks/) 和 [评估与进化](/06-eval-evolution/)，把认知落回工程选择与系统优化。
+6. 进阶读者继续进入 [本体论与知识表示](/07-ontology/)、[自进化 Skills](/08-self-evolving-skills/) 和 [数据治理](/09-data-governance/)，补齐长期工程化能力。
+7. 最后从 [Agent 实战](/agent/) 把所学落到具体场景。
 
 ## 知识地图
 
@@ -93,9 +95,13 @@ features:
   -> 多 Agent 系统
   -> 工具与框架
   -> 评估与进化
+  -> 本体论与知识表示
+  -> 自进化 Skills 与自我改进
+  -> 数据治理
+  -> Agent 实战案例
 ```
 
-## 七大模块
+## 十大模块
 
 <div class="home-module-grid">
   <a class="home-module-card" href="./00-preface/">
@@ -133,6 +139,21 @@ features:
     <p>让概率系统变得可比较、可测量、可迭代。</p>
     <span class="module-meta">优化闭环</span>
   </a>
+  <a class="home-module-card" href="./07-ontology/">
+    <h3>本体论与知识表示</h3>
+    <p>从哲学概念落到实体消歧、关系建模与语义对齐。</p>
+    <span class="module-meta">进阶主题</span>
+  </a>
+  <a class="home-module-card" href="./08-self-evolving-skills/">
+    <h3>自进化 Skills</h3>
+    <p>从人工预置技能，走向自动发现与自我修正闭环。</p>
+    <span class="module-meta">进阶主题</span>
+  </a>
+  <a class="home-module-card" href="./09-data-governance/">
+    <h3>数据治理</h3>
+    <p>数据血缘、敏感隔离、审计留痕与合规落地。</p>
+    <span class="module-meta">进阶主题</span>
+  </a>
 </div>
 
 ## 当前内容进度
@@ -140,12 +161,15 @@ features:
 | 模块 | 当前状态 | 重点内容 |
 | --- | --- | --- |
 | 序章 | 已成型 | 范式转移、AI 原生思维、学习方式 |
-| 大语言模型基础 | 已成型 | LLM 本质、上下文窗口 |
+| 大语言模型基础 | 已成型 | LLM 本质、上下文窗口、第1-10章小册子 |
 | Agent 核心机制 | 已成型 | Agent 本质、Tool Use、Context Engineering |
-| Memory 体系 | 持续完善 | 四种记忆形态、RAG 基础 |
-| 多 Agent 系统 | 持续完善 | 协作模式、MCP 协议 |
-| 工具与框架 | 持续完善 | 工具比较、手写 Agent |
-| 评估与进化 | 持续完善 | Agentic Eval、奖励函数 |
+| Memory 体系 | 持续完善 | 四种记忆形态、RAG 基础（待补3篇） |
+| 多 Agent 系统 | 持续完善 | 协作模式、系统关系图（待补3篇） |
+| 工具与框架 | 已成型 | 工具比较、手写 Agent、LangGraph、Spring AI |
+| 评估与进化 | 持续完善 | Agentic Eval、奖励函数、评估体系（待补2篇） |
+| 本体论与知识表示 | 骨架已搭 | 模块首页就绪，正文待补 |
+| 自进化 Skills | 骨架已搭 | 模块首页就绪，正文待补 |
+| 数据治理 | 骨架已搭 | 模块首页就绪，正文待补 |
 
 ## 这套站点的重点
 
