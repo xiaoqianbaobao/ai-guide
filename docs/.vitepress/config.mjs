@@ -242,7 +242,10 @@ function sidebarMemory() {
       items: [
         { text: '模块概述', link: '/03-memory/' },
         { text: 'Memory 的四种形态', link: '/03-memory/four-memory-types/' },
-        { text: 'RAG 原理', link: '/03-memory/rag-fundamentals/' }
+        { text: '记忆的写入时机与遗忘策略', link: '/03-memory/write-timing-and-forgetting-policy/' },
+        { text: 'RAG 原理', link: '/03-memory/rag-fundamentals/' },
+        { text: '向量库与图存储的选型对比', link: '/03-memory/vectordb-vs-graphdb/' },
+        { text: '从 Episodic 到 Semantic 的蒸馏流程实战', link: '/03-memory/episodic-to-semantic-pipeline/' }
       ]
     }
   ]
@@ -256,6 +259,9 @@ function sidebarMultiAgent() {
       items: [
         { text: '模块概述', link: '/04-multi-agent/' },
         { text: 'Orchestrator-Subagent', link: '/04-multi-agent/orchestrator-subagent/' },
+        { text: '多 Agent 的失败模式与恢复策略', link: '/04-multi-agent/failure-modes-and-recovery/' },
+        { text: '多 Agent 的成本与延迟权衡', link: '/04-multi-agent/cost-latency-tradeoffs/' },
+        { text: 'Blackboard / Debate 等非层级协作拓扑', link: '/04-multi-agent/topologies-blackboard-debate/' },
         { text: '系统概念关系图', link: '/04-multi-agent/system-relations/' }
       ]
     }

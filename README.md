@@ -24,6 +24,9 @@ AI Agent Guide 是一个基于 VitePress 构建的中文知识站点，目标是
 
 ## 本次更新
 
+- 修复 03-memory / 04-multi-agent 侧边栏挂载问题：此前新增的 6 篇文章只在模块 index 页列表里，没有挂到 `config.mjs` 的 sidebarMemory() 和 sidebarMultiAgent()，导致侧边栏看不到入口，现在已全部接入
+- 03-memory 侧边栏新增 3 篇：`记忆的写入时机与遗忘策略`、`向量库与图存储的选型对比`、`从 Episodic 到 Semantic 的蒸馏流程实战`
+- 04-multi-agent 侧边栏新增 3 篇：`多 Agent 的失败模式与恢复策略`、`多 Agent 的成本与延迟权衡`、`Blackboard / Debate 等非层级协作拓扑`
 - 参考 `ai-agent-guide-spec-v2.md` 进行结构性架构升级，主结构从 7 个核心模块扩容为 10 个主线模块
 - 新增 3 个模块骨架（目录 + 侧边栏 + 导航入口 + 模块首页）：
   - `07-ontology/` 本体论与知识表示
