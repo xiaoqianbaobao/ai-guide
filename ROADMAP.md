@@ -17,10 +17,10 @@
 | 04-multi-agent 多 Agent 系统 | 6 | 6 | 0 | ✅ 100% |
 | 05-tools-frameworks 工具与框架 | 13 | 13 | 0 | ✅ 100% |
 | 06-eval-evolution 评估与进化 | 5 | 4 | 1 | 🟡 80% |
-| 07-ontology 本体论与知识表示 | 7 | 6 | 1 | 🟢 86% |
-| 08-self-evolving-skills 自进化 Skills | 3 | 0 | 3 | 🔴 0% |
+| 07-ontology 本体论与知识表示 | 7 | 7 | 0 | ✅ 100% |
+| 08-self-evolving-skills 自进化 Skills | 4 | 3 | 1 | 🟢 75% |
 | 09-data-governance 数据治理 | 3 | 0 | 3 | 🔴 0% |
-| **合计** | **65** | **54** | **11** | **🟢 83%** |
+| **合计** | **65** | **57** | **8** | **🟢 88%** |
 
 ---
 
@@ -58,7 +58,7 @@
 
 ## 阶段二（5-12 周，新增模块骨架）
 
-### 07-ontology 本体论与知识表示（已发布首批）
+### 07-ontology 本体论与知识表示（已发布 7/7，全齐）
 
 | 文章 | 状态 | 备注 |
 |---|---|---|
@@ -68,15 +68,16 @@
 | Cruxible：用 YAML 写可执行本体论（entity/relationship/named_query/guards） | ✅ 已发布 | 开源参照物 |
 | 受治理的写入：direct/proposal_only/角色/审批组/证据与 Attestation | ✅ 已发布 | 治理机制核心 |
 | Ontology × Memory × Multi-Agent × Eval：跨模块集成 | ✅ 已发布 | 落地篇 |
-| Hypergraph 在企业级多 Agent 架构中的实际应用 | 📝 待写 | 高阶属性多向关系与治理衔接 |
+| Hypergraph 在企业级多 Agent 架构中的实际应用 | ✅ 已发布 | 高阶属性多向关系 + 与 proposal_only/pins/outcome 治理衔接 |
 
-### 08-self-evolving-skills 自进化 Skills（P1）
+### 08-self-evolving-skills 自进化 Skills（P1，已发布首批核心 3 篇）
 
 | 文章 | 状态 | 备注 |
 |---|---|---|
-| Skill 的自动发现与自动打包机制 | 📝 待写 | 区别于 05 中的"人工设计 Skills" |
-| 自我修正循环：从执行失败到生成新 Skill 的闭环 | 📝 待写 | - |
-| 自进化机制的失控风险与护栏设计 | 📝 待写 | 技能污染、能力漂移、版本回滚，结合金融强监管背景 |
+| Skill 的自动发现与自动打包机制 | ✅ 已发布 | 从运行时信号到 proposal/review/package/release 的流水线 |
+| 自我修正循环：从执行失败到生成新 Skill 的闭环 | ✅ 已发布 | 失败 6 类分类 + 归因 + 修复候选 + 4 条门禁 |
+| 自进化机制的失控风险与护栏设计 | ✅ 已发布 | 6 类失控模式（污染/漂移/静默覆盖/护栏自废/配置漂移/激励偏离）+ 18 条自检清单 |
+| 把自进化机制落地到 07 本体之上的最小 Scaffold | 📝 待写 | 参考 cruxible procedure schema 的可运行 skeleton |
 
 ### 09-data-governance 数据治理（P1）
 

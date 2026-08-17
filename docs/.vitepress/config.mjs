@@ -319,7 +319,8 @@ function sidebarOntology() {
         { text: 'Palantir Foundry：语义六件套（Object / Link / Action / Function / Roles / Workflow）', link: '/07-ontology/foundry-object-link-action-function/' },
         { text: 'Cruxible：用 YAML 写可执行本体论（entity / relationship / named_query / guards）', link: '/07-ontology/cruxible-yaml-ontology/' },
         { text: '受治理的写入：direct / proposal_only / 角色 / 审批组 / 证据与 Attestation', link: '/07-ontology/governed-writes-and-approvals/' },
-        { text: 'Ontology × Memory × Multi-Agent × Eval：跨模块集成', link: '/07-ontology/ontology-integration/' }
+        { text: 'Ontology × Memory × Multi-Agent × Eval：跨模块集成', link: '/07-ontology/ontology-integration/' },
+        { text: 'Hypergraph 在企业级多 Agent 架构中的应用', link: '/07-ontology/hypergraph-enterprise-multi-agent/' }
       ]
     }
   ]
@@ -331,7 +332,10 @@ function sidebarSelfEvolving() {
       text: '自进化 Skills 与 Agent 自我改进',
       collapsed: false,
       items: [
-        { text: '模块概述', link: '/08-self-evolving-skills/' }
+        { text: '模块概述', link: '/08-self-evolving-skills/' },
+        { text: 'Skill 的自动发现与自动打包机制', link: '/08-self-evolving-skills/skill-auto-discovery-and-packaging/' },
+        { text: '从执行失败到自我修正：生成新 Skill 的闭环', link: '/08-self-evolving-skills/self-improving-loop/' },
+        { text: '自进化的失控风险与护栏设计', link: '/08-self-evolving-skills/self-evolving-guardrails/' }
       ]
     }
   ]

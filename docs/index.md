@@ -46,7 +46,7 @@ features:
   </div>
   <div class="home-stat-card">
     <strong>路线图看板</strong>
-    <span>以 <code>ROADMAP.md</code> 追踪 59 篇目标文章的发布状态。</span>
+    <span>以 <code>ROADMAP.md</code> 追踪 65 篇目标文章的发布状态。</span>
   </div>
   <div class="home-stat-card">
     <strong>阅读增强</strong>
@@ -166,9 +166,9 @@ features:
 | Memory 体系 | 已成型 | 四种记忆形态、写入/遗忘、向量 vs 图、Episodic→Semantic |
 | 多 Agent 系统 | 已成型 | Orchestrator-Subagent、失败恢复、成本延迟、Blackboard/Debate |
 | 工具与框架 | 已成型 | 工具比较、手写 Agent、LangGraph、Spring AI、Harness、DeerFlow 深拆 |
-| 评估与进化 | 持续完善 | Agentic Eval、奖励函数、评估体系（待补2篇） |
-| 本体论与知识表示 | 已成型（持续扩展） | 总览破题、四条边界、Foundry 六件套、Cruxible YAML、受治理写入、跨模块集成（待补 Hypergraph） |
-| 自进化 Skills | 骨架已搭 | 模块首页就绪，正文待补 |
+| 评估与进化 | 持续完善 | Agentic Eval、奖励函数、评估体系（待补 1 篇） |
+| 本体论与知识表示 | 已成型（持续扩展） | 总览破题、四条边界、Foundry 六件套、Cruxible YAML、受治理写入、跨模块集成、Hypergraph（7 篇全齐） |
+| 自进化 Skills | 已成型（持续扩展） | Skill 自动发现与打包、自我修正闭环、失控风险与护栏 3 篇核心正文已发布 |
 | 数据治理 | 骨架已搭 | 模块首页就绪，正文待补 |
 
 ## 这套站点的重点

@@ -23,8 +23,8 @@ AI Agent Guide 是一个基于 VitePress 构建的中文开源知识站点，目
 - 多 Agent 系统：Orchestrator-Subagent、失败恢复、成本延迟、Blackboard/Debate 拓扑
 - 工具与框架：Harness 商品化、协议层、LangGraph、Spring AI、DeerFlow Harness 深拆、Agent Skills
 - 评估与进化：Agentic Eval、奖励函数、评估与进化闭环
-- 本体论与知识表示：总览破题、四条边界、Foundry 语义六件套、Cruxible YAML 本体、受治理写入、跨模块集成
-- 自进化 Skills 与 Agent 自我改进：关注技能发现、打包、自修正与护栏
+- 本体论与知识表示：总览破题、四条边界、Foundry 语义六件套、Cruxible YAML 本体、受治理写入、跨模块集成、Hypergraph 高阶关系（7/7 已发布）
+- 自进化 Skills 与 Agent 自我改进：Skill 自动发现与打包、自我修正闭环、失控风险与护栏设计（核心 3 篇已发布，实战 scaffold 待写）
 - 数据治理：覆盖血缘、审计、敏感隔离与合规落地
 - Agent 实战案例：编程助手 Agent、DeerFlow Harness 深读拆解等真实工程案例
 
