@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vitepress dev docs",
-    "build": "node -e \"fs.rmSync('dist', { recursive: true, force: true })\" && npx vitepress build docs --outDir dist",
+    "build": "rm -rf dist && vitepress build docs --outDir dist",
     "preview": "vitepress preview docs",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore"
   },
@@ -28,7 +28,7 @@
     "typescript": "^5.3.3",
     "unocss": "^0.58.5",
     "vite": "^5.0.12",
-    "vitepress": "^1.0.0-rc.39",
+    "vitepress": "^1.6.0",
     "vitepress-plugin-mermaid": "^2.0.17",
     "vue-router": "^4.2.5"
   },
