@@ -1,6 +1,9 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
+import path from 'node:path'
+import { fileURLToPath } from 'node:url'
 
+const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repositoryBase = '/ai-guide/'
 const publishedOrigin = 'https://xiaoqianbaobao.github.io'
 const isProduction = process.env.NODE_ENV === 'production'
@@ -10,8 +13,8 @@ export default withMermaid(defineConfig({
   title: 'AI Agent Guide',
   titleTemplate: ':title | AI Agent 全栈知识体系',
   description: '从第一性原理到工程实战，系统掌握 AI Agent 开发',
-  srcDir: '.',
-  outDir: 'dist',
+  srcDir: path.resolve(__dirname, '..'),
+  outDir: path.resolve(__dirname, '..', '..', 'dist'),
   cleanUrls: true,
   lastUpdated: true,
   ignoreDeadLinks: true,

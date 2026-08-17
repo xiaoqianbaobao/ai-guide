@@ -5,7 +5,7 @@
   "type": "module",
   "scripts": {
     "dev": "vitepress dev docs",
-    "build": "rm -rf dist && vitepress build docs --outDir dist",
+    "build": "rm -rf dist && NODE_ENV=production vitepress build docs",
     "preview": "vitepress preview docs",
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore"
   },

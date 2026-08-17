@@ -33,7 +33,14 @@ jobs:
       run: npm ci
 
     - name: Build
-      run: NODE_ENV=production npm run build
+      run: npm run build
+
+    - name: Debug build output
+      run: |
+        echo "=== pwd ===" && pwd
+        echo "=== ls -la ===" && ls -la
+        echo "=== ls -la dist ===" && ls -la dist || (echo "NO dist FOUND at ./dist, try docs/dist:" && ls -la docs/dist 2>&1 || true)
+        echo "=== tree-like listing ===" && find dist -maxdepth 2 -print 2>&1 | head -50 || true
 
     - name: Setup Pages
       uses: actions/configure-pages@v5
