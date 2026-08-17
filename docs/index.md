@@ -17,7 +17,7 @@ features:
   - title: 工程深度
     details: Tool Use、Memory、MCP、多 Agent、评估与进化，都会回到系统设计与工程约束。
   - title: 体系完整
-    details: 以 7 个模块组织完整知识地图，让每篇文章都能回到整体知识结构。
+    details: 以 10 个模块组织完整知识地图，让每篇文章都能回到整体知识结构。
   - title: 持续更新
     details: 按 P0、P1、P2 路线逐步补齐重点主题，不做一次性静态整理。
 ---
@@ -163,11 +163,11 @@ features:
 | 序章 | 已成型 | 范式转移、AI 原生思维、学习方式 |
 | 大语言模型基础 | 已成型 | LLM 本质、上下文窗口、第1-10章小册子 |
 | Agent 核心机制 | 已成型 | Agent 本质、Tool Use、Context Engineering |
-| Memory 体系 | 持续完善 | 四种记忆形态、RAG 基础（待补3篇） |
-| 多 Agent 系统 | 持续完善 | 协作模式、系统关系图（待补3篇） |
-| 工具与框架 | 已成型 | 工具比较、手写 Agent、LangGraph、Spring AI |
+| Memory 体系 | 已成型 | 四种记忆形态、写入/遗忘、向量 vs 图、Episodic→Semantic |
+| 多 Agent 系统 | 已成型 | Orchestrator-Subagent、失败恢复、成本延迟、Blackboard/Debate |
+| 工具与框架 | 已成型 | 工具比较、手写 Agent、LangGraph、Spring AI、Harness、DeerFlow 深拆 |
 | 评估与进化 | 持续完善 | Agentic Eval、奖励函数、评估体系（待补2篇） |
-| 本体论与知识表示 | 骨架已搭 | 模块首页就绪，正文待补 |
+| 本体论与知识表示 | 已成型（持续扩展） | 总览破题、四条边界、Foundry 六件套、Cruxible YAML、受治理写入、跨模块集成（待补 Hypergraph） |
 | 自进化 Skills | 骨架已搭 | 模块首页就绪，正文待补 |
 | 数据治理 | 骨架已搭 | 模块首页就绪，正文待补 |
 

@@ -313,7 +313,13 @@ function sidebarOntology() {
       text: '本体论与知识表示',
       collapsed: false,
       items: [
-        { text: '模块概述', link: '/07-ontology/' }
+        { text: '模块概述', link: '/07-ontology/' },
+        { text: '为什么 Agent 系统需要本体论', link: '/07-ontology/why-ontology-for-agents/' },
+        { text: 'Ontology vs Taxonomy vs Knowledge Graph vs RAG', link: '/07-ontology/ontology-vs-taxonomy-kg/' },
+        { text: 'Palantir Foundry：语义六件套（Object / Link / Action / Function / Roles / Workflow）', link: '/07-ontology/foundry-object-link-action-function/' },
+        { text: 'Cruxible：用 YAML 写可执行本体论（entity / relationship / named_query / guards）', link: '/07-ontology/cruxible-yaml-ontology/' },
+        { text: '受治理的写入：direct / proposal_only / 角色 / 审批组 / 证据与 Attestation', link: '/07-ontology/governed-writes-and-approvals/' },
+        { text: 'Ontology × Memory × Multi-Agent × Eval：跨模块集成', link: '/07-ontology/ontology-integration/' }
       ]
     }
   ]

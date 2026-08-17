@@ -19,11 +19,11 @@ AI Agent Guide 是一个基于 VitePress 构建的中文开源知识站点，目
 - 序章：建立范式转移与 AI 原生开发者思维
 - 语言模型基础：系统讲解 Transformer、Attention、KV Cache、RoPE、GQA 等底层机制
 - Agent 核心机制：覆盖 Tool Use、Context Engineering 等核心主题
-- Memory 体系：承接记忆设计、RAG 与长期知识沉淀
-- 多 Agent 系统：进入复杂任务分工、协作边界与系统关系
-- 工具与框架：补齐工具层、协议层与实现层视角
-- 评估与进化：作为系统优化与迭代闭环
-- 本体论与知识表示：从概念建模落到实体、关系与语义对齐
+- Memory 体系：四种记忆形态、写入与遗忘、向量 vs 图、Episodic→Semantic 蒸馏
+- 多 Agent 系统：Orchestrator-Subagent、失败恢复、成本延迟、Blackboard/Debate 拓扑
+- 工具与框架：Harness 商品化、协议层、LangGraph、Spring AI、DeerFlow Harness 深拆、Agent Skills
+- 评估与进化：Agentic Eval、奖励函数、评估与进化闭环
+- 本体论与知识表示：总览破题、四条边界、Foundry 语义六件套、Cruxible YAML 本体、受治理写入、跨模块集成
 - 自进化 Skills 与 Agent 自我改进：关注技能发现、打包、自修正与护栏
 - 数据治理：覆盖血缘、审计、敏感隔离与合规落地
 - Agent 实战案例：编程助手 Agent、DeerFlow Harness 深读拆解等真实工程案例
