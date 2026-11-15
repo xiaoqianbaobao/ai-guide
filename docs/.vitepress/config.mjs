@@ -251,6 +251,7 @@ function sidebarMemory() {
         { text: '向量库与图存储的选型对比', link: '/03-memory/vectordb-vs-graphdb/' },
         { text: '从 Episodic 到 Semantic 的蒸馏流程实战', link: '/03-memory/episodic-to-semantic-pipeline/' },
         { text: '在线记录与离线整理：dreaming', link: '/03-memory/dreaming-offline-consolidation/' },
+        { text: '如何评估一个记忆系统', link: '/03-memory/memory-evaluation/' },
         { text: '知识库、Agent 上下文与个人记忆', link: '/03-memory/wiki-and-runtime-context/' }
       ]
     }
