@@ -289,6 +289,7 @@ function sidebarTools() {
         { text: 'Spring AI ChatClient Advisor 与 Structured Output 实战', link: '/05-tools-frameworks/spring-ai-chatclient-advisors-practice/' },
         { text: 'Agent Skills', link: '/05-tools-frameworks/agent-skills/' },
         { text: 'Harness 设计', link: '/05-tools-frameworks/harness-design/' },
+        { text: 'Agent 工程闭环', link: '/05-tools-frameworks/agent-engineering-loop/' },
         { text: 'DeerFlow Harness 深度拆解', link: '/agent/cases/deerflow-harness-deep-dive/' }
       ]
     }

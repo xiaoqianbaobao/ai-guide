@@ -50,6 +50,8 @@ module: tools
 11. 最后读 [Harness 设计](./harness-design)，理解运行时控制结构怎样治理 skills、工具权限、上下文和恢复路径。
 12. 如果你想看真实项目源码拆解，再读 [DeerFlow Harness 深度拆解](../agent/cases/deerflow-harness-deep-dive/)，把前面的概念放回一个完整运行时引擎里。
 
+补充阅读：[Agent 工程闭环](./agent-engineering-loop) 将长任务、权限、可观测性和评估串成可恢复的工程流程。
+
 ## 本模块文章
 
 | 文章 | 类型 | 简介 |
