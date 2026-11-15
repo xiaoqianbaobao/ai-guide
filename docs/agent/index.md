@@ -67,9 +67,13 @@ title: Agent 智能体系统
 - **客户服务**：工单处理、问题解答
 - **研发效能**：需求分析、测试生成、发布管理
 
+## 企业级实战主线
+
+[企业级 Agent 实战路线](./cases/enterprise-agent-roadmap) 从知识问答和工单场景出发，明确从最小系统到权限、审批、评估和部署演练的交付与验收标准。
+
 ## 推荐阅读
 
-- [ReAct 范式详解](./architecture/react-paradigm.md)
-- [工具调用设计](./architecture/tool-calling.md)
-- [LangChain 框架](./frameworks/langchain-langgraph.md)
-- [工程实践](./engineering/intent-classification.md)
+- [Agent 的本质](../02-agent-core/what-is-agent)
+- [工具调用设计](../02-agent-core/tool-use)
+- [LangGraph 原理](../05-tools-frameworks/langgraph-principles)
+- [Agent 工程闭环](../05-tools-frameworks/agent-engineering-loop)

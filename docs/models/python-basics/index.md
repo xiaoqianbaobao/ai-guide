@@ -159,7 +159,7 @@ AI 衔接点：
 - [Python官方文档](https://docs.python.org/zh-cn/)
 - [菜鸟教程](https://www.runoob.com/python/python-tutorial.html)
 - [廖雪峰Python教程](https://www.liaoxuefeng.com/wiki/1016959663602400)
-- [Python核心编程](https://book.douban.com/subject/26288760/)
+- 《Python 核心编程》（建议核对作者与版次后选购）
 
 ## 开始学习
 

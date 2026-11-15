@@ -539,5 +539,5 @@ LangGraph 的核心抽象：
 - [LangGraph 官方文档](https://langchain-ai.github.io/langgraph/)
 - [Google Pregel 论文](https://research.google/pubs/pregel-a-system-for-large-scale-graph-processing/)：理解 super-step 概念的原始论文
 - [ReAct 论文](https://arxiv.org/abs/2210.03629)：理解 LLM Agent 的思考-行动循环
-- [LangGraph 官方教程](https://langchain-ai.github.io/langgraph/tutorials/)
+- [LangGraph 官方教程](https://docs.langchain.com/oss/python/learn)
 - Harrison Chase（LangChain 创始人）博客：[Why LangGraph](https://blog.langchain.dev/langgraph/)

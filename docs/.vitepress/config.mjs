@@ -17,7 +17,7 @@ export default withMermaid(defineConfig({
   outDir: path.resolve(__dirname, '..', '..', 'dist'),
   cleanUrls: true,
   lastUpdated: true,
-  ignoreDeadLinks: true,
+  ignoreDeadLinks: false,
   base: isProduction ? repositoryBase : '/',
   head: [
     ['meta', { name: 'theme-color', content: '#f7f5f1' }],
@@ -369,6 +369,7 @@ function sidebarAgent() {
       collapsed: false,
       items: [
         { text: 'Agent 概念总览', link: '/agent/' },
+        { text: '企业级 Agent 实战路线', link: '/agent/cases/enterprise-agent-roadmap/' },
         { text: '编程助手 Agent 实战', link: '/agent/cases/coding-assistant/' },
         { text: 'DeerFlow Harness 深度拆解', link: '/agent/cases/deerflow-harness-deep-dive/' },
       ]

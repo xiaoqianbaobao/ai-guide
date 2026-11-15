@@ -148,8 +148,8 @@ print("更清晰的上下文:", context_better)
 
 学完这一篇后，建议继续看：
 
-- [Agent 的本质](/02-agent-core/what-is-agent/)
-- [Context Engineering](/02-agent-core/context-engineering/)
+- [Agent 的本质](../02-agent-core/what-is-agent)
+- [Context Engineering](../02-agent-core/context-engineering)
 
 <div class="key-insight">
   <div class="key-insight-label">核心洞察</div>

@@ -46,8 +46,8 @@ module: ontology
 
 - 已读 [Memory 体系](../03-memory/)
 - 已读 [多 Agent 系统](../04-multi-agent/)
-- 已读 [LangGraph 状态图设计实战](../05-tools-frameworks/langgraph-state-design/)
-- 已读 [Harness 设计](../05-tools-frameworks/harness-design/)
+- 已读 [LangGraph 状态图设计实战](../05-tools-frameworks/langgraph-state-design)
+- 已读 [Harness 设计](../05-tools-frameworks/harness-design)
 
 ## 本模块学习顺序（推荐）
 
@@ -71,7 +71,7 @@ flowchart LR
 | [Cruxible：用 YAML 写一份可执行本体论](./cruxible-yaml-ontology) | 工程实现 | entity/relationship/named_query/mutation_guards + feedback/outcome/workflows/procedures/snapshots 全部进 config，运行时读它就执行。 | ✅ 已发布 |
 | [受治理的写入：direct / proposal_only / 角色 / 审批组 / 证据与 Attestation](./governed-writes-and-approvals) | 治理机制 | 写入的 4 条独立轴（Policy/Role/Review/Evidence）、判断性关系必须 proposal_only、独立评审人、attestation 不沉默覆盖、outcome contract 把成功本体化。 | ✅ 已发布 |
 | [跨模块集成：Ontology × Memory × Multi-Agent × Eval](./ontology-integration) | 落地集成 | 把本体作为三个模块的共同底座：语义写入、实体消歧、Blackboard 类型化、评估口径绑定到 named query + outcome。 | ✅ 已发布 |
-| （待写）Hypergraph 在企业级多 Agent 架构中的应用 | 进阶 | 高阶关系、带属性多向关系、如何与治理机制衔接。 | 📝 待写 |
+| [Hypergraph 在企业级多 Agent 架构中的应用](./hypergraph-enterprise-multi-agent) | 进阶 | 高阶关系、带属性多向关系、如何与治理机制衔接。 | ✅ 已发布 |
 
 ## 学完后去哪里
 

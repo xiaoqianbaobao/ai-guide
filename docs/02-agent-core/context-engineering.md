@@ -964,7 +964,7 @@ Context Engineering
 
 ## 下一步建议
 
-继续进入 [Memory 的四种形态](/03-memory/four-memory-types/)。
+继续进入 [Memory 的四种形态](../03-memory/four-memory-types)。
 
 因为一旦上下文窗口有限，系统就必须回答另一个问题：窗口外的信息应该如何被保存和召回。
 

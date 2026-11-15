@@ -243,7 +243,7 @@ result = llm_summarize(state["observations"])
 - [Agentic Artificial Intelligence: Architectures, Taxonomies, and Evaluation](https://arxiv.org/abs/2601.12560) — arxiv, Jan 2026
 - [AgentFence: Mapping Security Vulnerabilities Across Deep Research Agents](https://arxiv.org/pdf/2602.07652) — arxiv, 2026
 - [Measuring AI Agent Autonomy in Practice](https://www.anthropic.com/research/measuring-agent-autonomy) — Anthropic, 2026
-- [The Rise of Autonomous Agents](https://aws.amazon.com/blogs/aws-insights/the-rise-of-autonomous-agents-what-enterprise-leaders-need-to-know-about-the-next-wave-of-ai/) — AWS Insights, Jun 2025
+- [Operationalizing agentic AI on AWS](https://docs.aws.amazon.com/prescriptive-guidance/latest/strategy-operationalizing-agentic-ai/introduction.html) — AWS Prescriptive Guidance
 - [Taxonomy of Failure Modes in AI Agents](https://www.microsoft.com/en-us/security/blog/2025/04/24/new-whitepaper-outlines-the-taxonomy-of-failure-modes-in-ai-agents/) — Microsoft Security, Apr 2025
 - [From the logic of coordination to goal-directed reasoning](https://www.ncbi.nlm.nih.gov/pmc/articles/PMC12833085/) — Frontiers in AI, Jan 2026
 

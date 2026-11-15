@@ -9,35 +9,35 @@ description: "基于 deer-flow-by-cc 仓库源码、设计文档、白皮书，�
 
 **上篇：Harness — Agent 运行时引擎**
 
-1. [Harness 全景](#1-harness-全景)
-2. [两种运行模式](#2-两种运行模式)
-3. [Agent 工厂链](#3-agent-工厂链)
-4. [中间件链](#4-中间件链)
-5. [Runtime 子系统](#5-runtime-子系统)
-6. [Checkpointer 检查点系统](#6-checkpointer-检查点系统)
-7. [Store 持久化系统](#7-store-持久化系统)
-8. [Stream Bridge 事件流](#8-stream-bridge-事件流)
-9. [模型工厂](#9-模型工厂)
-10. [内存 / 记忆系统](#10-内存--记忆系统)
-11. [Sandbox 沙箱系统](#11-sandbox-沙箱系统)
-12. [Subagent 子智能体](#12-subagent-子智能体)
-13. [Tool 系统](#13-tool-系统)
-14. [Skills 技能系统](#14-skills-技能系统)
-15. [Config 配置系统](#15-config-配置系统)
+1. [Harness 全景](#_1-harness-全景)
+2. [两种运行模式](#_2-两种运行模式)
+3. [Agent 工厂链](#_3-agent-工厂链)
+4. [中间件链](#_4-中间件链)
+5. [Runtime 子系统](#_5-runtime-子系统)
+6. [Checkpointer 检查点系统](#_6-checkpointer-检查点系统)
+7. [Store 持久化系统](#_7-store-持久化系统)
+8. [Stream Bridge 事件流](#_8-stream-bridge-事件流)
+9. [模型工厂](#_9-模型工厂)
+10. [内存 / 记忆系统](#_10-内存-记忆系统)
+11. [Sandbox 沙箱系统](#_11-sandbox-沙箱系统)
+12. [Subagent 子智能体](#_12-subagent-子智能体)
+13. [Tool 系统](#_13-tool-系统)
+14. [Skills 技能系统](#_14-skills-技能系统)
+15. [Config 配置系统](#_15-config-配置系统)
 
 **中篇：身份 / 多租户 / 审计**
 
-16. [身份与多租户子系统](#16-身份与多租户子系统)
-17. [审计子系统](#17-审计子系统)
-18. [前端架构](#18-前端架构)
+16. [身份与多租户子系统](#_16-身份与多租户子系统)
+17. [审计子系统](#_17-审计子系统)
+18. [前端架构](#_18-前端架构)
 
 **下篇：部署与反问**
 
-19. [Checkpoint 迁移到 MySQL 方案](#19-checkpoint-迁移到-mysql-方案)
-20. [部署影响分析](#20-部署影响分析)
-21. [核心请求流 Deep Dive](#21-核心请求流-deep-dive)
-22. [Agent JD 知识点映射](#22-agent-jd-知识点映射)
-23. [深入追问与自测](#23-深入追问与自测)
+19. [Checkpoint 迁移到 MySQL 方案](#_19-checkpoint-迁移到-mysql-方案)
+20. [部署影响分析](#_20-部署影响分析)
+21. [核心请求流 Deep Dive](#_21-核心请求流-deep-dive)
+22. [Agent JD 知识点映射](#_22-jd-知识点映射)
+23. [深入追问与自测](#_23-深入追问与自测)
 
 ---
 

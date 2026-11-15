@@ -130,4 +130,4 @@ def compute_reward(result):
 
 ## 下一步
 
-建议回到前面的 [Agentic Eval 设计](/ai-guide/06-eval-evolution/agentic-eval-design) 和 [从零手写 Agent](/ai-guide/05-tools-frameworks/build-from-scratch) 对照阅读:一个帮助你理解系统该如何被优化,另一个帮助你理解系统本身是如何被搭出来的。
+建议回到前面的 [Agentic Eval 设计](../06-eval-evolution/agentic-eval-design) 和 [从零手写 Agent](../05-tools-frameworks/build-from-scratch) 对照阅读:一个帮助你理解系统该如何被优化,另一个帮助你理解系统本身是如何被搭出来的。
