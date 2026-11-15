@@ -40,7 +40,8 @@ Memory 不是单一技术名词，而是 Agent 系统里"如何保留、检索�
 2. 再读 [RAG 原理](./rag-fundamentals)，理解检索增强为什么只是 Memory 体系中的一种能力。
 3. 接着读 [记忆的写入时机与遗忘策略](./write-timing-and-forgetting-policy)，理解什么时候该写入、什么时候该主动遗忘。
 4. 再读 [向量库与图存储的选型对比](./vectordb-vs-graphdb)，理解记忆该存在什么样的结构里。
-5. 最后读 [从 Episodic 到 Semantic 的蒸馏流程实战](./episodic-to-semantic-pipeline)，把过程记录如何提炼为稳定知识的完整流程走一遍。
+5. 接着读 [从 Episodic 到 Semantic 的蒸馏流程实战](./episodic-to-semantic-pipeline)，把过程记录如何提炼为稳定知识的完整流程走一遍。
+6. 最后读 [在线记录与离线整理：dreaming](./dreaming-offline-consolidation)，理解在线记录与离线纠错、整理如何协同。
 
 ## 本模块文章
 
@@ -51,6 +52,8 @@ Memory 不是单一技术名词，而是 Agent 系统里"如何保留、检索�
 | [记忆的写入时机与遗忘策略](./write-timing-and-forgetting-policy) | 工程/实战 | 理解写入触发时机、遗忘策略与冲突处理 |
 | [向量库与图存储的选型对比](./vectordb-vs-graphdb) | 工程 | 理解语义检索与关系推理该分别用什么存储结构 |
 | [从 Episodic 到 Semantic 的蒸馏流程实战](./episodic-to-semantic-pipeline) | 实战 | 一条从经历到稳定知识的完整蒸馏 pipeline |
+| [在线记录与离线整理：dreaming](./dreaming-offline-consolidation) | 原理/工程 | 理解在线记录与离线整理的分工、纠错和工程边界 |
+| [知识库、Agent 上下文与个人记忆如何分工](./wiki-and-runtime-context) | 工程 | 理解权威知识、运行时上下文与私有记忆的边界 |
 
 ## 学完后去哪里
 

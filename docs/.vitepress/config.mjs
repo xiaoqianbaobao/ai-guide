@@ -249,7 +249,9 @@ function sidebarMemory() {
         { text: '记忆的写入时机与遗忘策略', link: '/03-memory/write-timing-and-forgetting-policy/' },
         { text: 'RAG 原理', link: '/03-memory/rag-fundamentals/' },
         { text: '向量库与图存储的选型对比', link: '/03-memory/vectordb-vs-graphdb/' },
-        { text: '从 Episodic 到 Semantic 的蒸馏流程实战', link: '/03-memory/episodic-to-semantic-pipeline/' }
+        { text: '从 Episodic 到 Semantic 的蒸馏流程实战', link: '/03-memory/episodic-to-semantic-pipeline/' },
+        { text: '在线记录与离线整理：dreaming', link: '/03-memory/dreaming-offline-consolidation/' },
+        { text: '知识库、Agent 上下文与个人记忆', link: '/03-memory/wiki-and-runtime-context/' }
       ]
     }
   ]
