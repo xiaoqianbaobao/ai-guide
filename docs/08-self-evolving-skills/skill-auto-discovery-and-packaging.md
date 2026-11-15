@@ -93,7 +93,9 @@ flowchart LR
   G --> S[Draft Skill YAML<br/>符合 Harness schema]
   G --> T[Draft tests/fixtures<br/>从样本中抽]
   G --> E[Draft preconditions/evidence floor/budget]
-  S + T + E --> P[SkillCandidate proposal]
+  S --> P[SkillCandidate proposal]
+  T --> P
+  E --> P
   P --> CG[Candidate Group （proposal_only）]
 ```
 

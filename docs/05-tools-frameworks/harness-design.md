@@ -31,10 +31,9 @@ tags:
 
 这些理解不是完全错，但都偏窄。如果只这样理解，你会看不见 harness 真正关键的部分：谁控制系统、任务一轮轮怎么推进、哪些动作被允许、出错后如何恢复、上下文预算如何治理。
 
-**有一个发人深省的数据点**：在 Terminal Bench 2.0 上，Claude Opus 4.6 跑在 Claude Code 里的得分，远低于同一个模型跑在定制 Harness 里的得分。有团队仅通过优化 Harness 设计，就把一个 coding agent 从排行榜第 30 名提升到第 5 名。**Harness 改变的不是模型能力，而是模型能力被激活和约束的方式。**
+Harness 会影响模型能力在具体任务中的表现：工具、环境、上下文和验证方式都会改变结果。[OpenAI 的评估方法讨论](https://openai.com/index/trustworthy-third-party-evaluations-foundations/)指出，比较结果需要说明 Harness 和运行条件；不能把不同配置的分数差异直接归因于某一个因素。
 
-这也意味着：当 Agent 在真实工程环境失败时，大多数情况下不是"模型不够强"，而是 **Harness 没有设计好**。
-
+真实系统失败可能来自模型、任务定义、工具、环境、数据或 Harness，需要通过轨迹和对照实验定位，而不能预先归咎于某一层。
 ---
 
 ## 2. 一个核心公式：Agent = Model + Harness

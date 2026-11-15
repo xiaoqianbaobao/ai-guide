@@ -440,11 +440,11 @@ RAG 注入的外部知识，需要注意**来源标注**和**相关性筛选**�
 
 ```text
 <retrieved_docs>
-来源：Mermaid v10 迁移指南 (2024-03-15)
-相关度：0.92
+来源：项目技术文档（虚构示例）
+相关度：0.92（示意值）
 内容：
-v10 版本移除了 mermaid.initialize() 的同步调用支持，
-需要改为 await mermaid.initialize() 异步形式...
+渲染流程和初始化配置需要分别检查；
+具体 API 行为以当前版本的官方文档为准。
 
 来源：VitePress Markdown 配置文档
 相关度：0.78
@@ -520,7 +520,7 @@ mermaid.initialize({ startOnLoad: true })  // ← 疑似问题行
 - ❌ 已尝试清除缓存 → 无效
 </completed_steps>
 
-当前假设：Mermaid v10 API 变更，initialize() 不再是同步方法。
+当前假设：Mermaid 导入方式或依赖版本不匹配。
 请验证并给出修复方案。
 ```
 
@@ -695,12 +695,12 @@ context = f"""
    → 忽略：其他无关配置（80 行）
 
 3. 基于精炼上下文推理：
-   → 定位：mermaid.initialize() 同步调用问题
-   → 方案：改为异步调用
+   → 核实：导入对象、依赖版本和插件配置
+   → 方案：依据实际错误与官方文档验证，不预设根因
 
 4. 工具调用：修改文件 + 重新构建
    → 更新上下文：completed_steps 新增"修复 Mermaid 配置"
-   → 结果：构建成功
+   → 结果：重新构建并记录实际结果
 ```
 
 ---

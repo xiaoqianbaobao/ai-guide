@@ -52,3 +52,102 @@ module: tools
 5. 只有在单 Agent 的瓶颈已被测量并确认时，再引入多角色与更复杂的编排。
 
 继续阅读：[Harness 设计](./harness-design)、[上下文工程](../02-agent-core/context-engineering)、[Agentic Eval](../06-eval-evolution/agentic-eval-design)、[多 Agent 失败恢复](../04-multi-agent/failure-modes-and-recovery)。
+
+## 深入：把任务拆成可以恢复的状态机
+
+前面的流程看上去很简单，但要让系统真正可恢复，需要回答一个尖锐问题：**进程在任意一行代码之后退出，再启动时系统凭什么知道下一步做什么？**
+
+把“生成报告”当成一个任务，它的状态可以是 `pending → gathering → drafting → validating → completed`。工具暂时不可用时进入 `retry_wait`；需要用户决策时进入 `waiting_for_input`；无法安全判断外部操作结果时进入 `needs_reconciliation`。这些状态是示意，实际系统还要定义取消、过期和失败的语义。
+
+状态不是给模型看的叙事，而是运行时可检查的数据。例如：
+
+```json
+{
+  "task_id": "report-042",
+  "revision": 7,
+  "status": "validating",
+  "goal": "整理公开资料并交付技术报告",
+  "constraints": ["每项关键结论提供来源", "不向外部发送文件"],
+  "artifacts": [{"path": "reports/draft.md", "revision": "git:abc123"}],
+  "completed_steps": ["collect_sources", "draft"],
+  "next_step": "check_citations",
+  "pending_operations": []
+}
+```
+
+这是示意结构，不对应任何现成框架。`revision` 用于检测并发更新：两个执行器同时读取第 7 版时，只允许一个基于第 7 版提交第 8 版，另一个必须重新读取。若不做这样的并发控制，两个工作进程可能各自以为自己负责同一步，重复触发操作。
+
+### 状态、对话与产物是什么关系？
+
+对话记录可以解释“为什么”，但未必完整、可检索或能证明副作用已经发生；状态记录回答“做到哪里”；产物是需要被验证的文件或外部对象。三者可以互相引用，却不能相互替代。恢复时先读状态，再核验产物和外部对象是否仍匹配版本；不要只凭摘要中的“已完成”继续执行。
+
+对于读取网页这种可重复的步骤，可以在失败后重试，但要注明取到的内容版本可能变化。对于发送消息或创建订单这样的写操作，重试前必须先确认此前调用是否成功。**“没收到响应”与“操作没发生”是两回事。**
+
+## 深入：如何处理一次结果未知的写入
+
+假设 Agent 请求外部系统创建一条工单，服务端创建成功，但网络在响应返回前断开。执行器看到了超时，不知道工单是否存在。如果它直接重新创建，就可能生成两条。
+
+一个实用设计是给业务意图分配稳定的 `operation_id`，记录目标、参数摘要和状态。随后：
+
+1. 保存操作意图 `prepared`；同一个业务意图的重试复用相同 ID。
+2. 将 ID 作为下游支持的幂等键发送，并记录调用尝试。
+3. 收到确定成功后记录外部对象 ID 和 `succeeded`；收到确定拒绝则记录 `failed`。
+4. 超时或连接中断时标记 `unknown`，先查询下游是否已有结果；只有协议与查询结果足以确认安全时才重试。
+5. 下游既无幂等机制也无查询接口时，转入人工核对，或依据业务设计补偿；不能用“重试三次”代替一致性方案。
+
+操作 ID 应绑定调用主体、目标和实际参数；同一个 ID 配上不同参数应拒绝，而不是悄悄执行另一项操作。数据库事务可保证本地状态更新的原子性，但通常不能与第三方 HTTP 调用形成一个共同事务。生产系统需要考虑进程在“外部成功、本地尚未记录”之间崩溃的窗口，并用下游幂等、查询、对账或补偿收敛。
+
+## 深入：上下文应该保留什么
+
+长任务中的上下文至少有四类，压缩策略不能一刀切：
+
+- **不可丢约束**：用户目标、禁止事项、权限与验收条件；应由可信状态重新注入，而不只依赖自由摘要。
+- **当前工作状态**：阶段、失败原因、下一步和未解决的问题；应包含版本与更新时间。
+- **证据和产物索引**：引用来源、文件位置、关键输出及版本；大文件可以按需读取。
+- **过程噪声**：重复日志、过期中间输出；可以归档或删除，但要保留足以审计和排障的记录。
+
+压缩可能把“不允许发送”误写成“可以发送”，也可能将猜测压成事实。因此关键约束应来自独立的权威记录；摘要中的事实带来源及不确定性；每次恢复先校验权限是否仍然有效。[Anthropic 的长任务实践](https://www.anthropic.com/research/harness-design-long-running-apps)讨论了压缩与重置后交接的不同取舍：重置可以减轻历史上下文干扰，但需要可靠交接，也增加运行成本。
+
+## 用一个故障演练验证闭环
+
+在测试环境中，让报告任务运行到“工单创建成功但响应尚未返回”时强制终止进程，再恢复。检查：是否使用相同操作 ID；是否先查询结果；是否只留下一个工单；是否把无法确认的状态升级给人；完整轨迹能否解释判断依据。接着分别在写入前、写入后和状态提交后注入故障。这个演练比只检查最后一段文本更能验证系统可靠性。
+
+生产指标也要体现这条链：`unknown` 状态的数量与持续时间、重复副作用、恢复成功率、每次任务成本、人工介入率。指标需要带上版本和时间范围，避免一个整体成功率掩盖少数严重事故。
+
+## 动手试一试：模拟超时后的对账
+
+下面是可直接用 Python 3 运行的教学示例。`RemoteTickets` 用内存模拟支持幂等键和查询的外部服务；它不是实际网络客户端，也不提供持久化或并发安全。
+
+```python
+class RemoteTickets:
+    def __init__(self):
+        self.by_key = {}
+
+    def create(self, key, title, lose_response=False):
+        if key in self.by_key and self.by_key[key]["title"] != title:
+            raise ValueError("同一幂等键不能用于不同参数")
+        ticket = self.by_key.setdefault(key, {"id": "T-001", "title": title})
+        if lose_response:
+            raise TimeoutError("服务已处理，但响应丢失")
+        return ticket
+
+    def find(self, key):
+        return self.by_key.get(key)
+
+remote = RemoteTickets()
+operation_id = "report-042:create-ticket"
+title = "核对引用"
+try:
+    remote.create(operation_id, title, lose_response=True)
+except TimeoutError:
+    # 不确定是否成功：先查询，而不是换个 ID 再创建。
+    ticket = remote.find(operation_id)
+    if ticket is None:
+        ticket = remote.create(operation_id, title)
+    print("对账结果：", ticket)
+
+assert len(remote.by_key) == 1
+print("外部工单数：", len(remote.by_key))
+```
+
+输出中工单数为 `1`。把示例里的 `find` 和 `create` 替换为真实接口前，必须确认服务端幂等键的作用范围、保留时间、参数冲突行为和查询一致性。真实系统还需持久化操作状态，并处理查询也超时或暂时查不到的情况。

@@ -231,7 +231,8 @@ function sidebarAgentCore() {
         { text: '模块概述', link: '/02-agent-core/' },
         { text: 'Agent 的本质', link: '/02-agent-core/what-is-agent/' },
         { text: 'Tool Use 完整机制', link: '/02-agent-core/tool-use/' },
-        { text: 'Context Engineering', link: '/02-agent-core/context-engineering/' }
+        { text: 'Context Engineering', link: '/02-agent-core/context-engineering/' },
+        { text: 'Agent 安全边界', link: '/02-agent-core/agent-security-boundaries/' }
       ]
     }
   ]
@@ -305,7 +306,8 @@ function sidebarEval() {
         { text: '模块概述', link: '/06-eval-evolution/' },
         { text: 'Agentic Eval 设计', link: '/06-eval-evolution/agentic-eval-design/' },
         { text: '奖励函数设计', link: '/06-eval-evolution/reward-function-design/' },
-        { text: 'Harness 与 Skill 的评估体系', link: '/06-eval-evolution/harness-skill-evaluation/' }
+        { text: 'Harness 与 Skill 的评估体系', link: '/06-eval-evolution/harness-skill-evaluation/' },
+        { text: '线上评估与回归', link: '/06-eval-evolution/production-evaluation-loop/' }
       ]
     }
   ]
