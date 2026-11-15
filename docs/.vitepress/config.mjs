@@ -46,6 +46,7 @@ export default withMermaid(defineConfig({
     nav: [
       { text: '学习指南', link: '/guide/' },
       { text: '序章', link: '/00-preface/' },
+      { text: '产品与 FDE', link: '/10-product-fde/' },
       {
         text: '模型基础',
         items: [
@@ -163,6 +164,10 @@ function buildSidebar() {
     '/07-ontology/': sidebarOntology(),
     '/08-self-evolving-skills/': sidebarSelfEvolving(),
     '/09-data-governance/': sidebarDataGovernance(),
+    '/10-product-fde/': [{ text: '产品与 FDE', collapsed: false, items: [
+      { text: '模块概述', link: '/10-product-fde/' },
+      { text: '从功能交付到客户成效', link: '/10-product-fde/outcome-over-output/' }
+    ] }],
     '/agent/': sidebarAgent()
   }
 }

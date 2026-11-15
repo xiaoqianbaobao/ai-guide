@@ -151,3 +151,9 @@ print("外部工单数：", len(remote.by_key))
 ```
 
 输出中工单数为 `1`。把示例里的 `find` 和 `create` 替换为真实接口前，必须确认服务端幂等键的作用范围、保留时间、参数冲突行为和查询一致性。真实系统还需持久化操作状态，并处理查询也超时或暂时查不到的情况。
+
+## 系统课程与延伸阅读
+
+- [Anthropic：Harness design for long-running application development](https://www.anthropic.com/research/harness-design-long-running-apps)：观察原文如何拆分规划、生成、评价和跨会话交接；试着列出其中哪些做法依赖实验环境，哪些可以迁移到自己的任务。
+- [OpenAI：Build an Agent Improvement Loop with Traces, Evals, and Codex](https://developers.openai.com/cookbook/examples/agents_sdk/agent_improvement_loop)：学习如何将轨迹、反馈和评估连接起来。示例涉及具体 SDK 与依赖，运行前核对版本、费用及数据来源。
+- [Python 官方教程](https://docs.python.org/3/tutorial/)：如果上面的示例不熟悉，先练习类、异常和数据结构，再尝试把内存模拟服务替换成受控测试接口。

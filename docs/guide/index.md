@@ -99,3 +99,7 @@ description: AI Agent 全栈知识体系的学习入口与使用方式
 - [学习路线图](./roadmap)
 - [先修知识](./prerequisites)
 - [序章](/00-preface/)
+
+## 系统课程与延伸资源
+
+[精选数学、模型、Agent 与产品课程](./learning-resources)，每项资源附有学习目标与练习建议。
