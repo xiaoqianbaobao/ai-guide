@@ -136,7 +136,9 @@ Crucible 已把 outcome contract 放在本体层。你对 Skill/Procedure 的 ev
 - 起步只要 10 步，就能把 Ontology 从"知识表示章节"变成横向工程基础设施。
 
 ## 下一步
-本体论模块到此结束。
+
+本专题接下来阅读 [Hypergraph 在企业级多 Agent 架构中的应用](./hypergraph-enterprise-multi-agent)。跨模块延伸：
+以下是相关专题的延伸阅读。
 - 想继续看 Agent 如何自我长出能力与程序 → [自进化 Skills 与 Agent 自我改进](../08-self-evolving-skills/)
 - 想继续看强监管场景的血缘/脱敏/合规落地 → [数据治理](../09-data-governance/)
 - 想把本体写进自己的评估体系 → 回到 [Harness 与 Skill 的评估体系](../06-eval-evolution/harness-skill-evaluation) 与 [Agentic Eval 设计](../06-eval-evolution/agentic-eval-design)

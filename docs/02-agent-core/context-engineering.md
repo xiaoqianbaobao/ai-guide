@@ -964,6 +964,8 @@ Context Engineering
 
 ## 下一步建议
 
+本专题接下来阅读 [Agent 安全边界](./agent-security-boundaries)。如果希望先探索跨模块主题，也可以：
+
 继续进入 [Memory 的四种形态](../03-memory/four-memory-types)。
 
 因为一旦上下文窗口有限，系统就必须回答另一个问题：窗口外的信息应该如何被保存和召回。

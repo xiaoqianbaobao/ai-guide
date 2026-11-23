@@ -1,18 +1,19 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
+import { lessonNeighbors } from './theme/navigation'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url))
 const repositoryBase = '/ai-guide/'
-const publishedOrigin = 'https://xiaoqianbaobao.github.io'
+const publishedOrigin = process.env.VITEPRESS_CANONICAL_ORIGIN || 'https://aiguide.org.cn'
 const isProduction = process.env.NODE_ENV === 'production'
 
 export default withMermaid(defineConfig({
   lang: 'zh-CN',
-  title: 'AI Agent Guide',
-  titleTemplate: ':title | AI Agent 全栈知识体系',
-  description: '从第一性原理到工程实战，系统掌握 AI Agent 开发',
+  title: '造与见',
+  titleTemplate: ':title | 造与见',
+  description: '从想法到第一个真实客户：融合 Builder 与 Seller 的 AI 学习体系',
   srcDir: path.resolve(__dirname, '..'),
   outDir: path.resolve(__dirname, '..', '..', 'dist'),
   cleanUrls: true,
@@ -21,8 +22,9 @@ export default withMermaid(defineConfig({
   base: isProduction ? repositoryBase : '/',
   head: [
     ['meta', { name: 'theme-color', content: '#f7f5f1' }],
+    ['link', { rel: 'icon', type: 'image/svg+xml', href: `${isProduction ? repositoryBase : '/'}logo.svg` }],
     ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: 'AI Agent 全栈知识体系' }],
+    ['meta', { property: 'og:title', content: '造与见｜从想法到第一个真实客户' }],
     ['meta', { property: 'og:description', content: '从第一性原理到工程实战，系统掌握 AI Agent 开发' }]
   ],
   markdown: {
@@ -42,7 +44,7 @@ export default withMermaid(defineConfig({
   },
   themeConfig: {
     logo: '/logo.svg',
-    siteTitle: 'AI Agent Guide',
+    siteTitle: '造与见',
     nav: [
       { text: '学习指南', link: '/guide/' },
       { text: '序章', link: '/00-preface/' },
@@ -92,8 +94,8 @@ export default withMermaid(defineConfig({
       text: '在 GitHub 上编辑此页'
     },
     docFooter: {
-      prev: '上一篇',
-      next: '下一篇'
+      prev: '本专题上一篇',
+      next: '本专题下一篇'
     },
     outline: {
       level: [2, 3],
@@ -126,7 +128,7 @@ export default withMermaid(defineConfig({
     },
     footer: {
       message: '基于 MIT 协议开源',
-      copyright: 'Copyright © 2026 AI Agent Guide Contributors'
+      copyright: 'Copyright © 2026 造与见 Contributors'
     }
   },
   vite: {
@@ -137,6 +139,9 @@ export default withMermaid(defineConfig({
     }
   },
   transformPageData(pageData) {
+    const adjacent = lessonNeighbors(buildSidebar(), pageData.relativePath)
+    pageData.frontmatter.prev = adjacent.prev
+    pageData.frontmatter.next = adjacent.next
     const pagePath = pageData.relativePath
       .replace(/index\.md$/, '')
       .replace(/\.md$/, '')
@@ -154,6 +159,8 @@ export default withMermaid(defineConfig({
 function buildSidebar() {
   return {
     '/guide/': sidebarGuide(),
+    '/models/python-basics/': sidebarPythonBasics(),
+    '/models/': sidebarModels(),
     '/00-preface/': sidebarPreface(),
     '/01-llm-foundations/': sidebarLLM(),
     '/02-agent-core/': sidebarAgentCore(),
@@ -166,6 +173,9 @@ function buildSidebar() {
     '/09-data-governance/': sidebarDataGovernance(),
     '/10-product-fde/': [{ text: '产品与 FDE', collapsed: false, items: [
       { text: '模块概述', link: '/10-product-fde/' },
+      { text: '客户访谈实战', link: '/10-product-fde/customer-discovery' },
+      { text: '从试点到第一个客户', link: '/10-product-fde/pilot-to-first-customer' },
+      { text: '从内容到第一个客户', link: '/10-product-fde/content-to-first-customer' },
       { text: '从功能交付到客户成效', link: '/10-product-fde/outcome-over-output/' }
     ] }],
     '/agent/': sidebarAgent()
@@ -179,9 +189,11 @@ function sidebarGuide() {
       collapsed: false,
       items: [
         { text: '学习指南', link: '/guide/' },
+        { text: '从想法到第一个真实客户', link: '/guide/idea-to-customer' },
         { text: '学习路线图', link: '/guide/roadmap/' },
         { text: '先修知识', link: '/guide/prerequisites/' },
-        { text: '如何使用本知识库', link: '/guide/how-to-learn/' }
+        { text: '如何使用本知识库', link: '/guide/how-to-learn/' },
+        { text: '学习资源', link: '/guide/learning-resources/' }
       ]
     }
   ]
@@ -298,8 +310,7 @@ function sidebarTools() {
         { text: 'Spring AI ChatClient Advisor 与 Structured Output 实战', link: '/05-tools-frameworks/spring-ai-chatclient-advisors-practice/' },
         { text: 'Agent Skills', link: '/05-tools-frameworks/agent-skills/' },
         { text: 'Harness 设计', link: '/05-tools-frameworks/harness-design/' },
-        { text: 'Agent 工程闭环', link: '/05-tools-frameworks/agent-engineering-loop/' },
-        { text: 'DeerFlow Harness 深度拆解', link: '/agent/cases/deerflow-harness-deep-dive/' }
+        { text: 'Agent 工程闭环', link: '/05-tools-frameworks/agent-engineering-loop/' }
       ]
     }
   ]
@@ -375,9 +386,26 @@ function sidebarAgent() {
       items: [
         { text: 'Agent 概念总览', link: '/agent/' },
         { text: '企业级 Agent 实战路线', link: '/agent/cases/enterprise-agent-roadmap/' },
+        { text: '企业知识助手第一刀', link: '/agent/cases/knowledge-assistant-first-slice/' },
         { text: '编程助手 Agent 实战', link: '/agent/cases/coding-assistant/' },
         { text: 'DeerFlow Harness 深度拆解', link: '/agent/cases/deerflow-harness-deep-dive/' },
       ]
     }
   ]
+}
+
+function sidebarModels() {
+  return [{ text: '编程基础', items: [{ text: '模块概述', link: '/models/' }] }]
+}
+
+function sidebarPythonBasics() {
+  return [{ text: 'Python 基础', items: [
+    { text: 'Python 基础教程', link: '/models/python-basics/' },
+    { text: '第1期 环境搭建与基础语法', link: '/models/python-basics/lesson-01/' },
+    { text: '第2期 数据类型与变量', link: '/models/python-basics/lesson-02/' },
+    { text: '第3期 控制流与函数', link: '/models/python-basics/lesson-03/' },
+    { text: '第4期 面向对象编程基础', link: '/models/python-basics/lesson-04/' },
+    { text: '第5期 文件操作与异常处理', link: '/models/python-basics/lesson-05/' },
+    { text: 'Python 之后学什么', link: '/models/python-basics/next-steps/' }
+  ] }]
 }

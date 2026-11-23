@@ -146,6 +146,8 @@ print("更清晰的上下文:", context_better)
 
 ## 下一步建议
 
+本专题继续阅读 [Transformer 专题导读](./transformer-attention-qkv)。也可以按兴趣探索以下内容：
+
 学完这一篇后，建议继续看：
 
 - [Agent 的本质](../02-agent-core/what-is-agent)

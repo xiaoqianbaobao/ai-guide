@@ -41,6 +41,42 @@ module: tools
 
 一次运行至少关联 `task_id`、`step_id`、工具名、耗时、结果状态和错误类型；模型与提示版本、token/费用也应按需要记录。日志应限制访问、脱敏并设定保留期，避免把完整上下文与密钥无差别写入。
 
+### 实践：先用允许字段构造一条轨迹事件
+
+> 2026-11-20 核验。以下是离线教学示例，使用虚构数据，不连接日志平台。实际采集需根据组织的数据分级和权限策略设计。
+
+[OpenAI 的追踪指南](https://developers.openai.com/api/docs/guides/agents-api/tracing)将一次运行中的模型响应和工具调用呈现在时间线上；但“能记录”不意味着应该记录完整输入。企业知识助手里，客户问题、工具参数和返回正文可能包含合同或个人信息。排障时先确定需要什么证据，再决定采集字段；轨迹 ID 本身也可能被用于关联用户，应限制访问和保存时间。
+
+下面的 Python 3 示例只输出预先允许的枚举和数值字段，并对缺失值停止处理。把它保存为 `safe_trace_demo.py` 后运行：
+
+```python
+import json
+
+TOOLS = {"search_docs", "draft_ticket"}
+STATUSES = {"ok", "denied", "error"}
+
+def make_event(tool, status, duration_ms, result_count):
+    if tool not in TOOLS or status not in STATUSES:
+        raise ValueError("不允许的工具或状态")
+    if type(duration_ms) is not int or duration_ms < 0:
+        raise ValueError("duration_ms 必须是非负整数")
+    if type(result_count) is not int or result_count < 0:
+        raise ValueError("result_count 必须是非负整数")
+    return {
+        "tool": tool,
+        "status": status,
+        "duration_ms": duration_ms,
+        "result_count": result_count,
+    }
+
+event = make_event("search_docs", "ok", 120, 2)
+print(json.dumps(event, ensure_ascii=False))
+```
+
+输出只包含 `tool`、`status`、`duration_ms` 与 `result_count`。示例刻意不接收原始文本，因此不会把原文写进这条事件；这不代表其他日志、代理或供应商追踪不会记录原文。真实系统还需建立受控关联 ID、按角色限制查询、设置保留期并验证删除策略，同时防止自由文本字段、异常堆栈和 URL 参数重新带入敏感数据。
+
+对照一个失败案例：如果检索结果不足，事件里的 `result_count=0` 可以帮助识别召回问题；它不能告诉我们某条引用是否支持结论。要评估引用质量，应在授权的隔离评估环境中使用脱敏样本和可追溯证据，而不是扩大生产日志采集范围。日志记录与评估样本是两种不同的数据使用，需要分别设定权限与生命周期。
+
 先为任务建立小规模、可复用的评估集：正常任务、缺失信息、恶意或冲突指令、工具失败、超时和重启恢复。分别检查最终结果、关键步骤、违规副作用、成本与耗时；对主观质量设定可审阅标准，并对自动评分抽样人工复核。线上监控应关注成功率、重试率、人工接管、成本与延迟，同时按版本比较，避免平均值掩盖失败。
 
 ## 最小落地顺序
@@ -52,6 +88,70 @@ module: tools
 5. 只有在单 Agent 的瓶颈已被测量并确认时，再引入多角色与更复杂的编排。
 
 继续阅读：[Harness 设计](./harness-design)、[上下文工程](../02-agent-core/context-engineering)、[Agentic Eval](../06-eval-evolution/agentic-eval-design)、[多 Agent 失败恢复](../04-multi-agent/failure-modes-and-recovery)。
+
+## 等待用户回复时，哪些工作可以继续？
+
+> 核验日期：2026-11-22。以下是离线教学模型，不是 OpenAI API 调用示例。
+
+假设 Agent 要在会议前准备客户简报，客户尚未说明会议重点。查询公开资料和整理已知事实可以继续；如果用户必须先授权访问内部材料，或者需要批准一项操作，就不能把没有回复当作同意。[OpenAI 的异步输入与时间感知案例](https://developers.openai.com/blog/time-awareness-and-async-input-for-personal-agents)展示了研究与提问并行，并由应用计时器负责最终交付；我们还需要在自己的系统中明确授权边界和失败策略。
+
+下面用状态判断区分三种情况。保存为 `clarification_demo.py`，运行 `python3 clarification_demo.py`：
+
+```python
+def decide(*, deadline_reached, approval_required, approved):
+    if deadline_reached:
+        return "交付已核验结果；没有结果则说明未完成"
+    if approval_required and not approved:
+        return "等待明确批准；只继续不依赖批准的工作"
+    return "继续已授权的工作"
+
+assert "等待" in decide(deadline_reached=False, approval_required=True, approved=False)
+assert "交付" in decide(deadline_reached=True, approval_required=True, approved=False)
+print(decide(deadline_reached=False, approval_required=True, approved=False))
+```
+
+程序预期输出“等待明确批准；只继续不依赖批准的工作”。它只演示决策条件，没有计时器、事件队列、身份验证或实际审批。实际实现应给每个问题分配 ID，关联回复与对应问题；设定截止时间后，处理迟到回复、重复事件与任务已结束的情况。截止时交付已核验内容或说明未完成，不自动执行未授权操作。异步提问是协作机制，不是绕过确认的机制。
+
+## 单次任务预算：先预留，再结算
+
+> 核验日期：2026-11-19。下面是单进程教学模型，金额为虚构单位，不代表真实价格或账单上限。
+
+长任务可能在一次运行中反复调用模型和工具。项目级总额告警不一定能阻止某一次任务继续花费。[OpenAI 的单次运行预算示例](https://developers.openai.com/cookbook/articles/per_run_spending_controller_responses_api)采用的基本思路是：调用前按可能的最高成本预留额度，完成后根据实际用量结算并释放差额；如果费用结果未知，不应直接把预留额退回。
+
+下面用标准库模拟一笔预留和结算，不调用外部服务。先保存为 `budget_demo.py`，运行 `python3 budget_demo.py`：
+
+```python
+from fractions import Fraction
+
+limit = Fraction("0.02")
+spent = Fraction("0.00")
+reserved = Fraction("0.00")
+
+def reserve(upper_bound):
+    global reserved
+    if upper_bound <= 0 or spent + reserved + upper_bound > limit:
+        raise ValueError("预算不足或预留金额无效")
+    reserved += upper_bound
+
+def settle(hold, actual):
+    global spent, reserved
+    if not (0 <= actual <= hold <= reserved):
+        raise ValueError("结算异常：保留预留额，停止并核对")
+    reserved -= hold
+    spent += actual
+
+reserve(Fraction("0.0146"))
+settle(Fraction("0.0146"), Fraction("0.01"))
+try:
+    reserve(Fraction("0.0146"))
+except ValueError:
+    print("拒绝下一次调用：剩余预算 0.01")
+print(f"已结算 {float(spent):.2f}，待结算 {float(reserved):.2f}")
+```
+
+预期输出为“拒绝下一次调用：剩余预算 0.01”和“已结算 0.01，待结算 0.00”。这里用 `Fraction` 避免浮点金额舍入误差；示例没有网络请求，不计算 token，也不能直接作为生产控制器。
+
+真实系统要同时处理工具费用、定价版本、重试、缓存、异步任务与进程崩溃。多个 worker 共用预算时，检查与预留必须在共享存储中原子执行；单进程变量或锁无法跨机器保证额度。响应超时但服务端可能已经计费时，将记录标为待核对并保留预留，再依据服务商可用的用量数据对账。服务商价格和计费口径会变化，运行前要重新核对；未覆盖的费用不应被宣传成已受预算保护。
 
 ## 深入：把任务拆成可以恢复的状态机
 

@@ -102,4 +102,6 @@ Codex 选择并入 ChatGPT 统一桌面应用，和 Chat、Work 模式并列，�
 
 ## 下一步
 
+本专题接下来阅读 [从零手写 Agent](./build-from-scratch)。深入了解运行时设计也可以：
+
 如果你想继续从工程细节层面理解 harness 内部到底在设计什么，可以进入 [Harness 设计](./harness-design)。

@@ -226,7 +226,7 @@ def dream(memory_dir, budget):
 
 继续阅读 [如何评估一个记忆系统](./memory-evaluation)，了解怎样用基线对照与任务级指标，判断这些设计是否真的带来了收益。
 
-如果关心多个 Agent 共享记忆时的写入冲突，可以进入 [多 Agent 系统](https://csqread.top/ai-guide/04-multi-agent/)。
+如果关心多个 Agent 共享记忆时的写入冲突，可以进入 [多 Agent 系统](../04-multi-agent/)。
 
 ## 延伸阅读
 

@@ -447,4 +447,6 @@ RUNTIME_CONFIG = {
 
 ## 下一步
 
+本专题接下来阅读 [MCP 协议](./mcp-protocol)，理解工具如何以标准方式接入。跨模块延伸：
+
 如果你已经理解了最小 Agent 的结构和宿主责任，下一步建议进入 [奖励函数设计](../06-eval-evolution/reward-function-design)，看看当系统开始迭代优化时，目标函数为什么会直接决定 Agent 的进化方向。

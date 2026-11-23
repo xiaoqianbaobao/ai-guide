@@ -408,6 +408,8 @@ RoPE 相关知识会帮助你理解：
 
 ## 下一步
 
+本专题接下来阅读 [第10章 GQA MQA 与推理带宽权衡实战](./chapter-06d-gqa-mqa-and-bandwidth)。相关复习：
+
 - 先回到 [第7章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把这页作为位置编码与长上下文部分的展开理解
 - 再读 [第8章 KV Cache 与自回归推理实战](./chapter-06b-kv-cache-and-autoregressive-decoding)，把“位置表示”和“推理成本”两个维度连起来
 

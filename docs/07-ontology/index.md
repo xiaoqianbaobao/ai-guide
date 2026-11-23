@@ -73,6 +73,6 @@ flowchart LR
 | [跨模块集成：Ontology × Memory × Multi-Agent × Eval](./ontology-integration) | 落地集成 | 把本体作为三个模块的共同底座：语义写入、实体消歧、Blackboard 类型化、评估口径绑定到 named query + outcome。 | ✅ 已发布 |
 | [Hypergraph 在企业级多 Agent 架构中的应用](./hypergraph-enterprise-multi-agent) | 进阶 | 高阶关系、带属性多向关系、如何与治理机制衔接。 | ✅ 已发布 |
 
-## 学完后去哪里
+## 学完本模块后去哪里
 
 如果你关心 Agent 如何"自己长出新能力"，可以进入 [自进化 Skills 与 Agent 自我改进](../08-self-evolving-skills/)；如果你关心强监管场景下的数据合规与质量，则继续看 [数据治理](../09-data-governance/)；想回到工程主流程把本体写进评估闭环，可继续读 [Harness 与 Skill 的评估体系](../06-eval-evolution/harness-skill-evaluation) 与 [Agentic Eval 设计](../06-eval-evolution/agentic-eval-design)。

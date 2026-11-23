@@ -380,6 +380,8 @@ OpenAI 和 Anthropic 在近年的 agent / eval / tool 公开资料里都反复�
 
 ## 下一步
 
+本专题接下来阅读 [向量库与图存储的选型对比](./vectordb-vs-graphdb)。跨模块延伸：
+
 如果你已经理解了 RAG 是如何扩展单个 Agent 的记忆能力，下一步建议进入 [Orchestrator-Subagent](../04-multi-agent/orchestrator-subagent)，看看当任务复杂到单个 Agent 不够时，系统会如何继续扩展。
 
 

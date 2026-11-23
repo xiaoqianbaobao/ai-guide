@@ -427,6 +427,8 @@ Agent 系统经常会：
 
 ## 下一步
 
+本专题接下来阅读 [第9章 RoPE 与长上下文外推实战](./chapter-06c-rope-and-long-context)。相关复习与延伸：
+
 - 回到 [第7章 训练、推理与现代 Transformer 演化](./chapter-06-training-inference-and-evolution)，把这一页作为推理部分的展开理解
 - 继续进入 [Agent 核心机制](../02-agent-core/)，你会更清楚为什么上下文与轨迹管理会直接影响系统成本
 

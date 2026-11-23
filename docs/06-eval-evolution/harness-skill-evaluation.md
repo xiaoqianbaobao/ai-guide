@@ -348,6 +348,8 @@ Skill 再漂亮，如果触发不准、加载过重、没有任务增益，依�
 
 ## 下一步
 
+本专题接下来阅读 [线上评估与回归](./production-evaluation-loop)。其他复习方向：
+
 - 继续阅读 [奖励函数设计](./reward-function-design)
 - 或回到 [Tool / MCP / Skill / Harness / Workflow / Agent 关系图](../04-multi-agent/system-relations)
 

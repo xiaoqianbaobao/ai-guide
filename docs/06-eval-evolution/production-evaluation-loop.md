@@ -98,6 +98,49 @@ limits:
 
 保留开发集供定位与迭代，留出不参与调参的测试集做最终检查；对重复使用的测试集持续关注污染。成本和延迟也要一起报告：一次成功若需要过高成本或很长等待，未必满足业务目标。[OpenAI 的评估有效性指南](https://openai.com/index/trustworthy-third-party-evaluations-foundations/)讨论了 Harness、奖励投机、污染与无效任务对评估结论的影响。
 
+## 一次客服 Agent 成本优化：先过质量门槛
+
+> 核验日期：2026-11-18。下例是独立教学模拟，数据和阈值均为假设，不是任何模型的实测结果或价格。
+
+[OpenAI 的客服 Agent 优化教程](https://developers.openai.com/cookbook/examples/agent_optimization/optimizing_agents_for_cost_and_quality)采用模拟工单与确定性工具，先在同一评估集上建立基线，再检查质量、策略遵守与转人工是否满足要求，最后比较成本和延迟。原教程明确说明，其默认模拟结果不是生产基准。
+
+假设你计划减少工单助手的模型调用。先用同一批脱敏任务记录旧版与新版的结果，确保运行环境、权限和评分规则一致；涉及转人工或拒绝越权的案例应单独设门槛。下面的脚本不调用模型，演示如何区分「更便宜」和「可以考虑上线」：
+
+```python
+from statistics import mean
+
+# 同一批虚构工单；safe 表示符合人工核验的安全规则。
+baseline = [
+    {"id": "order", "success": True, "safe": True, "cost": 0.04},
+    {"id": "refund", "success": True, "safe": True, "cost": 0.06},
+    {"id": "identity", "success": True, "safe": True, "cost": 0.05},
+]
+candidate = [
+    {"id": "order", "success": True, "safe": True, "cost": 0.02},
+    {"id": "refund", "success": True, "safe": True, "cost": 0.03},
+    {"id": "identity", "success": False, "safe": False, "cost": 0.02},
+]
+
+def summarize(rows):
+    return {
+        "success_rate": mean(row["success"] for row in rows),
+        "safety_failures": sum(not row["safe"] for row in rows),
+        "cost_per_task": mean(row["cost"] for row in rows),
+    }
+
+assert [r["id"] for r in baseline] == [r["id"] for r in candidate]
+old, new = summarize(baseline), summarize(candidate)
+quality_gate = (new["safety_failures"] == 0 and
+                new["success_rate"] >= old["success_rate"])
+print(f"基线成功率：{old['success_rate']:.0%}；候选成功率：{new['success_rate']:.0%}")
+print(f"候选安全失败：{new['safety_failures']}；平均成本：{new['cost_per_task']:.3f}")
+print("进入成本比较" if quality_gate else "拒绝发布：质量门槛未通过")
+```
+
+保存为 `compare.py` 并运行 `python3 compare.py`，应看到候选版成功率约 67%、安全失败 1 次，以及“拒绝发布”。虽然候选平均成本更低，身份验证失败仍使它不满足示例门槛。这里的 `safe` 是预先提供的人工标签；脚本本身不会识别安全问题。
+
+真实系统还应覆盖不同工单类型、权限边界、罕见故障与人工升级，保留不参与调参的测试集；记录重试、缓存、工具调用与人工复核成本，并分别比较延迟分位数。上线决策需要依据业务风险设定门槛，小样本零失败不能证明系统安全。模型价格、缓存规则和用量字段可能变化，应按运行时官方文档重新核对。
+
 ## 从离线测试到线上决策
 
 一次建议的发布流程是：先运行稳定的回归集和安全用例；人工检查新增失败及关键轨迹；记录版本、预算和已知限制；再对小范围真实流量启用，并设置自动停止或人工回滚条件。对照组和新版本应按相同口径收集指标；用户授权、流量分配和数据保留遵守实际系统要求。

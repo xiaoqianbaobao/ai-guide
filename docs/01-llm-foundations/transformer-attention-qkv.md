@@ -72,6 +72,8 @@ Transformer、Attention、QKV 这些概念如果只压在一篇文章里，常�
 
 ## 下一步
 
+本专题接下来从 [第1章 为什么是 Transformer](./chapter-01-why-transformer) 开始。以下是其他阅读方向：
+
 - 想继续从模型走向系统：进入 [Agent 核心机制](../02-agent-core/)
 - 想回到输入约束：重读 [上下文窗口](./context-window)
 

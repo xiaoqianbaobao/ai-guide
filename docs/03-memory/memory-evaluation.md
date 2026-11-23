@@ -92,6 +92,8 @@ Anthropic 的文章给出了一个可以借用的思路：**在同一批任务�
 
 ## 下一步
 
+本专题接下来阅读 [知识库、Agent 上下文与个人记忆](./wiki-and-runtime-context)，进一步厘清不同知识载体的职责。跨模块延伸：
+
 记忆评估与 [评估与进化](../06-eval-evolution/) 模块相通，可以继续阅读 [Agent 线上评估与回归](../06-eval-evolution/production-evaluation-loop)，了解更完整的 Agent 评估方法。
 
 ## 延伸阅读
