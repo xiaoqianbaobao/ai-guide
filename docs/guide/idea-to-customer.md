@@ -46,3 +46,17 @@ description: 用一个企业知识与工单助手案例，贯穿客户发现、�
 - 企业团队：先看 [企业实战路线](../agent/cases/enterprise-agent-roadmap) 中的治理与验收边界。团队课程、付费社区与个人服务还在规划。
 
 这条路线是循环而非直线：新证据可能让你回到前一阶段，甚至决定不做。每次回退，都应该留下改变判断的证据。
+
+## 配合学习：视频、课程与动手任务
+
+下面选的是原作者或课程方提供的材料。视频以英文为主，平台的字幕、访问方式和课程收费可能变化；先完成对应练习，再把内容带回自己的场景。
+
+| 阶段 | 推荐材料 | 看完后动手做什么 |
+| --- | --- | --- |
+| 发现问题 | [YC：How to Talk to Users](https://www.youtube.com/watch?v=MT4Ig2uqjTc)（视频） | 把三个“你会不会用”的问题改成“上次你怎么做”，用[问题证据卡](../10-product-fde/customer-discovery)记录观察与推断。 |
+| 缩小产品范围 | [YC：How to Plan an MVP](https://www.ycombinator.com/library/6f-how-to-plan-an-mvp)（视频与文字） | 写下目标用户、一个具体任务和最小交付；再列出涉及安全和授权时不能省略的边界。 |
+| 构建 Agent 基础 | [Hugging Face Agents Course：Unit 1](https://huggingface.co/learn/agents-course/en/unit1/introduction)（课程） | 画出一次工具调用的输入、动作和观察，再对照[只读原型](../agent/cases/knowledge-assistant-first-slice)说明哪些地方还没有引入模型。 |
+| 检查系统质量 | [DeepLearning.AI：Building Systems with the ChatGPT API](https://www.deeplearning.ai/courses/chatgpt-building-system)（分节视频与代码） | 重点看评估相关课程，对照[本地回归示例](../agent/cases/knowledge-assistant-evaluation)写一条资料不足或越权用例；课程代码与 API 版本可能更新。 |
+| 连接真实用户 | [YC：Building Product, Talking to Users, and Growing](https://www.ycombinator.com/library/dS-how-to-start-a-startup-building-product-talking-to-users-and-growing)（创始人演讲与文字） | 区分用户描述的问题与提出的功能方案，选择一条证据制定试点，而不是把每个建议都加进产品。 |
+
+这些材料适用于学习思路，不保证适合每个行业。特别是企业场景，快速试错也应以授权、数据边界与可撤回性为前提。资源核验日期：2026-11-25。

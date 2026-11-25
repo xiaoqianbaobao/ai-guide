@@ -15,6 +15,7 @@ const searchLoading = ref(false)
 const searchError = ref(false)
 async function toggleSearch() {
   searchOpen.value = !searchOpen.value
+  if (searchOpen.value) menuOpen.value = false
   if (!searchOpen.value || documents.value.length || searchLoading.value) return
   searchLoading.value = true
   searchError.value = false
@@ -69,7 +70,7 @@ watch(() => route.path, () => { menuOpen.value = false; searchOpen.value = false
           <details v-else class="next-dropdown"><summary>{{ item.text }}</summary><div><a v-for="child in item.items" :key="child.link" :href="href(child.link)">{{ child.text }}</a></div></details>
         </template>
       </nav>
-      <div class="next-header-actions"><button type="button" @click="toggleSearch" :aria-expanded="searchOpen">搜索</button><button type="button" @click="isDark = !isDark" :aria-label="isDark ? '切换浅色模式' : '切换深色模式'">{{ isDark ? '☼' : '☾' }}</button><button class="next-mobile-menu" type="button" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen">目录</button></div>
+      <div class="next-header-actions"><button type="button" @click="toggleSearch" :aria-expanded="searchOpen">搜索</button><button type="button" @click="isDark = !isDark" :aria-label="isDark ? '切换浅色模式' : '切换深色模式'">{{ isDark ? '☼' : '☾' }}</button><button class="next-mobile-menu" type="button" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen; searchOpen = false">目录</button></div>
     </header>
     <div v-if="searchOpen" class="next-search" role="search"><label for="next-search-input">搜索文章全文</label><input id="next-search-input" v-model="query" type="search" placeholder="输入关键词"><p v-if="!query">输入关键词查找文章</p><p v-else-if="searchLoading">正在加载搜索索引…</p><p v-else-if="searchError">搜索索引加载失败，请关闭后重试。</p><p v-else-if="!searchResults.length">没有找到匹配的文章</p><a v-for="item in searchResults" :key="item.url" :href="href(item.url)"><strong>{{ item.title }}</strong><small>{{ excerpt(item) }}</small></a></div>
     <main v-if="home" id="main" class="next-home"><Content /></main>
