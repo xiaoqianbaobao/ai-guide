@@ -102,30 +102,6 @@ export default withMermaid(defineConfig({
       label: '本文目录'
     },
     lastUpdatedText: '最后更新',
-    search: {
-      provider: 'local',
-      options: {
-        locales: {
-          root: {
-            translations: {
-              button: {
-                buttonText: '搜索文章',
-                buttonAriaLabel: '搜索文章'
-              },
-              modal: {
-                noResultsText: '没有找到相关结果',
-                resetButtonTitle: '清除搜索',
-                footer: {
-                  selectText: '选择',
-                  navigateText: '切换',
-                  closeText: '关闭'
-                }
-              }
-            }
-          }
-        }
-      }
-    },
     footer: {
       message: '基于 MIT 协议开源',
       copyright: 'Copyright © 2026 造与见 Contributors'
@@ -387,6 +363,7 @@ function sidebarAgent() {
         { text: 'Agent 概念总览', link: '/agent/' },
         { text: '企业级 Agent 实战路线', link: '/agent/cases/enterprise-agent-roadmap/' },
         { text: '企业知识助手第一刀', link: '/agent/cases/knowledge-assistant-first-slice/' },
+        { text: '知识助手回归评估', link: '/agent/cases/knowledge-assistant-evaluation/' },
         { text: '编程助手 Agent 实战', link: '/agent/cases/coding-assistant/' },
         { text: 'DeerFlow Harness 深度拆解', link: '/agent/cases/deerflow-harness-deep-dive/' },
       ]

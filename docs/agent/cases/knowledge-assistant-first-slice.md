@@ -84,7 +84,7 @@ if __name__ == "__main__":
 3. 设计一个用户同时属于两个团队的场景。先写预期权限表，再决定服务端如何表示授权；不要让用户通过提问自己指定租户。
 4. 与一位潜在使用者确认：“无法确认”时应该展示什么人工处理路径？把回答作为新的需求，而不是让模型猜测。
 
-继续阅读 [企业级 Agent 实战路线](./enterprise-agent-roadmap)、[客户访谈](../../10-product-fde/customer-discovery) 和 [Agent 线上评估](../../06-eval-evolution/production-evaluation-loop)。
+下一篇动手运行 [知识助手第一套回归评估](./knowledge-assistant-evaluation)，检查引用、拒答和跨租户泄露；也可以阅读 [企业级 Agent 实战路线](./enterprise-agent-roadmap)、[客户访谈](../../10-product-fde/customer-discovery) 和 [Agent 线上评估](../../06-eval-evolution/production-evaluation-loop)。
 
 ## 参考资料
 

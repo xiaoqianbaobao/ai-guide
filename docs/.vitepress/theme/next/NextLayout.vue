@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { computed, ref, watch } from 'vue'
+import { computed, nextTick, onMounted, ref, watch } from 'vue'
 import { Content, useData, useRoute, withBase } from 'vitepress'
 import WechatRail from '../components/WechatRail.vue'
 import type { LessonLink, LessonSidebar } from '../navigation'
@@ -23,6 +23,14 @@ async function toggleSearch() {
   finally { searchLoading.value = false }
 }
 const focus = ref(false)
+const headings = ref<{ id: string; title: string; level: number }[]>([])
+async function updateHeadings() {
+  await nextTick()
+  headings.value = Array.from(document.querySelectorAll<HTMLElement>('.next-article h2[id], .next-article h3[id]'))
+    .map(heading => ({ id: heading.id, title: heading.textContent?.replace(/^#\s*/, '').trim() || '', level: Number(heading.tagName.slice(1)) }))
+    .filter(heading => heading.title)
+}
+onMounted(updateHeadings)
 const home = computed(() => frontmatter.value.layout === 'home')
 const sidebar = computed(() => (theme.value.sidebar ?? {}) as LessonSidebar)
 const group = computed(() => {
@@ -47,7 +55,7 @@ function active(path: string) {
 }
 const prev = computed(() => frontmatter.value.prev as LessonLink | false)
 const next = computed(() => frontmatter.value.next as LessonLink | false)
-watch(() => route.path, () => { menuOpen.value = false; searchOpen.value = false })
+watch(() => route.path, () => { menuOpen.value = false; searchOpen.value = false; void updateHeadings() }, { flush: 'post' })
 </script>
 
 <template>
@@ -68,7 +76,7 @@ watch(() => route.path, () => { menuOpen.value = false; searchOpen.value = false
     <div v-else class="next-layout" :class="{ 'is-focus': focus, 'is-menu-open': menuOpen }">
       <aside class="next-sidebar" aria-label="课程目录"><section v-for="part in group" :key="part.text"><h2>{{ part.text }}</h2><a v-for="item in part.items" :key="item.link" :href="href(item.link)" :aria-current="active(item.link) ? 'page' : undefined">{{ item.text }}</a></section></aside>
       <main id="main" class="next-main"><article class="next-article vp-doc"><button type="button" class="next-focus" :aria-pressed="focus" @click="focus = !focus">{{ focus ? '退出专注' : '专注阅读' }}</button><Content /><nav v-if="prev || next" class="prev-next" aria-label="课程分页"><a v-if="prev" class="pager-link prev" :href="href(prev.link)"><small>本专题上一篇</small><strong>{{ prev.text }}</strong></a><a v-if="next" class="pager-link next" :href="href(next.link)"><small>本专题下一篇</small><strong>{{ next.text }}</strong></a></nav></article></main>
-      <aside v-if="page.headers?.length" class="next-outline" aria-label="本文目录"><strong>本文目录</strong><a v-for="header in page.headers" :key="header.slug" :class="{ sub: header.level > 2 }" :href="'#' + header.slug">{{ header.title }}</a></aside>
+      <aside v-if="headings.length" class="next-outline" aria-label="本文目录"><strong>本文目录</strong><a v-for="heading in headings" :key="heading.id" :class="{ sub: heading.level > 2 }" :href="'#' + encodeURIComponent(heading.id)">{{ heading.title }}</a></aside>
     </div>
     <footer class="next-footer">造与见 · 从想法到第一个真实客户</footer><WechatRail v-if="!home" />
   </div>
