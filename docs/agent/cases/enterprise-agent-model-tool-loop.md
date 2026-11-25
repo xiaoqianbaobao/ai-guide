@@ -35,6 +35,8 @@ python3 -m unittest test_agent_loop -v
 
 7 条测试使用模拟模型或模拟 SDK，覆盖：查询结果按 `call_id` 返回、来源由服务端提供、无证据时丢弃模型编造的回答、禁止模型自选租户或写入工具、无效参数、轮次上限及缺少联网开关时不创建提供方客户端。它们验证应用逻辑，**不证明真实模型或真实 API 请求已经跑通**。
 
+如果已经安装官方 `openai` SDK，还可以运行 `python3 -m unittest test_sdk_contract -v`：它使用 SDK 和本地模拟 HTTP 响应，验证两轮请求的序列化与工具结果格式，不连接外网。未安装 SDK 时该测试会跳过；本文用 SDK 2.44.0 完成过模拟测试，不代表不同版本和真实服务一定兼容。
+
 完整代码见 [agent_loop.py](https://github.com/xiaoqianbaobao/ai-guide/blob/main/examples/enterprise-agent-lab/agent_loop.py)。关键的服务端调用是：
 
 ```python
