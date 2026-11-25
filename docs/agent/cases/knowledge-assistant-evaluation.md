@@ -67,7 +67,7 @@ unauthorized = any(source not in allowed for source in result["sources"]) or any
 4. 扩展来源版本撤回、引用与结论不一致、无权限文档内容被改写等用例。
 5. 接入模型后，增加任务结果、轨迹、耗时和成本；涉及业务事实的模糊判断，由领域人员抽检评分器。
 
-这一小段代码可以作为自动化评估的起点，但尚未实现认证、真实检索、日志隔离或生产接入。后续应回到 [企业级 Agent 实战路线](./enterprise-agent-roadmap) 补齐身份、观测和故障恢复，并结合 [客户访谈](../../10-product-fde/customer-discovery) 收集经过授权的真实任务。
+这一小段代码可以作为自动化评估的起点，但尚未实现认证、真实检索、日志隔离或生产接入。下一篇 [工单审批、幂等与恢复](./ticket-approval-and-retry) 将模拟受控写入与响应丢失；也应回到 [企业级 Agent 实战路线](./enterprise-agent-roadmap) 补齐身份、观测和故障恢复，并结合 [客户访谈](../../10-product-fde/customer-discovery) 收集经过授权的真实任务。
 
 ## 延伸阅读与课程
 
