@@ -41,3 +41,12 @@ html { scroll-behavior:smooth; } body { margin:0; font-family:var(--vp-font-fami
 .next-article .shiki span { color:var(--shiki-light, inherit); background-color:transparent !important; }
 .dark .next-article .shiki span { color:var(--shiki-dark, inherit) !important; background-color:transparent !important; }
 @media (max-width: 1100px) { .next-dropdown .next-dropdown-panel { position:static; min-width:0; margin:0 0 8px; box-shadow:none; } }
+
+/* Keep long URLs and wide formulas within the reading column on small screens. */
+.next-article { overflow-wrap:anywhere; }
+.next-article mjx-container[display="true"] { max-width:100%; overflow-x:auto; overflow-y:hidden; }
+@media (max-width: 600px) {
+  .next-article .mermaid { position:relative; padding-top:22px; }
+  .next-article .mermaid::before { content:'图表可左右滑动'; position:absolute; top:0; left:0; color:var(--next-muted); font:12px/1.4 system-ui,sans-serif; }
+  .next-article .mermaid svg { width:max(100%, var(--diagram-width, 560px)); max-width:none !important; }
+}

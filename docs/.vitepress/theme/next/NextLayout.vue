@@ -72,8 +72,28 @@ async function copyCode(event: MouseEvent) {
 }
 const focus = ref(false)
 const headings = ref<{ id: string; title: string; level: number }[]>([])
+let diagramObserver: MutationObserver | undefined
+function updateDiagramWidths() {
+  document.querySelectorAll<SVGSVGElement>('.next-article .mermaid svg').forEach(svg => {
+    const width = svg.viewBox.baseVal.width
+    if (width > 0) svg.style.setProperty('--diagram-width', `${Math.ceil(width)}px`)
+    const container = svg.closest<HTMLElement>('.mermaid')
+    if (container) {
+      container.tabIndex = 0
+      container.setAttribute('role', 'region')
+      container.setAttribute('aria-label', '图表，可左右滚动')
+    }
+  })
+}
 async function updateHeadings() {
   await nextTick()
+  diagramObserver?.disconnect()
+  const article = document.querySelector('.next-article')
+  if (article) {
+    diagramObserver = new MutationObserver(updateDiagramWidths)
+    diagramObserver.observe(article, { childList: true, subtree: true })
+    updateDiagramWidths()
+  }
   document.querySelectorAll<HTMLButtonElement>('.next-article button.copy').forEach(button => {
     button.type = 'button'
     button.title = '复制代码'
@@ -84,7 +104,7 @@ async function updateHeadings() {
     .filter(heading => heading.title)
 }
 onMounted(() => { void updateHeadings(); window.addEventListener('keydown', handleShortcut); document.addEventListener('pointerdown', handleOutsideClick) })
-onBeforeUnmount(() => { window.removeEventListener('keydown', handleShortcut); document.removeEventListener('pointerdown', handleOutsideClick) })
+onBeforeUnmount(() => { diagramObserver?.disconnect(); window.removeEventListener('keydown', handleShortcut); document.removeEventListener('pointerdown', handleOutsideClick) })
 const home = computed(() => frontmatter.value.layout === 'home')
 const sidebar = computed(() => (theme.value.sidebar ?? {}) as LessonSidebar)
 const group = computed(() => {
