@@ -32,8 +32,8 @@ html { scroll-behavior:smooth; } body { margin:0; font-family:var(--vp-font-fami
 .next-article div[class*="language-"] > button.copy[data-copy-state="success"]::after { content:'已复制'; }
 .next-article div[class*="language-"] > button.copy[data-copy-state="error"]::after { content:'复制失败'; }
 .next-article div[class*="language-"] > button.copy:hover { color:var(--next-accent); border-color:var(--next-accent); }
-.next-article div[class*="language-"] > pre { margin:0; padding:52px 20px 16px 4em; overflow-x:auto; border-radius:0; background:transparent !important; color:inherit !important; font:14px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; tab-size:2; }
-.next-article div[class*="language-"]:not(.line-numbers-mode) > pre,.next-article div.language-text > pre { padding-left:20px; }
+.next-article div[class*="language-"] > pre { margin:0 0 0 3em; padding:52px 20px 16px 1em; overflow-x:auto; border-radius:0; background:transparent !important; color:inherit !important; font:14px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; tab-size:2; }
+.next-article div[class*="language-"]:not(.line-numbers-mode) > pre,.next-article div.language-text > pre { margin-left:0; padding-left:20px; }
 .next-article div[class*="language-"] pre code { display:block; width:max-content; min-width:100%; font:inherit; }
 .next-article div[class*="language-"] pre code .line { width:auto; min-width:100%; }
 .next-article div[class*="language-"] .line-numbers-wrapper { position:absolute; top:52px; left:0; width:3em; padding-right:.7em; border-right:1px solid var(--next-border); color:var(--next-muted); text-align:right; font:14px/1.7 ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; user-select:none; pointer-events:none; }
