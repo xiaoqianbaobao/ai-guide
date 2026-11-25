@@ -383,7 +383,8 @@ function sidebarAgent() {
 function sidebarModels() {
   return [{ text: '模型与数学基础', items: [
     { text: '模块概述', link: '/models/' },
-    { text: '线性代数：向量、点积与注意力', link: '/models/linear-algebra-for-agents/' }
+    { text: '线性代数：向量、点积与注意力', link: '/models/linear-algebra-for-agents/' },
+    { text: '概率：如何理解评估的不确定性', link: '/models/probability-for-agent-evals/' }
   ] }]
 }
 
