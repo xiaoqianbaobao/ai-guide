@@ -1,5 +1,6 @@
 import { defineConfig } from 'vitepress'
 import { withMermaid } from 'vitepress-plugin-mermaid'
+import mathjax3 from 'markdown-it-mathjax3'
 import { lessonNeighbors } from './theme/navigation'
 import path from 'node:path'
 import { fileURLToPath } from 'node:url'
@@ -28,7 +29,11 @@ export default withMermaid(defineConfig({
     ['meta', { property: 'og:description', content: '从第一性原理到工程实战，系统掌握 AI Agent 开发' }]
   ],
   markdown: {
-    lineNumbers: true
+    lineNumbers: true,
+    config(md) { md.use(mathjax3) }
+  },
+  vue: {
+    template: { compilerOptions: { isCustomElement: tag => tag.startsWith('mjx-') } }
   },
   mermaid: {
     theme: 'base',
@@ -52,6 +57,7 @@ export default withMermaid(defineConfig({
       {
         text: '模型基础',
         items: [
+          { text: '数学与编程基础', link: '/models/' },
           { text: '语言模型基础', link: '/01-llm-foundations/' }
         ]
       },
@@ -375,7 +381,10 @@ function sidebarAgent() {
 }
 
 function sidebarModels() {
-  return [{ text: '编程基础', items: [{ text: '模块概述', link: '/models/' }] }]
+  return [{ text: '模型与数学基础', items: [
+    { text: '模块概述', link: '/models/' },
+    { text: '线性代数：向量、点积与注意力', link: '/models/linear-algebra-for-agents/' }
+  ] }]
 }
 
 function sidebarPythonBasics() {

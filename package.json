@@ -10,6 +10,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs,.ts,.tsx,.cts,.mts --ignore-path .gitignore",
     "check:navigation": "node scripts/check-navigation.mjs",
     "check:links": "python3 scripts/check-links.py",
+    "check:math": "node scripts/check-math.mjs",
     "check:types": "tsc --noEmit --skipLibCheck --module esnext --moduleResolution bundler --target es2022 --esModuleInterop docs/.vitepress/config.ts",
     "check:navigation-unit": "node scripts/check-navigation-unit.mjs"
   },
