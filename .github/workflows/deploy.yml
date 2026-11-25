@@ -35,6 +35,15 @@ jobs:
     - name: Build
       run: npm run build
 
+    - name: Check tutorials and navigation
+      run: |
+        npm run check:navigation
+        npm run check:navigation-unit
+        npm run check:links
+        npm run check:math
+        npm run check:types
+        npm run check:examples
+
     - name: Debug build output
       run: |
         echo "=== pwd ===" && pwd

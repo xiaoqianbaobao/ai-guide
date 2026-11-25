@@ -1,6 +1,6 @@
-# AI Agent Guide
+# 造与见 · AI Agent 全栈知识体系
 
-AI Agent Guide 是一个基于 VitePress 构建的中文开源知识站点，目标是按知识体系方式组织从 LLM 原理到 Agent 工程实践的完整链路。
+造与见是一个中文开源知识站点，围绕「从想法到第一个真实客户」，连接 Builder 的技术能力与 Seller 的产品和商业能力。内容从数学、模型与 Agent 工程延伸到客户发现、试点和企业交付。
 
 ## 项目定位
 
@@ -10,7 +10,8 @@ AI Agent Guide 是一个基于 VitePress 构建的中文开源知识站点，目
 
 ## 访问地址
 
-- 线上地址：`https://xiaoqianbaobao.github.io/ai-guide/`
+- 服务器站点：`https://aiguide.org.cn/ai-guide/`（域名接入状态需以实际访问及备案配置为准）
+- GitHub Pages：`https://xiaoqianbaobao.github.io/ai-guide/`
 - 仓库地址：`https://github.com/xiaoqianbaobao/ai-guide`
 
 ## 当前结构
@@ -27,6 +28,7 @@ AI Agent Guide 是一个基于 VitePress 构建的中文开源知识站点，目
 - 自进化 Skills 与 Agent 自我改进：Skill 自动发现与打包、自我修正闭环、失控风险与护栏设计（核心 3 篇已发布，实战 scaffold 待写）
 - 数据治理：覆盖血缘、审计、敏感隔离与合规落地
 - Agent 实战案例：编程助手 Agent、DeerFlow Harness 深读拆解等真实工程案例
+- 产品与 FDE：客户发现、试点评估、产品成效与从内容到客户
 
 ## 项目目录
 
@@ -51,6 +53,7 @@ docs/agent/               # 实战案例
 要求：
 
 - Node.js `>= 18`
+- Python 3.10+（运行教学示例和检查脚本）；部分 SDK 契约测试需要额外安装对应 SDK，否则会标记跳过
 
 安装与启动：
 
@@ -65,16 +68,30 @@ npm run dev
 npm run build
 ```
 
+检查构建页面、课程分页、站内链接、公式和所有带测试的教学示例：
+
+```bash
+npm run check:navigation
+npm run check:navigation-unit
+npm run check:links
+npm run check:math
+npm run check:types
+npm run check:examples
+```
+
+分页、链接和公式检查需要先运行 `npm run build`。示例测试在各自目录中独立运行；跳过的可选测试不代表真实模型 API 或生产环境已经验证。
+
 ## 部署方式
 
-- 当前统一部署到 GitHub Pages
+- 服务器站点通过版本目录部署，发布前运行检查并保留可回滚版本
+- 仓库仍保留 GitHub Pages 自动构建和发布工作流
 - 生产环境使用 `/ai-guide/` 作为基础路径
-- 自动部署配置位于 [deploy.yml](file:///Users/qian/Documents/workspace/ai-guide/.github/workflows/deploy.yml)
+- GitHub Pages 工作流位于 [deploy.yml](.github/workflows/deploy.yml)
 
 ## 如何参与
 
-- 阅读 [CONTRIBUTING.md](file:///Users/qian/Documents/workspace/ai-guide/CONTRIBUTING.md)，了解贡献范围、提交流程和内容规范
-- 阅读 [CHANGELOG.md](file:///Users/qian/Documents/workspace/ai-guide/CHANGELOG.md)，查看项目近期更新与重要结构调整
+- 阅读 [CONTRIBUTING.md](CONTRIBUTING.md)，了解贡献范围、提交流程和内容规范
+- 阅读 [CHANGELOG.md](CHANGELOG.md)，查看项目近期更新与重要结构调整
 - 通过 Issue 提出选题建议、结构优化、错误修正和资料补充
 - 通过 Pull Request 参与文章编写、案例补充、图示修复、样式优化和工程配置改进
 
@@ -88,5 +105,5 @@ npm run build
 
 ## 路线图
 
-- 内容规划请参考 [ROADMAP.md](file:///Users/qian/Documents/workspace/ai-guide/ROADMAP.md)
-- 历史更新请参考 [CHANGELOG.md](file:///Users/qian/Documents/workspace/ai-guide/CHANGELOG.md)
+- 内容规划请参考 [ROADMAP.md](ROADMAP.md)
+- 历史更新请参考 [CHANGELOG.md](CHANGELOG.md)

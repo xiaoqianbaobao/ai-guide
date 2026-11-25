@@ -12,7 +12,8 @@
     "check:links": "python3 scripts/check-links.py",
     "check:math": "node scripts/check-math.mjs",
     "check:types": "tsc --noEmit --skipLibCheck --module esnext --moduleResolution bundler --target es2022 --esModuleInterop docs/.vitepress/config.ts",
-    "check:navigation-unit": "node scripts/check-navigation-unit.mjs"
+    "check:navigation-unit": "node scripts/check-navigation-unit.mjs",
+    "check:examples": "python3 scripts/check-examples.py"
   },
   "dependencies": {
     "gray-matter": "^4.0.3",
