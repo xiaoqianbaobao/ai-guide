@@ -8,6 +8,7 @@ import type { SearchDocument } from './search.data'
 const { page, frontmatter, theme, isDark } = useData()
 const route = useRoute()
 const menuOpen = ref(false)
+const openDropdown = ref<string | null>(null)
 const searchOpen = ref(false)
 const query = ref('')
 const searchInput = ref<HTMLInputElement | null>(null)
@@ -19,6 +20,7 @@ async function toggleSearch() {
   searchOpen.value = !searchOpen.value
   if (!searchOpen.value) { searchButton.value?.focus(); return }
   menuOpen.value = false
+  openDropdown.value = null
   await nextTick()
   searchInput.value?.focus()
   if (documents.value.length || searchLoading.value) return
@@ -38,17 +40,51 @@ function handleShortcut(event: KeyboardEvent) {
 function closePanels() {
   if (searchOpen.value) { searchOpen.value = false; searchButton.value?.focus() }
   menuOpen.value = false
+  openDropdown.value = null
+}
+function handleOutsideClick(event: PointerEvent) {
+  if (!(event.target as Element | null)?.closest('.next-dropdown')) openDropdown.value = null
+}
+async function copyCode(event: MouseEvent) {
+  const button = (event.target as Element | null)?.closest<HTMLButtonElement>('button.copy')
+  if (!button) return
+  const code = button.parentElement?.querySelector('pre code')?.textContent
+  if (code == null) return
+  try {
+    if (navigator.clipboard && window.isSecureContext) await navigator.clipboard.writeText(code)
+    else {
+      const input = document.createElement('textarea')
+      input.value = code
+      input.style.cssText = 'position:fixed;opacity:0;pointer-events:none'
+      document.body.appendChild(input)
+      input.select()
+      const copied = document.execCommand('copy')
+      input.remove()
+      if (!copied) throw new Error('copy failed')
+    }
+    button.dataset.copyState = 'success'
+    button.setAttribute('aria-label', '已复制代码')
+  } catch {
+    button.dataset.copyState = 'error'
+    button.setAttribute('aria-label', '复制失败，请手动复制代码')
+  }
+  window.setTimeout(() => { delete button.dataset.copyState; button.setAttribute('aria-label', '复制代码') }, 2000)
 }
 const focus = ref(false)
 const headings = ref<{ id: string; title: string; level: number }[]>([])
 async function updateHeadings() {
   await nextTick()
+  document.querySelectorAll<HTMLButtonElement>('.next-article button.copy').forEach(button => {
+    button.type = 'button'
+    button.title = '复制代码'
+    button.setAttribute('aria-label', '复制代码')
+  })
   headings.value = Array.from(document.querySelectorAll<HTMLElement>('.next-article h2[id], .next-article h3[id]'))
     .map(heading => ({ id: heading.id, title: heading.textContent?.replace(/^#\s*/, '').trim() || '', level: Number(heading.tagName.slice(1)) }))
     .filter(heading => heading.title)
 }
-onMounted(() => { void updateHeadings(); window.addEventListener('keydown', handleShortcut) })
-onBeforeUnmount(() => window.removeEventListener('keydown', handleShortcut))
+onMounted(() => { void updateHeadings(); window.addEventListener('keydown', handleShortcut); document.addEventListener('pointerdown', handleOutsideClick) })
+onBeforeUnmount(() => { window.removeEventListener('keydown', handleShortcut); document.removeEventListener('pointerdown', handleOutsideClick) })
 const home = computed(() => frontmatter.value.layout === 'home')
 const sidebar = computed(() => (theme.value.sidebar ?? {}) as LessonSidebar)
 const group = computed(() => {
@@ -73,7 +109,7 @@ function active(path: string) {
 }
 const prev = computed(() => frontmatter.value.prev as LessonLink | false)
 const next = computed(() => frontmatter.value.next as LessonLink | false)
-watch(() => route.path, () => { menuOpen.value = false; searchOpen.value = false; void updateHeadings() }, { flush: 'post' })
+watch(() => route.path, () => { menuOpen.value = false; openDropdown.value = null; searchOpen.value = false; void updateHeadings() }, { flush: 'post' })
 </script>
 
 <template>
@@ -84,7 +120,7 @@ watch(() => route.path, () => { menuOpen.value = false; searchOpen.value = false
       <nav class="next-topnav" :class="{ 'is-open': menuOpen }" aria-label="主导航">
         <template v-for="item in theme.nav" :key="item.text">
           <a v-if="item.link" :href="href(item.link)">{{ item.text }}</a>
-          <details v-else class="next-dropdown"><summary>{{ item.text }}</summary><div><a v-for="child in item.items" :key="child.link" :href="href(child.link)">{{ child.text }}</a></div></details>
+          <div v-else class="next-dropdown"><button type="button" class="next-dropdown-trigger" :aria-expanded="openDropdown === item.text" @click="openDropdown = openDropdown === item.text ? null : item.text">{{ item.text }} <span aria-hidden="true">⌄</span></button><div v-if="openDropdown === item.text" class="next-dropdown-panel"><a v-for="child in item.items" :key="child.link" :href="href(child.link)">{{ child.text }}</a></div></div>
         </template>
       </nav>
       <div class="next-header-actions"><button ref="searchButton" type="button" @click="toggleSearch" :aria-expanded="searchOpen" aria-keyshortcuts="Control+K Meta+K">搜索</button><button type="button" @click="isDark = !isDark" :aria-label="isDark ? '切换浅色模式' : '切换深色模式'">{{ isDark ? '☼' : '☾' }}</button><button class="next-mobile-menu" type="button" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen; searchOpen = false">目录</button></div>
@@ -93,7 +129,7 @@ watch(() => route.path, () => { menuOpen.value = false; searchOpen.value = false
     <main v-if="home" id="main" class="next-home"><Content /></main>
     <div v-else class="next-layout" :class="{ 'is-focus': focus, 'is-menu-open': menuOpen }">
       <aside class="next-sidebar" aria-label="课程目录"><section v-for="part in group" :key="part.text"><h2>{{ part.text }}</h2><a v-for="item in part.items" :key="item.link" :href="href(item.link)" :aria-current="active(item.link) ? 'page' : undefined">{{ item.text }}</a></section></aside>
-      <main id="main" class="next-main"><article class="next-article vp-doc"><button type="button" class="next-focus" :aria-pressed="focus" @click="focus = !focus">{{ focus ? '退出专注' : '专注阅读' }}</button><Content /><nav v-if="prev || next" class="prev-next" aria-label="课程分页"><a v-if="prev" class="pager-link prev" :href="href(prev.link)"><small>本专题上一篇</small><strong>{{ prev.text }}</strong></a><a v-if="next" class="pager-link next" :href="href(next.link)"><small>本专题下一篇</small><strong>{{ next.text }}</strong></a></nav></article></main>
+      <main id="main" class="next-main"><article class="next-article vp-doc" @click="copyCode"><button type="button" class="next-focus" :aria-pressed="focus" @click="focus = !focus">{{ focus ? '退出专注' : '专注阅读' }}</button><Content /><nav v-if="prev || next" class="prev-next" aria-label="课程分页"><a v-if="prev" class="pager-link prev" :href="href(prev.link)"><small>本专题上一篇</small><strong>{{ prev.text }}</strong></a><a v-if="next" class="pager-link next" :href="href(next.link)"><small>本专题下一篇</small><strong>{{ next.text }}</strong></a></nav></article></main>
       <aside v-if="headings.length" class="next-outline" aria-label="本文目录"><strong>本文目录</strong><a v-for="heading in headings" :key="heading.id" :class="{ sub: heading.level > 2 }" :href="'#' + encodeURIComponent(heading.id)">{{ heading.title }}</a></aside>
     </div>
     <footer class="next-footer">造与见 · 从想法到第一个真实客户</footer><WechatRail v-if="!home" />

@@ -76,7 +76,11 @@ class Coordinator:
 
     def reconcile(self, operation_id):
         operation = self.state(operation_id)
-        found = self.downstream.lookup(operation_id)
+        try:
+            found = self.downstream.lookup(operation_id)
+        except TimeoutError:
+            self.mark(operation_id, "unknown")
+            return self.state(operation_id)
         if found is None:
             # A missing lookup result is not proof that an external write failed.
             self.mark(operation_id, "unknown")
