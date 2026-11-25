@@ -1,7 +1,7 @@
 <template>
   <div class="knowledge-map">
     <div class="knowledge-map-label">你现在在这里</div>
-    <div class="knowledge-map-track">
+    <div ref="track" class="knowledge-map-track" role="region" aria-label="知识模块，可横向滚动" tabindex="0">
       <template v-for="(item, index) in modules" :key="item.id">
         <a
           :href="withBase(item.link)"
@@ -17,6 +17,7 @@
         </span>
       </template>
     </div>
+    <span class="knowledge-map-hint">左右滑动查看全部模块</span>
     <p v-if="currentArticle" class="knowledge-map-current">
       当前阅读：{{ currentArticle }}
     </p>
@@ -24,6 +25,7 @@
 </template>
 
 <script setup lang="ts">
+import { nextTick, onMounted, ref, watch } from 'vue'
 import { withBase } from 'vitepress'
 
 interface ModuleItem {
@@ -32,10 +34,22 @@ interface ModuleItem {
   link: string
 }
 
-defineProps<{
+const props = defineProps<{
   currentModule: string
   currentArticle?: string
 }>()
+const track = ref<HTMLElement | null>(null)
+async function showCurrentModule() {
+  await nextTick()
+  if (!window.matchMedia('(max-width: 700px)').matches || !track.value) return
+  const current = track.value.querySelector<HTMLElement>('.is-current')
+  if (!current) return
+  const parent = track.value.getBoundingClientRect()
+  const item = current.getBoundingClientRect()
+  track.value.scrollLeft += item.left - parent.left - (parent.width - item.width) / 2
+}
+onMounted(() => { void showCurrentModule() })
+watch(() => props.currentModule, () => { void showCurrentModule() })
 
 const modules: ModuleItem[] = [
   { id: 'preface', name: '序章', link: '/00-preface/' },

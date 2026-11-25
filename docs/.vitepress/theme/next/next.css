@@ -62,3 +62,13 @@ html { scroll-behavior:smooth; } body { margin:0; font-family:var(--vp-font-fami
   .next-header-actions { gap:6px; }
   .next-header-actions button { padding:7px 6px; white-space:nowrap; }
 }
+
+/* A long knowledge map should not push the article below the first screen on phones. */
+.knowledge-map-hint { display:none; }
+@media (max-width: 700px) {
+  .knowledge-map { padding:12px; }
+  .knowledge-map-track { flex-wrap:nowrap; overflow-x:auto; overscroll-behavior-x:contain; scrollbar-width:thin; padding-bottom:4px; }
+  .knowledge-map-item,.knowledge-map-separator { flex:none; white-space:nowrap; }
+  .knowledge-map-hint { display:block; margin-top:4px; color:var(--next-muted); font-size:11px; }
+  .knowledge-map-current { margin-top:6px; }
+}
