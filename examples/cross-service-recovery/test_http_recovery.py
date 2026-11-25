@@ -1,9 +1,11 @@
 from contextlib import closing
+from io import BytesIO
 from multiprocessing import Process, Queue
 from pathlib import Path
 import sqlite3
 import tempfile
 import unittest
+from unittest.mock import patch
 from http_downstream import HttpDownstream, make_server
 from recovery import Coordinator
 
@@ -65,6 +67,22 @@ class HttpRecoveryTests(unittest.TestCase):
         self.process.join(timeout=5)
         restarted = Coordinator(self.coordinator.path, self.remote)
         self.assertEqual(restarted.reconcile("http-operation"), before)
+
+    def test_invalid_success_response_remains_unknown_then_recovers(self):
+        # Simulate a committed downstream write followed by an unusable 200 response.
+        self.remote.create("http-operation", "请人工核实退款")
+        for body in (b'{broken', b'{}', b'{"receipt": null}'):
+            with self.subTest(body=body), patch("http_downstream.urlopen", return_value=BytesIO(body)):
+                state = self.coordinator.dispatch("http-operation")
+                self.assertEqual(state["state"], "unknown")
+                self.assertIsNone(state["receipt"])
+        self.assertEqual(self.coordinator.reconcile("http-operation")["state"], "confirmed")
+        self.assertEqual(self.count_external(), 1)
+
+    def test_invalid_lookup_response_remains_unknown(self):
+        for body in (b'{broken', b'{}', b'{"receipt": null, "digest": "bad"}'):
+            with self.subTest(body=body), patch("http_downstream.urlopen", return_value=BytesIO(body)):
+                self.assertEqual(self.coordinator.reconcile("http-operation")["state"], "unknown")
 
     def test_conflicting_payload_is_rejected(self):
         self.remote.create("http-operation", "第一份内容")

@@ -2,6 +2,7 @@
 from http.client import RemoteDisconnected
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
+import re
 import socket
 from urllib.error import HTTPError, URLError
 from urllib.parse import quote, unquote
@@ -79,21 +80,33 @@ class HttpDownstream:
         request = Request(self.base + "/tickets", data=body, headers=headers)
         try:
             with urlopen(request, timeout=self.timeout) as response:
-                return json.load(response)["receipt"]
+                payload = json.load(response)
+                if not isinstance(payload, dict) or not isinstance(payload.get("receipt"), str) or not payload["receipt"].strip():
+                    raise ValueError("invalid receipt")
+                return payload["receipt"]
         except HTTPError as error:
             if error.code in (400, 409):
                 raise ValueError("downstream rejected request") from error
             raise TimeoutError("downstream outcome unknown") from error
         except (URLError, TimeoutError, RemoteDisconnected, ConnectionResetError) as error:
             raise TimeoutError("downstream outcome unknown") from error
+        except (ValueError, TypeError) as error:
+            raise TimeoutError("invalid response; downstream outcome unknown") from error
 
     def lookup(self, operation_id):
         try:
             with urlopen(self.base + "/tickets/" + quote(operation_id, safe=""), timeout=self.timeout) as response:
-                return json.load(response)
+                payload = json.load(response)
+                if (not isinstance(payload, dict) or not isinstance(payload.get("receipt"), str)
+                        or not payload["receipt"].strip() or not isinstance(payload.get("digest"), str)
+                        or not re.fullmatch(r"[0-9a-f]{64}", payload["digest"])):
+                    raise ValueError("invalid lookup response")
+                return payload
         except HTTPError as error:
             if error.code == 404:
                 return None
             raise TimeoutError("lookup unavailable") from error
         except (URLError, TimeoutError, RemoteDisconnected, ConnectionResetError) as error:
             raise TimeoutError("lookup unavailable") from error
+        except (ValueError, TypeError) as error:
+            raise TimeoutError("invalid lookup response") from error
