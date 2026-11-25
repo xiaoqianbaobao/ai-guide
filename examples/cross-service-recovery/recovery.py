@@ -76,6 +76,9 @@ class Coordinator:
 
     def reconcile(self, operation_id):
         operation = self.state(operation_id)
+        # A temporary lookup failure cannot undo a previously recorded receipt.
+        if operation["state"] == "confirmed":
+            return operation
         try:
             found = self.downstream.lookup(operation_id)
         except TimeoutError:

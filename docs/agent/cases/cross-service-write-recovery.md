@@ -47,7 +47,7 @@ python3 recovery.py
 python3 -m unittest -v
 ```
 
-预期演示输出“响应丢失后: unknown”和“重启并对账后: confirmed”。9 条测试覆盖：响应丢失、下游写入后调用方崩溃、查询无结果、沿用相同 ID 重试、同 ID 不同内容的冲突，以及本机 HTTP 连接中断和服务不可用。[完整源码](https://github.com/xiaoqianbaobao/ai-guide/tree/main/examples/cross-service-recovery)在临时目录创建两个数据库，退出后自动清理。
+预期演示输出“响应丢失后: unknown”和“重启并对账后: confirmed”。10 条测试覆盖：响应丢失、下游写入后调用方崩溃、查询无结果、沿用相同 ID 重试、同 ID 不同内容的冲突，以及本机 HTTP 连接中断和服务不可用。[完整源码](https://github.com/xiaoqianbaobao/ai-guide/tree/main/examples/cross-service-recovery)在临时目录创建两个数据库，退出后自动清理。
 
 只运行跨进程 HTTP 演练：
 
@@ -57,9 +57,13 @@ python3 -m unittest test_http_recovery -v
 
 其中一个测试让本机下游先提交工单，再关闭连接而不发送响应；调用方记录 `unknown`，随后用相同操作 ID 查询并确认回执。另一个测试关闭服务后核验查询失败仍保留 `unknown`。HTTP 适配器把网络错误和服务端错误当成结果未知，同一 ID 的内容冲突则明确拒绝。这里的服务只监听本机，并没有连接真实工单系统。
 
+已经保存了 `confirmed` 和回执的操作，再次执行对账时应返回已有记录。我们用独立进程测试了“先成功、再关闭下游、重启调用方”的情况：暂时查不到下游不能把已知成功降级成 `unknown`，更不能把回执清空。这里的 `confirmed` 表示该操作曾经成功创建，不表示工单此刻仍存在或业务状态没有变化；后续状态变化应由另一套同步和审计机制处理。
+
 关键逻辑是先查询已知操作，再判断能否确认：
 
 ```python
+if local_state == "confirmed":
+    return saved_receipt  # 已确认的回执不因暂时无法查询而丢失
 found = downstream.lookup(operation_id)
 if found is None:
     mark(operation_id, "unknown")  # 查不到不自动等于没有发生

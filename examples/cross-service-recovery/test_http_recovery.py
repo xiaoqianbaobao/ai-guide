@@ -58,6 +58,14 @@ class HttpRecoveryTests(unittest.TestCase):
         self.process.join(timeout=5)
         self.assertEqual(self.coordinator.reconcile("http-operation")["state"], "unknown")
 
+    def test_confirmed_receipt_survives_downstream_outage(self):
+        before = self.coordinator.dispatch("http-operation")
+        self.assertEqual(before["state"], "confirmed")
+        self.process.terminate()
+        self.process.join(timeout=5)
+        restarted = Coordinator(self.coordinator.path, self.remote)
+        self.assertEqual(restarted.reconcile("http-operation"), before)
+
     def test_conflicting_payload_is_rejected(self):
         self.remote.create("http-operation", "第一份内容")
         with self.assertRaises(ValueError):
