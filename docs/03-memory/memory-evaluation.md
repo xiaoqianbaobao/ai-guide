@@ -19,7 +19,7 @@ tags:
   summary="记忆系统是否有用不能靠感觉判断。本文梳理主流 benchmark 的差异、厂商自报数据的局限，以及一套自建评估的最小方案。"
 />
 
-> 核验日期：2026-11-15。基准成绩是特定数据集、模型和评测配置下的结果，不应直接推广到其他任务。
+> 核验日期：2026-11-26。基准成绩是特定数据集、模型和评测配置下的结果，不应直接推广到其他任务。
 
 记忆系统的设计选择很多：存什么、怎么组织、何时整理。每一项都看起来合理，是否真的带来收益，需要评估来回答。本篇讨论两件事：主流 benchmark 各自测什么，以及自建评估时最小的可行方案。
 
@@ -33,8 +33,8 @@ tags:
 | --- | --- | --- | --- |
 | LoCoMo | 2024 | 超长多 session 对话中的事实召回 | 偏对话问答，不测行动 |
 | LongMemEval | 2024 | 五项记忆能力，含知识更新与拒答（abstention） | 同样以问答为主 |
-| BEAM | 2026（ICLR） | 十项记忆能力，规模到 1M、10M token | 较新，公开系统少 |
-| STATE-Bench | 2026 | 任务级：Agent 是否真的完成任务 | 场景偏窄 |
+| BEAM | 2026（ICLR） | 十项对话记忆能力，最长到 10M token | 生成式对话与问答不能直接代表真实业务行动 |
+| STATE-Bench | 2026 | 任务级：Agent 是否遵循流程并达到预期状态 | 覆盖特定模拟场景，不能替代真实环境验收 |
 | LongMemEval-V2 | 2026 | 将 LongMemEval 格式扩展到 Web Agent 环境 | 较新 |
 
 趋势是从「回答对不对」走向「做事做成没有」。[Anthropic 的文章](https://www.anthropic.com/research/components-of-agent-memory)也是这个思路：CL-Bench 用任务奖励，Pokémon 用游戏进度（徽章数、到达特定城市的步数），wiki 评测用逐条评分标准的命中比例。这里的指标和任务各不相同，不宜把分数直接放在一张排行榜上。
@@ -76,6 +76,40 @@ Anthropic 的文章给出了一个可以借用的思路：**在同一批任务�
 
 评估时要刻意制造「记忆会误导」的情形：在隔离测试环境中的 memory 植入一条错误记录，看 Agent 是否会沿用、dreaming 能否对照证据纠正。Anthropic 的 Mt. Moon 实验包含对错误游戏记忆的回溯纠错；它提示我们，记忆系统的**纠错能力**与召回准确率是两回事。离线整理本身也可能引入新错误，因此要检查修正是否真的得到原始证据支持。
 
+### 把任务完成变成可验证的状态
+
+[Microsoft 的 STATE-Bench](https://opensource.microsoft.com/blog/2026/05/19/introducing-state-bench-a-benchmark-for-ai-agent-memory/) 把客服、旅行、购物任务放入有状态的模拟环境。对改变状态的任务，它检查最终环境是否满足预期；对流程或信息类任务，还可能使用模型评审。它还报告多次运行全部成功的比例，用于观察一致性。因此“回复说已经退款”与“系统中存在正确退款”应是两个不同的检查。
+
+下面是借鉴这一思路的**虚构练习**，并非 STATE-Bench 原题：
+
+| 输入与条件 | 应检查的结果 | 为什么需要记忆 |
+| --- | --- | --- |
+| 上次会话记录客户偏好邮件通知；本次客户提供符合退款条件的订单 | 核验订单和规则后，恰好创建一笔正确退款，通知渠道为邮件 | 跨会话沿用仍有效的偏好 |
+| 记忆中写着“所有订单都可退款”，但当前政策规定该订单不可退 | 不创建退款，解释原因并提供人工处理入口 | 检验过时或错误记忆是否被当前权威规则纠正 |
+
+让三组使用同一初始数据库快照、同一批隐藏任务和相同工具权限；每次运行后重置测试环境。下面的标准库示例展示如何检查最终状态，保存为 `check_refund.py` 后用 `python3 check_refund.py` 运行：
+
+```python
+def check_refund(state, order_id, expected_amount):
+    """测试环境最终状态；金额以分为单位。"""
+    refunds = [r for r in state["refunds"] if r["order_id"] == order_id]
+    return len(refunds) == 1 and refunds[0]["amount"] == expected_amount
+
+
+valid = {"refunds": [{"order_id": "demo-1", "amount": 1200}]}
+duplicate = {"refunds": [
+    {"order_id": "demo-1", "amount": 1200},
+    {"order_id": "demo-1", "amount": 1200},
+]}
+assert check_refund(valid, "demo-1", 1200)
+assert not check_refund(duplicate, "demo-1", 1200)
+print("状态断言通过")
+```
+
+这只是一条状态断言，不验证审批、租户隔离、通知内容或政策是否适用；实际验收还要分别断言这些条件。对于禁止退款的用例，应断言退款数量为零。重复运行时可同时报告每次成功率，以及每个任务的多次运行是否全部成功；后者更严格，但对重复次数敏感，必须注明次数和样本量。
+
+避免评测泄漏：先用历史轨迹构造记忆，再在未用于构造记忆的任务上测试；不要将隐藏任务的标准答案写入记忆。STATE-Bench 的 [Agent Learning Track](https://github.com/microsoft/STATE-Bench/blob/main/docs/AGENT_LEARNING_TRACK.md) 明确区分了用于学习的轨迹与保留的测试任务，也规定不得把测试定义和环境当作学习提取的标准答案。自己做实验时还应对不同组隔离记忆目录，防止上一组运行污染下一组。
+
 ## 四、几条经验
 
 - 先有基线，再加记忆。没有对照的「有记忆后效果不错」说明不了什么。
@@ -99,5 +133,7 @@ Anthropic 的文章给出了一个可以借用的思路：**在同一批任务�
 ## 延伸阅读
 
 - Anthropic，[The components of agent memory](https://www.anthropic.com/research/components-of-agent-memory)
+- Microsoft，[STATE-Bench 介绍](https://opensource.microsoft.com/blog/2026/05/19/introducing-state-bench-a-benchmark-for-ai-agent-memory/)和[官方视频讲解](https://www.youtube.com/watch?v=oFs9aU_T794)：了解有状态任务评估设计。
+- Tavakoli 等，[BEAM 论文（ICLR 2026）](https://openreview.net/pdf?id=y59hf5lrMn)：查看数据生成、能力分类与局限。
 - Hu 等，[Memory in the Age of AI Agents](https://arxiv.org/abs/2512.13564)（含 benchmark 与开源框架汇总）
 - Mem0，[AI Memory Benchmarks in 2026](https://mem0.ai/library/agent-memory/ai-memory-benchmarks-in-2026)（厂商视角的 benchmark 综述，阅读时注意评测口径）
