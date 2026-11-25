@@ -373,6 +373,7 @@ function sidebarAgent() {
         { text: '知识助手回归评估', link: '/agent/cases/knowledge-assistant-evaluation/' },
         { text: '工单审批、幂等与恢复', link: '/agent/cases/ticket-approval-and-retry/' },
         { text: '本地企业助手闭环', link: '/agent/cases/enterprise-agent-local-lab/' },
+        { text: '接入模型：只读工具调用链', link: '/agent/cases/enterprise-agent-model-tool-loop/' },
         { text: '编程助手 Agent 实战', link: '/agent/cases/coding-assistant/' },
         { text: 'DeerFlow Harness 深度拆解', link: '/agent/cases/deerflow-harness-deep-dive/' },
       ]
