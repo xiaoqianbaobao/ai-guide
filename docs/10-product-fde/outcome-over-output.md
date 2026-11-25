@@ -76,7 +76,9 @@ description: 用企业工单案例理解交付、行为改变、业务成效，�
 理论人工成本 = 66.7 × 120 ≈ 8,000 元 / 月
 ```
 
-但这只是理论值。假设还需支付模型与检索 1,500 元、人工复核 2,000 元、系统运维 1,000 元，每月净收益估算约为 `8,000 - 1,500 - 2,000 - 1,000 = 3,500 元`，还没有计入前期实施费用、风险损失、税费和人员时间能否真正被释放。
+但这只是理论时间价值，不能直接叫作现金净收益。假设额外支付模型与检索 1,500 元、人工复核 2,000 元、系统运维 1,000 元，且前面 4 分钟的节省**尚未扣除**这笔新增复核工作，那么时间价值减去这些增量成本为 `8,000 - 1,500 - 2,000 - 1,000 = 3,500 元/月`。它是把释放时间按时薪估值后的示意差额，不代表企业账上真的多了 3,500 元。如果 4 分钟已经扣除了复核时间，就不能再减去同一笔复核成本。
+
+要估算现金影响，还需要客户说明释放时间如何变成实际减少的支出或新增的可归因收入。比如仅作演练，假设有证据支持其中 25% 能转化为减少加班支出，则现金影响为 `8,000 × 25% - 1,500 - 2,000 - 1,000 = -2,500 元/月`。这个假设不代表真实可实现比例；前期实施费用、税费、风险和其他收益仍需另算。一个指标为正、另一个为负并不矛盾，因为它们回答的问题不同。
 
 更有用的做法是列出区间：如果工单覆盖率只有一半、核验耗时更高或者错误导致返工，结论是否仍成立？不要把“节省的分钟”直接等同于企业已经减少的工资支出；节省时间可能转化为更好的服务、处理更多工单，也可能暂时无法转化为财务收益。
 
@@ -99,12 +101,6 @@ description: 用企业工单案例理解交付、行为改变、业务成效，�
 
 检查自己的答案：它是否只写了“上线问答功能”？指标是否有分母、时间范围和确认方式？如果回答快但引用错误，你的方案能否发现？
 
-## 延伸阅读
-
-- Martin Fowler，[Outcome Over Output](https://martinfowler.com/bliki/OutcomeOverOutput.html)：理解产出与成效的区别，以及结果归因的困难。
-- [Agent 线上评估与回归](../06-eval-evolution/production-evaluation-loop)：设计可重复的任务、评分与回归。
-- [企业级 Agent 实战路线](../agent/cases/enterprise-agent-roadmap)：将产品假设落回持续交付与工程验收。
-
 ## 八、真实创业者谈产品：需求不是功能清单
 
 在 Y Combinator 的《How to Start a Startup》课程中，Homejoy 联合创始人 Adora Cheung 回顾了与用户交流的经验：用户提出某个功能时，团队需要继续追问背后想解决的问题，而不是把每条建议都直接变成需求。她还建议先厘清产品解决的问题，并与潜在用户交流验证。可在 [YC 课程页面观看讲座并阅读文字记录](https://www.ycombinator.com/library/dS-how-to-start-a-startup-building-product-talking-to-users-and-growing)。
@@ -120,3 +116,4 @@ description: 用企业工单案例理解交付、行为改变、业务成效，�
 - **创始人访谈**：[YC：Google Photos 产品负责人、Bump 联合创始人 David Lieb 访谈](https://www.ycombinator.com/blog/google-photos-product-lead-and-bump-cofounder-david-lieb-with-gustaf-alstromer/)。关注团队如何接触用户；读完设计一次不带推销目标的工作现场观察。
 - **书籍**：[Marty Cagan，《Inspired》，第二版](https://www.oreilly.com/library/view/inspired-2nd-edition/9781119387503/)。公开目录与介绍显示其重点包括产品团队、产品发现和交付；可对照自己的团队检查谁负责验证价值、可行性与可用性。页面可能需要订阅；这里基于公开介绍给出阅读方向，不冒充全书读后评述。
 - **书籍／客户开发**：[Steve Blank 的 Customer Discovery 介绍](https://steveblank.com/2010/08/26/) 与《The Four Steps to the Epiphany》。从客户发现和商业模式假设入手，读时记录哪些问题适用于企业客户、哪些需要按当前环境调整；这里是阅读指引，完整书评待通读后补充。
+- **站内实践**：[Agent 线上评估与回归](../06-eval-evolution/production-evaluation-loop) 与 [企业级 Agent 实战路线](../agent/cases/enterprise-agent-roadmap)：把产品假设落回任务评估与工程验收。
