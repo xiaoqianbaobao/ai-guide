@@ -2,7 +2,7 @@
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 from pathlib import Path
-from service import IDENTITIES, Service
+from service import ConflictError, IDENTITIES, Service
 
 
 class Handler(BaseHTTPRequestHandler):
@@ -43,7 +43,7 @@ class Handler(BaseHTTPRequestHandler):
         if self.path == "/api/drafts":
             return service.create_draft(identity, data.get("text"))
         if self.path == "/api/approve":
-            return service.approve(identity, data.get("draft_id"))
+            return service.approve(identity, data.get("draft_id"), data.get("reviewed_version"))
         if self.path == "/api/submit":
             return service.submit(identity, data.get("draft_id"), data.get("operation_id"))
         raise LookupError("route not found")
@@ -55,6 +55,8 @@ class Handler(BaseHTTPRequestHandler):
             self.respond(403, {"error": "forbidden"})
         except LookupError:
             self.respond(404, {"error": "not found"})
+        except ConflictError:
+            self.respond(409, {"error": "draft changed; review again"})
         except (ValueError, TypeError, json.JSONDecodeError):
             self.respond(400, {"error": "invalid request"})
 

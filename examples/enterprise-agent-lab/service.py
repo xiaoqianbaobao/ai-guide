@@ -20,6 +20,10 @@ IDENTITIES = {
 }
 
 
+class ConflictError(Exception):
+    """The draft changed after the reviewer fetched it."""
+
+
 def digest(tenant: str, text: str) -> str:
     return hashlib.sha256((tenant + "\0" + text).encode()).hexdigest()
 
@@ -77,20 +81,26 @@ class Service:
 
     def get_draft(self, identity: Identity, draft_id: str) -> dict:
         with closing(self.connect()) as db:
-            row = db.execute("SELECT id, text, creator, approved_by FROM drafts WHERE id = ? AND tenant = ?",
+            row = db.execute("SELECT id, tenant, text, creator, approved_by FROM drafts WHERE id = ? AND tenant = ?",
                              (draft_id, identity.tenant)).fetchone()
         if not row:
             raise LookupError("draft not found")
-        return dict(row)
+        return {"id": row["id"], "text": row["text"], "creator": row["creator"],
+                "approved_by": row["approved_by"], "version": digest(row["tenant"], row["text"])}
 
-    def approve(self, identity: Identity, draft_id: str) -> dict:
+    def approve(self, identity: Identity, draft_id: str, reviewed_version: str) -> dict:
         if identity.role != "reviewer":
             raise PermissionError("reviewer required")
+        if not isinstance(reviewed_version, str) or len(reviewed_version) != 64:
+            raise ValueError("reviewed version required")
         with closing(self.connect()) as db, db:
+            db.execute("BEGIN IMMEDIATE")
             row = db.execute("SELECT * FROM drafts WHERE id = ? AND tenant = ?", (draft_id, identity.tenant)).fetchone()
             if not row:
                 raise LookupError("draft not found")
             current = digest(row["tenant"], row["text"])
+            if reviewed_version != current:
+                raise ConflictError("draft changed after review")
             db.execute("UPDATE drafts SET approved_digest = ?, approved_by = ? WHERE id = ?", (current, identity.user, draft_id))
             self.audit(db, identity, "draft_approved", draft_id)
         return {"draft_id": draft_id, "status": "approved"}

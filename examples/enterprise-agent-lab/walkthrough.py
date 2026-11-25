@@ -17,8 +17,10 @@ if __name__ == "__main__":
     print("知识查询:", call("/api/ask", "demo-support", {"question": "退款"}))
     draft = call("/api/drafts", "demo-support", {"text": "客户询问退款进度，请人工核实。"})
     draft_id = draft["draft_id"]
-    print("待审草稿:", call("/api/drafts/" + draft_id, "demo-support-reviewer"))
-    print("审批结果:", call("/api/approve", "demo-support-reviewer", {"draft_id": draft_id}))
+    reviewed = call("/api/drafts/" + draft_id, "demo-support-reviewer")
+    print("待审草稿:", reviewed)
+    print("审批结果:", call("/api/approve", "demo-support-reviewer",
+                        {"draft_id": draft_id, "reviewed_version": reviewed["version"]}))
     # A fresh ID must be generated once and persisted by a real client before sending.
     import uuid
     payload = {"draft_id": draft_id, "operation_id": uuid.uuid4().hex}
