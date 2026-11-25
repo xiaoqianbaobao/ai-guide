@@ -44,6 +44,8 @@ class Handler(BaseHTTPRequestHandler):
             return service.create_draft(identity, data.get("text"))
         if self.path == "/api/approve":
             return service.approve(identity, data.get("draft_id"), data.get("reviewed_version"))
+        if self.path == "/api/revoke":
+            return service.revoke(identity, data.get("draft_id"))
         if self.path == "/api/submit":
             return service.submit(identity, data.get("draft_id"), data.get("operation_id"))
         raise LookupError("route not found")
@@ -77,9 +79,9 @@ class Handler(BaseHTTPRequestHandler):
     do_POST = dispatch
 
 
-def make_server(path: str, port: int = 8765):
+def make_server(path: str, port: int = 8765, **service_options):
     server = ThreadingHTTPServer(("127.0.0.1", port), Handler)
-    server.service = Service(path)
+    server.service = Service(path, **service_options)
     return server
 
 

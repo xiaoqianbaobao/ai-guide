@@ -13,7 +13,7 @@ async function request(path, token, payload) {
   return data
 }
 function show(selector, value) { $(selector).textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2) }
-function resetReview() { state.reviewed = null; state.operationId = null; state.draftId = null; $('#approve').disabled = true; $('#submit').disabled = true }
+function resetReview() { state.reviewed = null; state.operationId = null; state.draftId = null; $('#approve').disabled = true; $('#revoke').disabled = true; $('#submit').disabled = true }
 
 $('#ask-form').addEventListener('submit', async (event) => {
   event.preventDefault()
@@ -40,11 +40,17 @@ $('#approve').addEventListener('click', async () => {
   if (!state.reviewed) return
   try {
     const result = await request('/api/approve', 'demo-support-reviewer', { draft_id: state.reviewed.id, reviewed_version: state.reviewed.version })
-    state.draftId = state.reviewed.id; state.operationId = crypto.randomUUID(); $('#submit').disabled = false
+    state.draftId = state.reviewed.id; state.operationId = crypto.randomUUID(); $('#submit').disabled = false; $('#revoke').disabled = false
     show('#review-result', result)
   } catch (error) { resetReview(); show('#review-result', error.message + '；请重新读取草稿。') }
 })
+$('#revoke').addEventListener('click', async () => {
+  try {
+    const result = await request('/api/revoke', 'demo-support-reviewer', { draft_id: state.draftId })
+    resetReview(); show('#review-result', result); show('#submit-result', '批准已撤销，请重新读取并批准。')
+  } catch (error) { show('#review-result', error.message) }
+})
 $('#submit').addEventListener('click', async () => {
-  try { show('#submit-result', await request('/api/submit', 'demo-support', { draft_id: state.draftId, operation_id: state.operationId })) }
+  try { const result = await request('/api/submit', 'demo-support', { draft_id: state.draftId, operation_id: state.operationId }); $('#revoke').disabled = true; show('#submit-result', result) }
   catch (error) { show('#submit-result', error.message) }
 })

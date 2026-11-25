@@ -9,13 +9,15 @@ import unittest
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 from server import make_server
+from service import IDENTITIES, Service, digest
 
 
 class ApiTests(unittest.TestCase):
     def setUp(self):
         self.tmp = tempfile.TemporaryDirectory()
         self.db_path = str(Path(self.tmp.name) / "test.sqlite3")
-        self.server = make_server(self.db_path, port=0)
+        self.now = 1000.0
+        self.server = make_server(self.db_path, port=0, clock=lambda: self.now, approval_ttl=300)
         self.thread = threading.Thread(target=self.server.serve_forever, daemon=True)
         self.thread.start()
         self.base = f"http://127.0.0.1:{self.server.server_port}"
@@ -94,6 +96,44 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.request("/api/submit", "demo-support", {"draft_id": draft_id, "operation_id": "op"})[0], 403)
         self.assertEqual(self.approve(draft_id)[0], 200)
 
+    def test_expiry_rejects_new_write_but_not_replay_of_completed_write(self):
+        _, first = self.request("/api/drafts", "demo-support", {"text": "已提交"})
+        _, second = self.request("/api/drafts", "demo-support", {"text": "未提交"})
+        self.approve(first["draft_id"])
+        self.approve(second["draft_id"])
+        payload = {"draft_id": first["draft_id"], "operation_id": "op-first"}
+        self.assertEqual(self.request("/api/submit", "demo-support", payload)[0], 200)
+        self.now += 300
+        self.assertEqual(self.request("/api/submit", "demo-support", {"draft_id": second["draft_id"], "operation_id": "op-second"})[0], 403)
+        status, result = self.request("/api/submit", "demo-support", payload)
+        self.assertEqual(status, 200)
+        self.assertTrue(result["replayed"])
+
+    def test_revoke_blocks_submission_and_requires_reapproval(self):
+        _, draft = self.request("/api/drafts", "demo-support", {"text": "待撤销"})
+        draft_id = draft["draft_id"]
+        self.approve(draft_id)
+        self.assertEqual(self.request("/api/revoke", "demo-support", {"draft_id": draft_id})[0], 403)
+        self.assertEqual(self.request("/api/revoke", "demo-support-reviewer", {"draft_id": draft_id})[0], 200)
+        payload = {"draft_id": draft_id, "operation_id": "op"}
+        self.assertEqual(self.request("/api/submit", "demo-support", payload)[0], 403)
+        self.approve(draft_id)
+        self.assertEqual(self.request("/api/submit", "demo-support", payload)[0], 200)
+        self.assertEqual(self.request("/api/revoke", "demo-support-reviewer", {"draft_id": draft_id})[0], 409)
+
+    def test_submit_and_revoke_race_has_only_one_winner(self):
+        _, draft = self.request("/api/drafts", "demo-support", {"text": "竞争示例"})
+        draft_id = draft["draft_id"]
+        self.approve(draft_id)
+        barrier = threading.Barrier(2)
+        def send(path, token, payload):
+            barrier.wait(timeout=3)
+            return self.request(path, token, payload)[0]
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            write = pool.submit(send, "/api/submit", "demo-support", {"draft_id": draft_id, "operation_id": "race"})
+            revoke = pool.submit(send, "/api/revoke", "demo-support-reviewer", {"draft_id": draft_id})
+            self.assertIn((write.result(), revoke.result()), [(200, 409), (403, 200)])
+
     def test_unknown_identity_and_empty_question_are_rejected(self):
         self.assertEqual(self.request("/api/ask", "unknown", {"question": "退款"})[0], 403)
         self.assertEqual(self.request("/api/ask", "demo-support", {"question": ""})[0], 400)
@@ -103,6 +143,17 @@ class ApiTests(unittest.TestCase):
             self.assertIn("企业知识与工单助手", response.read().decode())
         with urlopen(self.base + "/app.js", timeout=3) as response:
             self.assertIn("/api/approve", response.read().decode())
+
+    def test_legacy_approval_without_expiry_requires_reapproval(self):
+        legacy = str(Path(self.tmp.name) / "legacy.sqlite3")
+        with closing(sqlite3.connect(legacy)) as db, db:
+            db.execute("CREATE TABLE drafts(id TEXT PRIMARY KEY, tenant TEXT NOT NULL, creator TEXT NOT NULL, text TEXT NOT NULL, digest TEXT NOT NULL, approved_digest TEXT, approved_by TEXT)")
+            fingerprint = digest("support", "旧草稿")
+            db.execute("INSERT INTO drafts VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       ("old", "support", "alice", "旧草稿", fingerprint, fingerprint, "bob"))
+        service = Service(legacy, clock=lambda: self.now)
+        with self.assertRaises(PermissionError):
+            service.submit(IDENTITIES["demo-support"], "old", "operation")
 
 
 if __name__ == "__main__":
