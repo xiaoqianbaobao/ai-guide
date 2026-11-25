@@ -25,7 +25,7 @@ description: 用一个企业知识与工单助手案例，贯穿客户发现、�
 
 先做有边界的最小系统：用模拟文档回答问题并提供来源，资料不足时明确说不知道。把身份、授权、审批和故障恢复作为逐步完善的能力；不要因为演示成功就声称已经适合生产。
 
-**交付物：** 可运行的最小原型、数据与权限边界、测试任务集。先运行 [只读知识助手教学原型](../agent/cases/knowledge-assistant-first-slice)，再查看 [企业级 Agent 实战路线](../agent/cases/enterprise-agent-roadmap) 是建设计划，包含阶段验收，但整套可运行课程仍待完成。先补 [Agent 工程闭环](../05-tools-frameworks/agent-engineering-loop) 与 [线上评估](../06-eval-evolution/production-evaluation-loop)。
+**交付物：** 可运行的最小原型、数据与权限边界、测试任务集。先运行 [只读知识助手教学原型](../agent/cases/knowledge-assistant-first-slice)，再体验[本地企业助手闭环](../agent/cases/enterprise-agent-local-lab)中的查询、审核与模拟工单。[企业级 Agent 实战路线](../agent/cases/enterprise-agent-roadmap)列出后续阶段的验收，整套生产级课程仍待完成。按需补充 [Agent 工程闭环](../05-tools-frameworks/agent-engineering-loop) 与 [线上评估](../06-eval-evolution/production-evaluation-loop)。
 
 ## 第四阶段：真实使用
 
