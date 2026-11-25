@@ -33,6 +33,28 @@ description: 通过试点对照、价值测算和合作提案，把产品演示�
 
 高风险指标需要单独设置门槛：即使平均耗时减少，也不能用它抵消一次严重越权。权限隔离、审批、恢复与回归用例参见 [企业级 Agent 实战路线](../agent/cases/enterprise-agent-roadmap) 和 [Agent 安全边界](../02-agent-core/agent-security-boundaries)。
 
+### 从一条任务记录开始
+
+跟客户事先约定计时起止点：例如从客服开始处理问题，到答案完成核对并交付客户。等待、复核、修正、转人工应按同一规则记录；不能把 Agent 生成答案的几秒钟，直接拿来与人工完成整个任务的时间比较。下面是**虚构的离线演练**，两种方式处理的是经授权的历史样本，不对真实订单执行操作：
+
+| 样本 | 原流程（分钟） | 辅助流程总耗时（分钟） | 原减辅助 | 结果 |
+| --- | ---: | ---: | ---: | --- |
+| A | 12 | 7 | +5 | 有效引用，人工核对通过 |
+| B | 5 | 4 | +1 | 有效引用，人工核对通过 |
+| C | 8 | 11 | -3 | 引用过期，转人工修正 |
+| D | 6 | 5 | +1 | 有效引用，人工核对通过 |
+
+四条记录的总耗时分别为 31 和 27 分钟，平均每条相差 1 分钟；C 虽然失败，也必须保留其耗时和转人工结果。假设客户事先要求所有引用必须有效，那么 C 应计入质量问题，不能仅凭平均时间缩短就宣布试点成功。这里没有提供随机分配、独立复核或足够样本，因此这个差值只是演示如何计算，**不能视为产品带来的因果收益**。
+
+真实试点还要处理几个容易被平均值掩盖的问题：
+
+- **选择偏差：** 如果员工只把简单问题交给助手，直接比较两组平均耗时会夸大效果。先定义纳入条件与任务分类，再按可行方式随机分配或匹配难度，并记录未纳入原因。
+- **顺序效应：** 同一人先做一遍再做同一个问题，第二次会因为熟悉答案而变快。离线对照可用不同但相似的样本、平衡处理顺序并隔离答案；若无法做到，就在报告中标明局限。
+- **分母与缺失：** 预先约定纳入的是所有分配任务还是只有成功任务；记录未使用、超时、放弃与转人工，避免只统计最好看的案例。检查实际分配比例和丢失记录；[Microsoft 的实验数据质量指南](https://www.microsoft.com/en-us/research/articles/patterns-of-trustworthy-experimentation-during-experiment-stage/)把分配比例异常和数据丢失作为需要排查的信号。
+- **上线顺序与风险：** 试点前与业务方共同写下继续、修改或停止的条件。统计分析不能替代越权、严重错误等明确停止条件；样本太少时应增加观察或缩小范围，而不是把“不足以判断”写成“证明有效”。
+
+记录表至少保留匿名任务编号、类别与难度、分配方式、起止时间、复核及转人工耗时、质量结果、失败原因和记录来源。避免为了分析把不必要的客户隐私复制到个人表格；先与客户确定访问权限、保留期限和脱敏方式。
+
 ## 3. 用范围而不是单点承诺测算价值
 
 假设每月有 1,000 次相关任务，原流程平均 8 分钟；试点后平均操作和复核合计 5 分钟。若每小时人工成本按 60 元估算：
@@ -95,4 +117,5 @@ python3 -m unittest -v
 - [Y Combinator：Guide to Business Models](https://www.ycombinator.com/library/Gh-yc-guide-to-business-models)：从客户问题和商业模式角度思考收费。
 - [OpenAI：A Practical Guide to Building AI Agents](https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/)：围绕工作流、工具和评估建立技术基线。
 - [Anthropic：Demystifying Evals for AI Agents](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)：理解任务集、评估方式与持续改进。
+- [Microsoft Research：Patterns of Trustworthy Experimentation](https://www.microsoft.com/en-us/research/articles/patterns-of-trustworthy-experimentation-during-experiment-stage/)：参考实验过程中的数据质量、指标和新鲜感效应检查。
 - Teresa Torres，《Continuous Discovery Habits》：可借鉴持续接触用户与检验假设的节奏；企业采购、隐私与安全约束仍需单独设计。
