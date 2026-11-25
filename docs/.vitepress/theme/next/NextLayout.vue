@@ -8,6 +8,7 @@ import type { SearchDocument } from './search.data'
 const { page, frontmatter, theme, isDark } = useData()
 const route = useRoute()
 const menuOpen = ref(false)
+const sidebarOpen = ref(false)
 const openDropdown = ref<string | null>(null)
 const searchOpen = ref(false)
 const query = ref('')
@@ -20,6 +21,7 @@ async function toggleSearch() {
   searchOpen.value = !searchOpen.value
   if (!searchOpen.value) { searchButton.value?.focus(); return }
   menuOpen.value = false
+  sidebarOpen.value = false
   openDropdown.value = null
   await nextTick()
   searchInput.value?.focus()
@@ -40,6 +42,7 @@ function handleShortcut(event: KeyboardEvent) {
 function closePanels() {
   if (searchOpen.value) { searchOpen.value = false; searchButton.value?.focus() }
   menuOpen.value = false
+  sidebarOpen.value = false
   openDropdown.value = null
 }
 function handleOutsideClick(event: PointerEvent) {
@@ -129,7 +132,7 @@ function active(path: string) {
 }
 const prev = computed(() => frontmatter.value.prev as LessonLink | false)
 const next = computed(() => frontmatter.value.next as LessonLink | false)
-watch(() => route.path, () => { menuOpen.value = false; openDropdown.value = null; searchOpen.value = false; void updateHeadings() }, { flush: 'post' })
+watch(() => route.path, () => { menuOpen.value = false; sidebarOpen.value = false; openDropdown.value = null; searchOpen.value = false; void updateHeadings() }, { flush: 'post' })
 </script>
 
 <template>
@@ -137,18 +140,18 @@ watch(() => route.path, () => { menuOpen.value = false; openDropdown.value = nul
     <a class="next-skip" href="#main">跳到正文</a>
     <header class="next-header">
       <a class="next-brand" :href="href('/')"><img :src="href('/logo.svg')" width="30" height="30" alt=""> <strong>造与见</strong></a>
-      <nav class="next-topnav" :class="{ 'is-open': menuOpen }" aria-label="主导航">
+      <nav id="site-navigation" class="next-topnav" :class="{ 'is-open': menuOpen }" aria-label="主导航">
         <template v-for="item in theme.nav" :key="item.text">
           <a v-if="item.link" :href="href(item.link)">{{ item.text }}</a>
           <div v-else class="next-dropdown"><button type="button" class="next-dropdown-trigger" :aria-expanded="openDropdown === item.text" @click="openDropdown = openDropdown === item.text ? null : item.text">{{ item.text }} <span aria-hidden="true">⌄</span></button><div v-if="openDropdown === item.text" class="next-dropdown-panel"><a v-for="child in item.items" :key="child.link" :href="href(child.link)">{{ child.text }}</a></div></div>
         </template>
       </nav>
-      <div class="next-header-actions"><button ref="searchButton" type="button" @click="toggleSearch" :aria-expanded="searchOpen" aria-keyshortcuts="Control+K Meta+K">搜索</button><button type="button" @click="isDark = !isDark" :aria-label="isDark ? '切换浅色模式' : '切换深色模式'">{{ isDark ? '☼' : '☾' }}</button><button class="next-mobile-menu" type="button" :aria-expanded="menuOpen" @click="menuOpen = !menuOpen; searchOpen = false">目录</button></div>
+      <div class="next-header-actions"><button ref="searchButton" type="button" @click="toggleSearch" :aria-expanded="searchOpen" aria-keyshortcuts="Control+K Meta+K">搜索</button><button type="button" @click="isDark = !isDark" :aria-label="isDark ? '切换浅色模式' : '切换深色模式'">{{ isDark ? '☼' : '☾' }}</button><button class="next-mobile-menu" type="button" :aria-expanded="menuOpen" aria-controls="site-navigation" @click="menuOpen = !menuOpen; sidebarOpen = false; openDropdown = null; searchOpen = false">导航</button><button v-if="!home && group.length" class="next-mobile-lessons" type="button" :aria-expanded="sidebarOpen" aria-controls="lesson-navigation" @click="sidebarOpen = !sidebarOpen; focus = false; menuOpen = false; openDropdown = null; searchOpen = false">课程</button></div>
     </header>
     <div v-if="searchOpen" class="next-search" role="search"><label for="next-search-input">搜索文章全文</label><input id="next-search-input" ref="searchInput" v-model="query" type="search" placeholder="输入关键词"><p v-if="!query">输入关键词查找文章</p><p v-else-if="searchLoading">正在加载搜索索引…</p><p v-else-if="searchError">搜索索引加载失败，请关闭后重试。</p><p v-else-if="!searchResults.length">没有找到匹配的文章</p><a v-for="item in searchResults" :key="item.url" :href="href(item.url)"><strong>{{ item.title }}</strong><small>{{ excerpt(item) }}</small></a></div>
     <main v-if="home" id="main" class="next-home"><Content /></main>
-    <div v-else class="next-layout" :class="{ 'is-focus': focus, 'is-menu-open': menuOpen }">
-      <aside class="next-sidebar" aria-label="课程目录"><section v-for="part in group" :key="part.text"><h2>{{ part.text }}</h2><a v-for="item in part.items" :key="item.link" :href="href(item.link)" :aria-current="active(item.link) ? 'page' : undefined">{{ item.text }}</a></section></aside>
+    <div v-else class="next-layout" :class="{ 'is-focus': focus, 'is-menu-open': sidebarOpen }">
+      <aside id="lesson-navigation" class="next-sidebar" aria-label="课程目录"><section v-for="part in group" :key="part.text"><h2>{{ part.text }}</h2><a v-for="item in part.items" :key="item.link" :href="href(item.link)" :aria-current="active(item.link) ? 'page' : undefined">{{ item.text }}</a></section></aside>
       <main id="main" class="next-main"><article class="next-article vp-doc" @click="copyCode"><button type="button" class="next-focus" :aria-pressed="focus" @click="focus = !focus">{{ focus ? '退出专注' : '专注阅读' }}</button><Content /><nav v-if="prev || next" class="prev-next" aria-label="课程分页"><a v-if="prev" class="pager-link prev" :href="href(prev.link)"><small>本专题上一篇</small><strong>{{ prev.text }}</strong></a><a v-if="next" class="pager-link next" :href="href(next.link)"><small>本专题下一篇</small><strong>{{ next.text }}</strong></a></nav></article></main>
       <aside v-if="headings.length" class="next-outline" aria-label="本文目录"><strong>本文目录</strong><a v-for="heading in headings" :key="heading.id" :class="{ sub: heading.level > 2 }" :href="'#' + encodeURIComponent(heading.id)">{{ heading.title }}</a></aside>
     </div>
