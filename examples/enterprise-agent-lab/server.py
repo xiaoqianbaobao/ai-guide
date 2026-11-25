@@ -49,6 +49,19 @@ class Handler(BaseHTTPRequestHandler):
         raise LookupError("route not found")
 
     def dispatch(self):
+        static_files = {"/": ("index.html", "text/html; charset=utf-8"),
+                        "/app.js": ("app.js", "text/javascript; charset=utf-8"),
+                        "/style.css": ("style.css", "text/css; charset=utf-8")}
+        if self.command == "GET" and self.path in static_files:
+            filename, content_type = static_files[self.path]
+            body = (Path(__file__).resolve().parent / filename).read_bytes()
+            self.send_response(200)
+            self.send_header("Content-Type", content_type)
+            self.send_header("Cache-Control", "no-store")
+            self.send_header("Content-Length", str(len(body)))
+            self.end_headers()
+            self.wfile.write(body)
+            return
         try:
             self.respond(200, self.handle_request())
         except PermissionError:
@@ -73,4 +86,10 @@ def make_server(path: str, port: int = 8765):
 if __name__ == "__main__":
     db_path = Path(__file__).resolve().parent / "lab.sqlite3"
     print("教学服务仅监听 http://127.0.0.1:8765；不要用于真实数据。", flush=True)
-    make_server(str(db_path)).serve_forever()
+    server = make_server(str(db_path))
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\n教学服务已停止。")
+    finally:
+        server.server_close()

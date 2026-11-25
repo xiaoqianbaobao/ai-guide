@@ -98,6 +98,12 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.request("/api/ask", "unknown", {"question": "退款"})[0], 403)
         self.assertEqual(self.request("/api/ask", "demo-support", {"question": ""})[0], 400)
 
+    def test_local_learning_interface_is_served(self):
+        with urlopen(self.base + "/", timeout=3) as response:
+            self.assertIn("企业知识与工单助手", response.read().decode())
+        with urlopen(self.base + "/app.js", timeout=3) as response:
+            self.assertIn("/api/approve", response.read().decode())
+
 
 if __name__ == "__main__":
     unittest.main()

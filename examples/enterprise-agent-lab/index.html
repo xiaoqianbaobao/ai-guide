@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>企业助手本地实验室</title>
+  <link rel="stylesheet" href="/style.css">
+  <script src="/app.js" defer></script>
+</head>
+<body>
+  <header><div><span class="eyebrow">造与见 / 本地实验室</span><h1>企业知识与工单助手</h1><p>跟着一条真实请求链，练习查询、审查与提交。</p></div><span class="badge">仅限本机教学</span></header>
+  <main>
+    <div class="notice"><strong>请只使用虚构数据。</strong> 这里的演示身份可以被任意冒用，没有真实认证或模型，不要用于生产。</div>
+    <div class="grid">
+      <section><span class="step">01 / 知识查询</span><h2>查找可访问的规则</h2><p>演示身份：客服操作员。试试“退款”，再试试“薪酬”。</p><form id="ask-form"><label for="question">问题</label><input id="question" value="退款" maxlength="500" required><button>查询</button></form><pre id="answer" aria-live="polite">查询结果会显示在这里。</pre></section>
+      <section><span class="step">02 / 创建草稿</span><h2>准备人工处理</h2><p>演示身份：客服操作员。创建草稿不会提交工单。</p><form id="draft-form"><label for="draft-text">草稿内容</label><textarea id="draft-text" maxlength="1000" required>客户询问退款进度，请人工核实。</textarea><button>创建草稿</button></form><pre id="draft-result" aria-live="polite">创建后，草稿会自动带入下一步。</pre></section>
+      <section><span class="step">03 / 人工审核</span><h2>查看并批准具体版本</h2><p>演示身份：客服审核人。内容变化后需要重新查看。</p><form id="review-form"><label for="draft-id">草稿 ID</label><input id="draft-id" required><button>读取草稿</button></form><pre id="review-result" aria-live="polite">尚未读取草稿。</pre><button id="approve" class="secondary" disabled>批准已查看版本</button></section>
+      <section><span class="step">04 / 提交与重试</span><h2>提交模拟工单</h2><p>演示身份：客服操作员。再次点击会使用相同操作 ID 重试。</p><button id="submit" disabled>提交工单</button><pre id="submit-result" aria-live="polite">请先创建并批准草稿。</pre></section>
+    </div>
+    <footer>示例使用本地 SQLite。真实场景还需要可信身份、审批撤销、模型接入和外部系统对账。</footer>
+  </main>
+</body>
+</html>
