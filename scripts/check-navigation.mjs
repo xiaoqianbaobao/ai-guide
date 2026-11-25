@@ -21,13 +21,31 @@ const pages = new Map()
 for (const file of await allHtml(output)) {
   const html = await readFile(file, 'utf8')
   const nav = html.match(/<nav class="prev-next"[\s\S]*?<\/nav>/)?.[0] ?? ''
+  const sidebar = html.match(/<aside\b[^>]*class="next-sidebar"[\s\S]*?<\/aside>/)?.[0] ?? ''
+  const entries = [...sidebar.matchAll(/<a\b([^>]*)>/g)].map(match => {
+    const attrs = match[1]
+    const href = attrs.match(/\bhref="([^"]+)"/)?.[1]
+    return href ? { path: normalizedLink(href), current: /\baria-current="page"/.test(attrs) } : null
+  }).filter(Boolean)
   const links = {}
   for (const match of nav.matchAll(/<a\b[^>]*class="[^"]*pager-link (prev|next)[^"]*"[^>]*href="([^"]+)"/g)) links[match[1]] = normalizedLink(match[2])
-  pages.set(route(file), { links, file })
+  pages.set(route(file), { links, entries, file })
 }
 const errors = []
 let edges = 0
-for (const [current, { links }] of pages) {
+for (const [current, { links, entries }] of pages) {
+  const matches = entries.map((entry, index) => entry.current ? index : -1).filter(index => index >= 0)
+  const matchingPaths = entries.filter(entry => entry.path === current)
+  if (matchingPaths.length > 1) errors.push(`${current}: 课程目录中重复收录当前页面`)
+  if (matchingPaths.length === 1 && matches.length === 0) errors.push(`${current}: 课程目录缺少当前页标记`)
+  if (matches.length > 1) errors.push(`${current}: 课程目录存在多个当前项`)
+  if (matches.length === 1) {
+    const index = matches[0]
+    if (entries[index].path !== current) errors.push(`${current}: 当前目录项指向 ${entries[index].path}`)
+    for (const [direction, expected] of [['prev', entries[index - 1]?.path], ['next', entries[index + 1]?.path]]) {
+      if (links[direction] !== expected) errors.push(`${current} ${direction}: ${links[direction] ?? '空'}，课程目录中的相邻项为 ${expected ?? '空'}`)
+    }
+  } else if (Object.keys(links).length) errors.push(`${current}: 有分页链接，但课程目录没有当前项`)
   for (const [direction, target] of Object.entries(links)) {
     edges++
     const other = pages.get(target)
@@ -47,4 +65,4 @@ for (const [from, target] of [
   if (pages.get(from)?.links.next !== target) errors.push(`${from} 的下一篇不是预期的 ${target ?? '无'}`)
 }
 if (errors.length) { console.error(errors.join('\n')); process.exitCode = 1 }
-else console.log(`已检查 ${pages.size} 个 HTML 页面与 ${edges} 个分页链接；目标存在、前后互指且不跨专题。`)
+else console.log(`已检查 ${pages.size} 个 HTML 页面与 ${edges} 个分页链接；目标存在、前后互指、不跨专题且与课程目录顺序一致。`)
