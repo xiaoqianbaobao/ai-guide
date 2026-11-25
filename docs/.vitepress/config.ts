@@ -385,6 +385,7 @@ function sidebarModels() {
     { text: '模块概述', link: '/models/' },
     { text: '线性代数：向量、点积与注意力', link: '/models/linear-algebra-for-agents/' },
     { text: '概率：如何理解评估的不确定性', link: '/models/probability-for-agent-evals/' },
+    { text: '优化：用梯度下降从错误中学习', link: '/models/gradient-descent-from-error/' },
     { text: 'CNN：从局部窗口到视觉特征', link: '/models/cnn-from-pixels-to-features/' },
     { text: 'GNN：用消息传递理解节点与关系', link: '/models/gnn-message-passing/' }
   ] }]

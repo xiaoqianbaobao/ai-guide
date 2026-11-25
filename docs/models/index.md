@@ -35,6 +35,8 @@ Python 基础教程
 
 接着阅读 [概率第一课：为什么 20 次零失败不等于可靠](./probability-for-agent-evals)，用可运行示例理解 Agent 评估中的抽样与不确定性。
 
+理解模型如何学习时，可运行 [优化第一课：用梯度下降让模型从错误中学习](./gradient-descent-from-error)。
+
 进入视觉模型时，可学习 [CNN 第一课：从局部窗口到可学习的视觉特征](./cnn-from-pixels-to-features)，先手算再运行卷积层的简化示例。
 
 遇到关系数据时，可继续阅读 [图神经网络第一课：用消息传递理解节点与关系](./gnn-message-passing)，手算一次邻居聚合。

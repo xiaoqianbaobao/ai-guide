@@ -11,7 +11,7 @@ description: 精选课程、官方教程和书籍，为每一项资源给出学�
 
 | 资源 | 形式与适合对象 | 学完尝试 |
 | --- | --- | --- |
-| [3Blue1Brown：线性代数的本质，第一讲](https://www.youtube.com/watch?v=kjBOesZCoqc) | 视频系列入口；适合建立几何直觉 | 画出向量与线性变换，并解释矩阵列与基向量的关系 |
+| [3Blue1Brown：线性代数的本质，第一讲](https://www.youtube.com/watch?v=fNk_zzaMoSs) | 视频系列第一讲；适合建立向量的几何直觉 | 画出向量；继续学习后解释矩阵列与基向量的关系 |
 | [Stanford CS229：机器学习第一讲](https://www.youtube.com/watch?v=Bl4Feh_Mjvo) | 斯坦福课程视频；需要数学和 Python 基础 | 区分监督学习、训练集和测试集，并解释过拟合 |
 | [PyTorch：Deep Learning with PyTorch: A 60 Minute Blitz](https://docs.pytorch.org/tutorials/beginner/blitz/index.html) | 官方动手教程，包含张量、自动微分、神经网络与分类器 | 跑通分类示例，记录依赖、训练与验证结果，并改变一个参数比较 |
 | [Stanford CS224W：图机器学习](https://cs224w.stanford.edu/) | 图机器学习课程材料；适合已有机器学习基础者 | 解释节点、边、消息传递，并在小图中手算一次聚合 |
