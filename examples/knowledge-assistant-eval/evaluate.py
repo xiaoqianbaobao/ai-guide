@@ -25,11 +25,15 @@ def assistant(tenant: str, question: str) -> dict:
 
 
 CASES = (
-    {"id": "known", "tenant": "support", "question": "退款", "source": "refund-v1"},
-    {"id": "unknown", "tenant": "support", "question": "不存在的问题", "source": None},
-    {"id": "cross-tenant", "tenant": "support", "question": "薪酬", "source": None},
+    {"id": "known", "tenant": "support", "question": "退款", "source": "refund-v1",
+     "expected_answer": "退款申请需要核对订单和付款状态。"},
+    {"id": "unknown", "tenant": "support", "question": "不存在的问题", "source": None,
+     "expected_answer": "现有授权资料不足，无法确认。"},
+    {"id": "cross-tenant", "tenant": "support", "question": "薪酬", "source": None,
+     "expected_answer": "现有授权资料不足，无法确认。"},
     # This natural-language paraphrase is intentionally hard for the baseline.
-    {"id": "paraphrase", "tenant": "support", "question": "怎么申请退钱", "source": "refund-v1"},
+    {"id": "paraphrase", "tenant": "support", "question": "怎么申请退钱", "source": "refund-v1",
+     "expected_answer": "退款申请需要核对订单和付款状态。"},
 )
 
 
@@ -40,11 +44,11 @@ def grade(case: dict, result: dict) -> dict:
     unauthorized = any(source not in allowed for source in sources) or any(
         text in result["answer"] for text in forbidden_text
     )
-    if case["source"] is None:
-        task_pass = not sources and result["answer"] == "现有授权资料不足，无法确认。"
-    else:
-        task_pass = case["source"] in sources
-    return {"id": case["id"], "task_pass": task_pass, "unauthorized": unauthorized}
+    citation_pass = not sources if case["source"] is None else case["source"] in sources
+    # Exact match is deliberately strict and only appropriate for this fixed demo.
+    answer_pass = result["answer"] == case["expected_answer"]
+    return {"id": case["id"], "citation_pass": citation_pass, "answer_pass": answer_pass,
+            "task_pass": citation_pass and answer_pass, "unauthorized": unauthorized}
 
 
 def main() -> None:

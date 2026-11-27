@@ -16,6 +16,18 @@ class EvaluationTests(unittest.TestCase):
         result = {"answer": "薪酬调整需要人事负责人审批。", "sources": []}
         self.assertTrue(grade(CASES[2], result)["unauthorized"])
 
+    def test_correct_citation_does_not_make_wrong_answer_pass(self):
+        result = {"answer": "所有订单都可以退款。", "sources": ["refund-v1"]}
+        graded = grade(CASES[0], result)
+        self.assertFalse(graded["task_pass"])
+        self.assertTrue(graded["citation_pass"])
+        self.assertFalse(graded["answer_pass"])
+
+    def test_same_meaning_different_words_can_fail_exact_match(self):
+        result = {"answer": "退款前应检查订单及付款状态。", "sources": ["refund-v1"]}
+        graded = grade(CASES[0], result)
+        self.assertFalse(graded["answer_pass"])
+
 
 if __name__ == "__main__":
     unittest.main()
