@@ -10,6 +10,8 @@ tags:
 
 <KnowledgeMap current-module="self-evolving-skills" current-article="从执行失败到自我修正：生成新 Skill 的闭环" />
 
+# 从执行失败到自我修正：生成新 Skill 的闭环
+
 <ArticleHeader
   module="自进化 Skills 与 Agent 自我改进"
   :tags="['进阶', '运行时', '自我修正']"

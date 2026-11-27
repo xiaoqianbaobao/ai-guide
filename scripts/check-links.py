@@ -12,9 +12,15 @@ class Page(HTMLParser):
         super().__init__()
         self.links = []
         self.ids = set()
+        self.has_article = False
+        self.h1_count = 0
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
+        if tag == "article" and "next-article" in attributes.get("class", "").split():
+            self.has_article = True
+        if tag == "h1":
+            self.h1_count += 1
         if "id" in attributes:
             self.ids.add(attributes["id"])
         if tag == "a" and "href" in attributes:
@@ -32,8 +38,16 @@ def main():
     errors = []
     count = 0
     for file, page in pages.items():
+        if page.has_article and page.h1_count != 1:
+            errors.append((file.relative_to(ROOT), "h1", f"文章需要一个一级标题，实际为 {page.h1_count} 个"))
         for href in page.links:
+            if not href.strip() or href.strip() == "#":
+                errors.append((file.relative_to(ROOT), href, "空链接"))
+                continue
             url = urlsplit(href)
+            if url.scheme.lower() in {"file", "javascript"} or url.path.startswith("/Users/"):
+                errors.append((file.relative_to(ROOT), href, "本机文件或不安全链接"))
+                continue
             if url.scheme or url.netloc or href.startswith("//"):
                 continue
             path = unquote(url.path)

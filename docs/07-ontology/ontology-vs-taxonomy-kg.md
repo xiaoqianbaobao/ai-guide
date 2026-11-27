@@ -9,6 +9,8 @@ tags:
 
 <KnowledgeMap current-module="ontology" current-article="Ontology vs Taxonomy vs Knowledge Graph vs RAG：四条边界怎么画" />
 
+# Ontology vs Taxonomy vs Knowledge Graph vs RAG：四条边界怎么画
+
 <ArticleHeader
   module="本体论与知识表示"
   :tags="['进阶', '建模']"

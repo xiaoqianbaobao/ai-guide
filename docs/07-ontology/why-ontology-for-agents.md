@@ -9,6 +9,8 @@ tags:
 
 <KnowledgeMap current-module="ontology" current-article="为什么 Agent 系统需要本体论" />
 
+# 为什么 Agent 系统需要本体论
+
 <ArticleHeader
   module="本体论与知识表示"
   :tags="['进阶', '建模']"

@@ -10,6 +10,8 @@ tags:
 
 <KnowledgeMap current-module="ontology" current-article="Hypergraph 在企业级多 Agent 架构中的应用" />
 
+# Hypergraph 在企业级多 Agent 架构中的应用
+
 <ArticleHeader
   module="本体论与知识表示"
   :tags="['进阶', '建模', '多 Agent']"

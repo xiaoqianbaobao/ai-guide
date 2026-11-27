@@ -10,6 +10,8 @@ tags:
 
 <KnowledgeMap current-module="ontology" current-article="Palantir Foundry：语义六件套" />
 
+# Palantir Foundry：Object / Link / Action / Function / Roles / Workflow 语义六件套
+
 <ArticleHeader
   module="本体论与知识表示"
   :tags="['进阶', '建模', '案例']"

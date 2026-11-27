@@ -10,6 +10,8 @@ tags:
 
 <KnowledgeMap current-module="self-evolving-skills" current-article="Skill 的自动发现与自动打包机制" />
 
+# Skill 的自动发现与自动打包机制
+
 <ArticleHeader
   module="自进化 Skills 与 Agent 自我改进"
   :tags="['进阶', '运行时', 'Skills']"

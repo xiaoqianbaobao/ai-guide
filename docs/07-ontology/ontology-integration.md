@@ -10,6 +10,8 @@ tags:
 
 <KnowledgeMap current-module="ontology" current-article="跨模块集成：Ontology × Memory × Multi-Agent × Eval" />
 
+# Ontology 如何接入 Memory / Multi-Agent / Eval：跨模块集成
+
 <ArticleHeader
   module="本体论与知识表示"
   :tags="['进阶', '建模', '集成']"

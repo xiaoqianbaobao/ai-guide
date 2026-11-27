@@ -11,6 +11,8 @@ tags:
 
 <KnowledgeMap current-module="self-evolving-skills" current-article="自进化的失控风险与护栏设计" />
 
+# 自进化的失控风险与护栏设计
+
 <ArticleHeader
   module="自进化 Skills 与 Agent 自我改进"
   :tags="['进阶', '运行时', '风控', '审计']"

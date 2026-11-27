@@ -10,6 +10,8 @@ tags:
 
 <KnowledgeMap current-module="ontology" current-article="受治理的写入：direct / proposal_only / 角色 / 审批组 / 证据与 Attestation" />
 
+# 受治理的写入：direct / proposal_only / 角色 / 审批组 / 证据与 Attestation
+
 <ArticleHeader
   module="本体论与知识表示"
   :tags="['进阶', '建模', '治理']"

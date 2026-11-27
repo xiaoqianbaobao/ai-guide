@@ -5,6 +5,8 @@ description: "基于 deer-flow-by-cc 仓库源码、设计文档、白皮书，�
 
 <KnowledgeMap current-module="cases" current-article="DeerFlow Harness 深度拆解" />
 
+# DeerFlow Harness 深度拆解：Agent 运行时引擎的完整架构设计
+
 ## 目录
 
 **上篇：Harness — Agent 运行时引擎**
@@ -41,13 +43,13 @@ description: "基于 deer-flow-by-cc 仓库源码、设计文档、白皮书，�
 
 ---
 
-# 上篇：Harness — Agent 运行时引擎
+## 上篇：Harness — Agent 运行时引擎
 
 ---
 
-## 1. Harness 全景
+### 1. Harness 全景
 
-### 1.1 是什么
+#### 1.1 是什么
 
 Harness 是 DeerFlow 的 **Agent 运行时引擎**，位于 `backend/packages/harness/deerflow/`。它作为一个可独立发布的 Python 包，提供了完整的 AI Agent 执行能力。
 
@@ -63,7 +65,7 @@ Harness 是 DeerFlow 的 **Agent 运行时引擎**，位于 `backend/packages/ha
 
 > **关键依赖红线**：`app.*` 可以 import `deerflow.*`，但 `deerflow.*` 绝不能 import `app.*`。这条红线由 `tests/test_harness_boundary.py` 在 CI 中强制执行，确保 harness 包可以在任何 Python 项目中独立使用，不耦合 DeerFlow 的业务逻辑。
 
-### 1.2 包结构总览
+#### 1.2 包结构总览
 
 ```
 backend/packages/harness/deerflow/
@@ -141,11 +143,11 @@ backend/packages/harness/deerflow/
 
 ---
 
-## 2. 两种运行模式
+### 2. 两种运行模式
 
 DeerFlow 支持两种运行模式，决定 Agent 在哪个进程中执行。
 
-### 2.1 Standard 模式（4 进程）
+#### 2.1 Standard 模式（4 进程）
 
 ```
 Nginx (2026)
@@ -160,7 +162,7 @@ Nginx (2026)
 Gateway 负责：API 路由、身份认证、审计  
 LangGraph Server 负责：Agent 创建、中间件链执行、工具调用、沙箱操作
 
-### 2.2 Gateway 模式（3 进程）
+#### 2.2 Gateway 模式（3 进程）
 
 ```
 Nginx (2026)
@@ -174,7 +176,7 @@ Nginx (2026)
 
 Agent 运行时**嵌入 Gateway 进程**，无独立 LangGraph Server。`/api/langgraph/*` 路径在 nginx 配置中通过 envsubst 改写指向 Gateway。
 
-### 2.3 对比总结
+#### 2.3 对比总结
 
 | 维度 | Standard | Gateway |
 |------|----------|---------|
@@ -189,11 +191,11 @@ Agent 运行时**嵌入 Gateway 进程**，无独立 LangGraph Server。`/api/la
 
 ---
 
-## 3. Agent 工厂链
+### 3. Agent 工厂链
 
 Agent 的创建有两层工厂，分别服务于不同场景。
 
-### 3.1 `create_deerflow_agent()` — SDK 级工厂
+#### 3.1 `create_deerflow_agent()` — SDK 级工厂
 
 位于 `agents/factory.py`，**纯参数驱动**，不依赖 YAML 配置或全局单例：
 
@@ -219,7 +221,7 @@ def create_deerflow_agent(
 - **`features`**：声明式 Feature Flag（`RuntimeFeatures`），自动组装
 - **`extra_middleware`**：通过 `@Next(SomeMiddleware)` / `@Prev(SomeMiddleware)` 精准定位插入
 
-### 3.2 RuntimeFeatures 声明式 Feature Flag
+#### 3.2 RuntimeFeatures 声明式 Feature Flag
 
 ```python
 @dataclass
@@ -240,7 +242,7 @@ class RuntimeFeatures:
 
 `summarization` 和 `guardrail` 没有内置默认实现——它们只接受 `False` 或自定义实例。
 
-### 3.3 `@Next` / `@Prev` 装饰器机制
+#### 3.3 `@Next` / `@Prev` 装饰器机制
 
 通过装饰器声明中间件的定位：
 
@@ -257,7 +259,7 @@ class MyCustomMiddleware(AgentMiddleware):
 4. 有锚点中间件 → 迭代解析（支持外部中间件之间的互相锚定）
 5. 最终保证：`ClarificationMiddleware` 永远在链尾
 
-### 3.4 `make_lead_agent()` — 应用级工厂
+#### 3.4 `make_lead_agent()` — 应用级工厂
 
 位于 `agents/lead_agent/agent.py`，**配置驱动**，读取 config.yaml + agents config：
 
@@ -313,11 +315,11 @@ if store is not None:
 
 ---
 
-## 4. 中间件链
+### 4. 中间件链
 
 这是 Agent 最核心的架构模式——中间件在 agent 每次 LLM 调用前后和工具调用前后插入自定义逻辑。
 
-### 4.1 Hook 机制
+#### 4.1 Hook 机制
 
 ```python
 class AgentMiddleware:
@@ -327,7 +329,7 @@ class AgentMiddleware:
     async def awrap_tool_call(self, request, handler) -> ...    # 异步版本
 ```
 
-### 4.2 完整中间件链（14 层）
+#### 4.2 完整中间件链（14 层）
 
 从最内到最外（执行顺序）：
 
@@ -384,7 +386,7 @@ class AgentMiddleware:
        澄清请求拦截。LLM 输出的 clarify 请求直接返回用户，不继续执行。永远在链尾。
 ```
 
-### 4.3 中间件排序逻辑（`_build_middlewares`）
+#### 4.3 中间件排序逻辑（`_build_middlewares`）
 
 ```python
 def _build_middlewares(config, model_name, agent_name, custom_middlewares):
@@ -410,11 +412,11 @@ def _build_middlewares(config, model_name, agent_name, custom_middlewares):
 
 ---
 
-## 5. Runtime 子系统
+### 5. Runtime 子系统
 
 Gateway 模式特有的运行时管理，位于 `runtime/`。
 
-### 5.1 主事件循环（`main_loop.py`）
+#### 5.1 主事件循环（`main_loop.py`）
 
 ```python
 _main_loop: asyncio.AbstractEventLoop | None = None
@@ -423,7 +425,7 @@ _tracked_futures: weakref.WeakSet[concurrent.futures.Future] = weakref.WeakSet()
 _shutting_down: bool = False
 ```
 
-#### 为什么需要这个？
+##### 为什么需要这个？
 
 解决 langchain_openai 的 `_get_default_async_httpx_client` bug——该函数使用 `@lru_cache`，cache **key 不包含事件循环标识**。如果 httpx client 先在短生命周期的循环上创建（如 memory updater 的 `asyncio.run`），其连接池 socket 绑定到已关闭的循环，后续从另一循环使用时崩溃：
 
@@ -431,7 +433,7 @@ _shutting_down: bool = False
 RuntimeError("Event loop is closed")
 ```
 
-#### 解决方案
+##### 解决方案
 
 Gateway 启动时注册**长生命周期的主循环**（Uvicorn loop），同步线程通过 `submit_to_main_loop(factory)` 提交协程：
 
@@ -453,7 +455,7 @@ def submit_to_main_loop(coro_factory):
     return future.result()
 ```
 
-#### shutdown 安全
+##### shutdown 安全
 
 ```python
 async def shutdown_main_loop():
@@ -465,7 +467,7 @@ async def shutdown_main_loop():
     _main_loop = None
 ```
 
-### 5.2 RunManager（`runs/manager.py`）
+#### 5.2 RunManager（`runs/manager.py`）
 
 Run 的生命周期管理：
 
@@ -484,7 +486,7 @@ class RunRecord:
     error: str | None
 ```
 
-### 5.3 run_agent Worker（`runs/worker.py`）
+#### 5.3 run_agent Worker（`runs/worker.py`）
 
 Agent 执行的核心协程：
 
@@ -508,11 +510,11 @@ async def run_agent(bridge, run_manager, record, *, checkpointer, store, agent_f
 
 ---
 
-## 6. Checkpointer 检查点系统
+### 6. Checkpointer 检查点系统
 
 **这是 Agent 状态持久化的核心。** 每次 LLM 调用、工具调用、状态变更后，LangGraph 自动将 `ThreadState` 持久化到 checkpointer。
 
-### 6.1 LangGraph 的 Checkpointer 抽象
+#### 6.1 LangGraph 的 Checkpointer 抽象
 
 ```
 BaseCheckpointSaver (langgraph.checkpoint.base)
@@ -525,7 +527,7 @@ BaseCheckpointSaver (langgraph.checkpoint.base)
 └── adelete_thread(thread_id)                  # 删除整个 thread
 ```
 
-### 6.2 三后端对比
+#### 6.2 三后端对比
 
 | 维度 | memory | sqlite | postgres |
 |------|--------|--------|----------|
@@ -536,7 +538,7 @@ BaseCheckpointSaver (langgraph.checkpoint.base)
 | **配置示例** | — | `store.db` | `postgresql://u:p@h/db` |
 | **额外依赖** | 内置 | `langgraph-checkpoint-sqlite` | `langgraph-checkpoint-postgres` |
 
-### 6.3 工厂代码深度分析
+#### 6.3 工厂代码深度分析
 
 **同步工厂**（`agents/checkpointer/provider.py`）：
 
@@ -586,7 +588,7 @@ async def _async_checkpointer(config):
             yield saver
 ```
 
-### 6.4 触发时机（在 `run_agent` worker 中）
+#### 6.4 触发时机（在 `run_agent` worker 中）
 
 ```python
 # 1. agent 创建后绑定 checkpointer
@@ -610,7 +612,7 @@ pre_run_snapshot = {
 #    3) aput_writes 恢复 pending writes
 ```
 
-### 6.5 配置方式
+#### 6.5 配置方式
 
 ```yaml
 # config.yaml
@@ -629,7 +631,7 @@ logger.warning(
 
 ---
 
-## 7. Store 持久化系统
+### 7. Store 持久化系统
 
 Store 是 Checkpointer 的**配套系统**，**职责完全不同**：
 
@@ -640,7 +642,7 @@ Store 是 Checkpointer 的**配套系统**，**职责完全不同**：
 | **读取方式** | LangGraph 内部自动使用 | 代码中显式读取 |
 | **数据重要性** | 对话可继续的关键 | Thread 列表展示 |
 
-### 7.1 关键洞察：两个系统共享同一个配置
+#### 7.1 关键洞察：两个系统共享同一个配置
 
 ```python
 # runtime/store/provider.py
@@ -653,7 +655,7 @@ config = get_app_config().checkpointer  # ← 和 get_checkpointer() 同一个�
 - `type: sqlite` → `SqliteStore` → 共享 `.deer-flow/store.db`
 - `type: postgres` → `PostgresStore` → 同 PG 实例
 
-### 7.2 Store 写入内容
+#### 7.2 Store 写入内容
 
 ```python
 store.put(("threads",), thread_id, {
@@ -666,7 +668,7 @@ store.put(("threads",), thread_id, {
 
 这就是前端 Thread 列表的数据来源。
 
-### 7.3 `_sqlite_utils.py`
+#### 7.3 `_sqlite_utils.py`
 
 ```python
 def resolve_sqlite_conn_str(raw: str) -> str:
@@ -683,11 +685,11 @@ def ensure_sqlite_parent_dir(conn_str: str) -> None:
 
 ---
 
-## 8. Stream Bridge 事件流
+### 8. Stream Bridge 事件流
 
 StreamBridge 是 Agent 执行器（生产者）和 SSE 端点（消费者）的解耦层。
 
-### 8.1 抽象接口
+#### 8.1 抽象接口
 
 ```python
 class StreamBridge(abc.ABC):
@@ -697,7 +699,7 @@ class StreamBridge(abc.ABC):
     async def cleanup(self, run_id, *, delay=0)
 ```
 
-### 8.2 当前实现：MemoryStreamBridge
+#### 8.2 当前实现：MemoryStreamBridge
 
 ```python
 class _RunStream:
@@ -739,7 +741,7 @@ SSE 端点 (消费者)
 缓冲区满: 丢弃旧事件（start_offset 前移）
 ```
 
-### 8.3 未来实现
+#### 8.3 未来实现
 
 ```python
 # async_provider.py
@@ -749,9 +751,9 @@ if config.type == "redis":
 
 ---
 
-## 9. 模型工厂
+### 9. 模型工厂
 
-### 9.1 `create_chat_model()`
+#### 9.1 `create_chat_model()`
 
 ```python
 def create_chat_model(name: str | None = None, thinking_enabled: bool = False, **kwargs) -> BaseChatModel:
@@ -777,7 +779,7 @@ def create_chat_model(name: str | None = None, thinking_enabled: bool = False, *
     return model_instance
 ```
 
-### 9.2 支持的全部 Provider
+#### 9.2 支持的全部 Provider
 
 | Provider | Class | 特点 |
 |----------|-------|------|
@@ -792,7 +794,7 @@ def create_chat_model(name: str | None = None, thinking_enabled: bool = False, *
 | **MiniMax** | `deerflow.models.patched_minimax` | 国内 |
 | **MindIE** | `deerflow.models.mindie_provider` | 华为昇腾 |
 
-### 9.3 Credential 加载
+#### 9.3 Credential 加载
 
 ```python
 # credential_loader.py — 支持多种凭证来源
@@ -803,9 +805,9 @@ def create_chat_model(name: str | None = None, thinking_enabled: bool = False, *
 
 ---
 
-## 10. 内存 / 记忆系统
+### 10. 内存 / 记忆系统
 
-### 10.1 架构
+#### 10.1 架构
 
 ```
 每次对话完成
@@ -827,7 +829,7 @@ memory_queue ── 异步 ──► memory_updater.py
                                             注入记忆 prompt 到 system message
 ```
 
-### 10.2 核心组件
+#### 10.2 核心组件
 
 | 文件 | 职责 |
 |------|------|
@@ -840,9 +842,9 @@ memory_queue ── 异步 ──► memory_updater.py
 
 ---
 
-## 11. Sandbox 沙箱系统
+### 11. Sandbox 沙箱系统
 
-### 11.1 抽象层
+#### 11.1 抽象层
 
 ```
 sandbox/sandbox.py              → Sandbox ABC
@@ -859,7 +861,7 @@ sandbox/local/local_sandbox.py  → LocalSandbox（subprocess 执行）
 sandbox/local/local_sandbox_provider.py → LocalSandboxProvider
 ```
 
-### 11.2 SandboxAuditMiddleware
+#### 11.2 SandboxAuditMiddleware
 
 bash 命令的安全审计，作为中间件嵌入 Agent 链（位置 5）：
 
@@ -894,9 +896,9 @@ verdict → block → error ToolMessage + log warning
 
 ---
 
-## 12. Subagent 子智能体
+### 12. Subagent 子智能体
 
-### 12.1 线程池架构
+#### 12.1 线程池架构
 
 ```
 task_tool 被调用
@@ -915,7 +917,7 @@ SubagentExecutor.__init__(config, tools, sandbox_state, thread_data, identity, .
         └─ 查询: get_background_task_result(task_id) → SubagentResult
 ```
 
-### 12.2 关键设计
+#### 12.2 关键设计
 
 | 能力 | 实现 |
 |------|------|
@@ -926,15 +928,15 @@ SubagentExecutor.__init__(config, tools, sandbox_state, thread_data, identity, .
 | **Skills 加载** | 按 `config.skills` whitelist 加载 SKILL.md → SystemMessage |
 | **工具过滤** | `config.tools` allowlist + `config.disallowed_tools` denylist |
 
-### 12.3 为什么用线程池而不是 asyncio Task？
+#### 12.3 为什么用线程池而不是 asyncio Task？
 
 Subagent 执行可能调用**同步代码**（如 sandbox 命令、部分 MCP 客户端），同步操作会阻塞 asyncio 循环。用线程池将这些操作隔离出事件循环，避免阻塞主循环上的其他 run。
 
 ---
 
-## 13. Tool 系统
+### 13. Tool 系统
 
-### 13.1 工具注册
+#### 13.1 工具注册
 
 ```python
 # tools/__init__.py
@@ -945,7 +947,7 @@ def get_available_tools(model_name, groups=None, subagent_enabled=False):
     """
 ```
 
-### 13.2 内置工具清单
+#### 13.2 内置工具清单
 
 | 工具 | 文件 | 职责 |
 |------|------|------|
@@ -957,7 +959,7 @@ def get_available_tools(model_name, groups=None, subagent_enabled=False):
 | `tool_search` | `tools/builtins/tool_search.py` | 工具搜索（延迟加载） |
 | `invoke_acp_agent` | `tools/builtins/invoke_acp_agent_tool.py` | ACP 互操作 |
 
-### 13.3 MCP 集成
+#### 13.3 MCP 集成
 
 ```python
 # mcp/client.py
@@ -974,9 +976,9 @@ class MultiServerMCPClient:
 
 ---
 
-## 14. Skills 技能系统
+### 14. Skills 技能系统
 
-### 14.1 结构
+#### 14.1 结构
 
 ```
 skills/public/{skill_name}/
@@ -987,7 +989,7 @@ skills/public/{skill_name}/
   templates/            ← 模板
 ```
 
-### 14.2 Lifecycle
+#### 14.2 Lifecycle
 
 ```python
 loader.py            → load_skills(tenant_id, workspace_id, enabled_only)
@@ -999,7 +1001,7 @@ manager.py           → 启用/禁用
 validation.py        → manifest 完整性校验
 ```
 
-### 14.3 租户感知的扫描优先级
+#### 14.3 租户感知的扫描优先级
 
 ```
 workspace user skill > tenant custom skill > public skill
@@ -1007,9 +1009,9 @@ workspace user skill > tenant custom skill > public skill
 
 ---
 
-## 15. Config 配置系统
+### 15. Config 配置系统
 
-### 15.1 AppConfig 结构
+#### 15.1 AppConfig 结构
 
 ```python
 class AppConfig(BaseModel):
@@ -1033,7 +1035,7 @@ class AppConfig(BaseModel):
     stream_bridge: StreamBridgeConfig | None   ← 重点
 ```
 
-### 15.2 热重载机制
+#### 15.2 热重载机制
 
 ```python
 get_app_config()            # 返回缓存单例
@@ -1049,22 +1051,22 @@ pop_current_app_config()         # 退出
 
 ---
 
-# 中篇：身份 / 多租户 / 审计
+## 中篇：身份 / 多租户 / 审计
 
 ---
 
-## 16. 身份与多租户子系统
+### 16. 身份与多租户子系统
 
 位于 `backend/app/gateway/identity/`，是社区在 DeerFlow 2.0 基础上新增的核心模块。
 
-### 16.1 设计原则
+#### 16.1 设计原则
 
 1. **单体内分包**：identity 全部在 `app/gateway/identity/`，对 harness 零侵入，仅通过 HTTP header 传递身份
 2. **双重隔离**：DB 用 `tenant_id` 列级过滤；文件系统用 `tenants/{tid}/workspaces/{wid}/` 路径
 3. **权限决策三点**：Gateway API 入口 → LangGraph 工具调用 → SQL 层自动 filter
 4. **Feature Flag**：`ENABLE_IDENTITY` 默认关闭，零破坏
 
-### 16.2 数据模型（PostgreSQL `identity` schema，10 张表）
+#### 16.2 数据模型（PostgreSQL `identity` schema，10 张表）
 
 ```
 tenants                     — 租户 (slug, name, plan, status)
@@ -1083,7 +1085,7 @@ api_tokens                  — API Token (dft_ 前缀, bcrypt)
 audit_logs                  — 审计日志 (action, result, metadata JSONB)
 ```
 
-### 16.3 RBAC 模型
+#### 16.3 RBAC 模型
 
 **5 预置角色**：
 
@@ -1097,7 +1099,7 @@ audit_logs                  — 审计日志 (action, result, metadata JSONB)
 
 **~24 权限点**：`tenant:create|read|update|delete`, `workspace:create|read|...`, `thread:read|write|delete`, `skill:invoke|manage`, `audit:read` 等。
 
-### 16.4 认证流程
+#### 16.4 认证流程
 
 **三种凭证**：
 
@@ -1121,7 +1123,7 @@ audit_logs                  — 审计日志 (action, result, metadata JSONB)
 }
 ```
 
-### 16.5 权限决策 `@requires`
+#### 16.5 权限决策 `@requires`
 
 ```python
 @router.post("/api/workspaces/{ws_id}/skills/{skill_id}/invoke")
@@ -1134,7 +1136,7 @@ async def invoke_skill(
 
 三步检查：1) 是否登录 2) 有权限 3) 水平 scope 匹配 → 任一失败 → 401/403 + 审计
 
-### 16.6 SQL 级别自动租户过滤
+#### 16.6 SQL 级别自动租户过滤
 
 ```python
 class TenantScoped:
@@ -1152,7 +1154,7 @@ def _apply_tenant_filter(execute_state):
 同时有 `before_flush` 事件拦截跨租户 INSERT。  
 平台管理员可通过 `with_platform_privilege()` 上下文临时 bypass（写审计追踪）。
 
-### 16.7 Gateway → LangGraph 身份透传（M5）
+#### 16.7 Gateway → LangGraph 身份透传（M5）
 
 通过 HMAC 签名 header 透传，**不传 JWT**（避免内部网络暴露 bearer token）：
 
@@ -1169,7 +1171,7 @@ HMAC 字段：`user_id + tenant_id + workspace_id + permissions + ts`。
 LangGraph 侧 IdentityMiddleware 验签 → `state["identity"]`。5min 窗口防重放。  
 子 agent 继承：直接注入 `state["identity"]`，不走 HMAC（同进程内无网络边界风险）。
 
-### 16.8 存储隔离
+#### 16.8 存储隔离
 
 ```
 $DEER_FLOW_HOME/
@@ -1187,7 +1189,7 @@ skills/
     workspaces/{wid}/user/               # workspace 内用户技能
 ```
 
-### 16.9 Session 管理
+#### 16.9 Session 管理
 
 | 功能 | 实现 |
 |------|------|
@@ -1204,9 +1206,9 @@ skills/
 
 ---
 
-## 17. 审计子系统
+### 17. 审计子系统
 
-### 17.1 写入管线
+#### 17.1 写入管线
 
 ```
 AuditMiddleware (Gateway 外层的中间件)
@@ -1218,7 +1220,7 @@ AuditMiddleware (Gateway 外层的中间件)
   → Postgres executemany INSERT INTO identity.audit_logs
 ```
 
-### 17.2 故障处理
+#### 17.2 故障处理
 
 | 场景 | 行为 |
 |------|------|
@@ -1228,7 +1230,7 @@ AuditMiddleware (Gateway 外层的中间件)
 | **PG 恢复** | backfill job 自动回灌 JSONL → PG |
 | **SIGTERM** | drain 队列 timeout 5s |
 
-### 17.3 关键事件分类
+#### 17.3 关键事件分类
 
 必须持久化的动作（即使 PG 挂也要写 fallback）：
 
@@ -1251,7 +1253,7 @@ HTTP 写操作 (POST/PUT/PATCH/DELETE) 进入关键路径
 平台:     system.migration.*, system.retention.archived
 ```
 
-### 17.4 脱敏
+#### 17.4 脱敏
 
 ```
 - HTTP body 不记录
@@ -1261,7 +1263,7 @@ HTTP 写操作 (POST/PUT/PATCH/DELETE) 进入关键路径
 - 含 password/token/secret/key 的字段 → ***
 ```
 
-### 17.5 不变量
+#### 17.5 不变量
 
 1. **关键事件不丢**（队列满时同步写 + PG 挂时 fallback）
 2. **审计表不可变**（DB GRANT 禁 UPDATE/DELETE）
@@ -1272,9 +1274,9 @@ HTTP 写操作 (POST/PUT/PATCH/DELETE) 进入关键路径
 
 ---
 
-## 18. 前端架构
+### 18. 前端架构
 
-### 18.1 目录组织
+#### 18.1 目录组织
 
 ```
 frontend/src/app/
@@ -1290,7 +1292,7 @@ frontend/src/app/
     chats/、agents/、skills/
 ```
 
-### 18.2 认证守卫
+#### 18.2 认证守卫
 
 ```typescript
 // middleware.ts — Next.js Edge Middleware
@@ -1310,7 +1312,7 @@ export const config = {
 
 页面级守卫：`useIdentity()` + `<RequirePermission tag="...">`
 
-### 18.3 前端数据流
+#### 18.3 前端数据流
 
 ```
 Page Component
@@ -1322,13 +1324,13 @@ Page Component
 
 ---
 
-# 下篇：部署与反问
+## 下篇：部署与反问
 
 ---
 
-## 19. Checkpoint 迁移到 MySQL 方案
+### 19. Checkpoint 迁移到 MySQL 方案
 
-### 19.1 MySQL 方案是否可行？
+#### 19.1 MySQL 方案是否可行？
 
 之前推荐了 Postgres 而否定了 MySQL，这个判断有偏差。如果"公司有成熟的 MySQL 运维"是合理的架构决策——引入额外 PG 实例的运维成本，可能比写一个 MySQL adapter 更高。
 
@@ -1338,7 +1340,7 @@ Page Component
 2. **MySQL LONGBLOB 能存**——最大 4GB，checkpoint 数据远小于这个值
 3. **LangGraph 升级风险可控**——主要风险是新增抽象方法，有测试覆盖即可
 
-### 19.2 接口分析（到底要改多少代码？）
+#### 19.2 接口分析（到底要改多少代码？）
 
 ```python
 class BaseCheckpointSaver:
@@ -1353,7 +1355,7 @@ class BaseCheckpointSaver:
 
 **工作量很轻**——MySQLSaver 约 250 行，MySQLStore 约 150 行，工厂适配约 30 行，总计 ~430 行。
 
-### 19.3 MySQL 表结构 + Python 实现草案
+#### 19.3 MySQL 表结构 + Python 实现草案
 
 **表结构**：
 
@@ -1454,7 +1456,7 @@ class MySQLSaver(BaseCheckpointSaver):
                     (thread_id,))
 ```
 
-### 19.4 MySQL vs Postgres 对比
+#### 19.4 MySQL vs Postgres 对比
 
 | 维度 | MySQL（自定义 MySQLSaver） | Postgres（官方 PostgresSaver） |
 |------|---------------------------|-------------------------------|
@@ -1466,7 +1468,7 @@ class MySQLSaver(BaseCheckpointSaver):
 | 备份恢复 | 复用 MySQL 现有体系 | 需配置 PG 备份 |
 | 并发能力 | InnoDB 行级锁，多写者支持 | 行级锁，支持 |
 
-### 19.5 生产注意事项
+#### 19.5 生产注意事项
 
 **1. max_allowed_packet**：MySQL 默认 4MB-64MB。checkpoint 包含 base64 图片时可能超限。建议调大：
 
@@ -1485,7 +1487,7 @@ blob_data = zlib.compress(pickle.dumps(checkpoint), level=6)
 
 **4. 版本兼容策略**：在 CI 中加入 LangGraph 版本兼容性测试。升级 LangGraph 时先跑测试，接口变化时更新 MySQLSaver。
 
-### 19.6 结论
+#### 19.6 结论
 
 **合理的决策思路应该是：**
 
@@ -1496,9 +1498,9 @@ blob_data = zlib.compress(pickle.dumps(checkpoint), level=6)
 
 关键不是"哪个数据库更适合 checkpoint 存储"，而是**哪个你已经有了成熟的运维体系**——一个 DBA 团队维护得好的 MySQL，远比一个没人会管的 PG 实例可靠。
 
-## 20. 部署影响分析
+### 20. 部署影响分析
 
-### 20.1 当前架构的部署约束
+#### 20.1 当前架构的部署约束
 
 | 约束 | 来源 | 影响 |
 |------|------|------|
@@ -1508,7 +1510,7 @@ blob_data = zlib.compress(pickle.dumps(checkpoint), level=6)
 | 主事件循环绑定 | `main_loop.py` | 所有异步操作收敛到同一循环 |
 | Memory 异步队列 | `queue.py` | 重启丢失待处理的记忆 |
 
-### 20.2 理想生产部署方案
+#### 20.2 理想生产部署方案
 
 ```
 Nginx (负载均衡)
@@ -1537,7 +1539,7 @@ Nginx (负载均衡)
 2. Subagent → 独立 worker（未来）
 3. SSE → WebSocket 替代（或独立推送服务）
 
-### 20.3 迁移路线图
+#### 20.3 迁移路线图
 
 | 阶段 | 改动 | 风险 | 收益 |
 |------|------|------|------|
@@ -1550,9 +1552,9 @@ Nginx (负载均衡)
 
 ---
 
-## 21. 核心请求流 Deep Dive
+### 21. 核心请求流 Deep Dive
 
-### 21.1 用户发送消息完整链路（Gateway 模式）
+#### 21.1 用户发送消息完整链路（Gateway 模式）
 
 ```
 1. Browser → SSE POST /api/runs
@@ -1618,7 +1620,7 @@ Nginx (负载均衡)
    └─ async for event: SSE data → Browser
 ```
 
-### 21.2 Checkpoint 读写时机（关键路径）
+#### 21.2 Checkpoint 读写时机（关键路径）
 
 ```
 时间线:
@@ -1650,9 +1652,9 @@ Tn  Complete           → RunStatus.success
 
 ---
 
-## 22. JD 知识点映射
+### 22. JD 知识点映射
 
-### 23.1 LangGraph / Agent 框架
+#### 23.1 LangGraph / Agent 框架
 
 | 知识点 | DeerFlow 体现 | 反问可讲 |
 |--------|---------------|----------|
@@ -1663,7 +1665,7 @@ Tn  Complete           → RunStatus.success
 | **Tool 绑定** | 自动 schema 生成 + tool call 分发 | Function Calling 原理 |
 | **中断/恢复** | RunManager + checkpoint rollback | 有状态服务的挑战 |
 
-### 23.2 工程实践
+#### 23.2 工程实践
 
 | 知识点 | DeerFlow 体现 |
 |--------|---------------|
@@ -1676,7 +1678,7 @@ Tn  Complete           → RunStatus.success
 | **双轨部署** | Standard / Gateway 两种模式 |
 | **配置热重载** | mtime 自检 + ContextVar runtime override |
 
-### 23.3 可能被追问的深度问题
+#### 23.3 可能被追问的深度问题
 
 **Q1: Checkpoint SQLite → Postgres 后，现有 threads 能继续对话吗？**
 
@@ -1700,9 +1702,9 @@ Subagent 可能调用同步代码（sandbox 命令、MCP 客户端），同步�
 
 ---
 
-## 23. 深入追问与自测
+### 23. 深入追问与自测
 
-### 架构设计类
+#### 架构设计类
 
 1. 如果新增"自定义角色"功能（P1），需要修改哪些文件？修改顺序？
 2. 如何支持 LDAP/SAML 登录？在当前 OIDC 框架下如何复用？
@@ -1710,19 +1712,19 @@ Subagent 可能调用同步代码（sandbox 命令、MCP 客户端），同步�
 4. 如何实现"跨租户协作"？哪些隔离边界需要突破？
 5. StreamBridge 从内存改为 Redis 需要修改哪些模块？接口会怎么设计？
 
-### Checkpoint / 持久化类
+#### Checkpoint / 持久化类
 
 6. Checkpointer 的 `aput` 和 `aput_writes` 的区别是什么？什么场景各被调用？
 7. 如何在不重启的情况下把 SQLite checkpoint 文件迁移到 Postgres？迁移脚本的幂等性怎么保证？
 8. 如果 Postgres checkpoint 写入延迟过高，LangGraph 的执行速度会受影响吗？
 
-### 安全类
+#### 安全类
 
 9. 如果 HMAC 密钥泄漏（`INTERNAL_SIGNING_KEY`），攻击者能做什么？如何轮换？
 10. SandboxAuditMiddleware 的正则规则如果太严格会误杀正常命令，怎么处理？
 11. SQLA `before_flush` 中 platform_admin 为什么不需要检查 tenant_id？什么场景下可能有风险？
 
-### 并发与性能类
+#### 并发与性能类
 
 12. `asyncio.Queue` 满时为什么区分 critical/non-critical，而不是用更大的 queue？
 13. Subagent 的 cancel 为什么用合作式（检查 cancel_event）而不是直接 `Task.cancel()`？
@@ -1733,11 +1735,11 @@ Subagent 可能调用同步代码（sandbox 命令、MCP 客户端），同步�
 
 ---
 
-## 25. LangGraph 执行模型内部机制（深度拆解）
+### 25. LangGraph 执行模型内部机制（深度拆解）
 
 > 本节深入到代码实现层面，解析 LangGraph 内部是如何执行 Agent 的、中间件链是如何调度的、状态是如何变更和序列化的。理解这些对排查 Agent 行为问题和做性能优化至关重要。
 
-### 25.1 Pregel 执行引擎
+#### 25.1 Pregel 执行引擎
 
 LangGraph 底层基于 Google Pregel 论文的**图计算模型**。每个 `create_agent()` 创建的 agent 本质上是一个 **CompiledStateGraph**，由以下组件构成：
 
@@ -1771,7 +1773,7 @@ CompiledStateGraph
 # 3. 两者之间的条件边（LLM 决定是否调 tool）
 ```
 
-#### `agent.astream()` 的执行循环
+##### `agent.astream()` 的执行循环
 
 ```python
 # 伪代码 — LangGraph Pregel 执行引擎的核心循环
@@ -1844,7 +1846,7 @@ Step 2: agent node（LLM 再次调用，看到工具结果）
 2. 写 checkpoint（`checkpointer.aput`）
 3. 发出一个 SSE event
 
-### 25.2 ThreadState 的 Reducer 机制
+#### 25.2 ThreadState 的 Reducer 机制
 
 这是 LangGraph 最微妙的设计之一。ThreadState 中的字段分两类：
 
@@ -1901,7 +1903,7 @@ Step 3: agent node 输出 {"messages": [AIMessage], "artifacts": ["file.py"]}
          → artifacts reducer: 旧 artifacts + ["file.py"]（去重后）
 ```
 
-### 25.3 中间件链的调度机制
+#### 25.3 中间件链的调度机制
 
 中间件链被 LangGraph 嵌入到 `agent` node 中（不是 tools node）。`create_agent()` 内部的工作方式：
 
@@ -1973,7 +1975,7 @@ def create_agent(model, tools, middleware, system_prompt, state_schema):
                                                                               响应方向
 ```
 
-### 25.4 序列化流水线（ThreadState → SSE JSON）
+#### 25.4 序列化流水线（ThreadState → SSE JSON）
 
 `run_agent` worker 每次 `astream` 迭代都会产生 state chunk，这些 chunk 需要序列化为 JSON 推送给前端。
 
@@ -2042,7 +2044,7 @@ SSE data: {"event": "values", "data": {"messages": [...]}}
 前端 React Query 消费 → 更新 UI
 ```
 
-### 25.5 IdentityGuardrailMiddleware 代码级解析
+#### 25.5 IdentityGuardrailMiddleware 代码级解析
 
 这是 M5（身份透传）中工具级权限授权的中介件。它和 `IdentityMiddleware` 配合使用：
 
@@ -2120,7 +2122,7 @@ class IdentityGuardrailMiddleware(AgentMiddleware):
 
 4. **Flag-off 兼容**：当 `state["identity"]` 不存在时（`ENABLE_IDENTITY=false`），直接放行，不破坏现有行为。
 
-### 25.6 Tool 加载流水线（反射 + 去重）
+#### 25.6 Tool 加载流水线（反射 + 去重）
 
 工具加载不是简单的 import——它是通过**配置驱动 + 反射实例化**的流水线：
 
@@ -2207,7 +2209,7 @@ def resolve_class(path: str, base_type: type | None = None) -> type:
     ...
 ```
 
-### 25.7 关于 Checkpoint 存储的澄清
+#### 25.7 关于 Checkpoint 存储的澄清
 
 这是一个重要澄清：**SQLite 和 Postgres 后端是磁盘持久化的，不占用物理内存。**
 
@@ -2217,7 +2219,7 @@ def resolve_class(path: str, base_type: type | None = None) -> type:
 | **sqlite** (SqliteSaver) | 磁盘文件 `.db` | ❌ 不占（仅读写时页缓存） | ✅ 文件持久化 |
 | **postgres** (PostgresSaver) | 数据库服务器 | ❌ 不占 | ✅ 数据库持久化 |
 
-#### 为什么不用担心 SQLite 的容量？
+##### 为什么不用担心 SQLite 的容量？
 
 **场景**："80G 物理内存存 100 人团队的 checkpoint.db 很快就满了"
 
@@ -2258,7 +2260,7 @@ def resolve_class(path: str, base_type: type | None = None) -> type:
 
 ---
 
-## 26. LangGraph create_agent 内部实现
+### 26. LangGraph create_agent 内部实现
 
 `create_agent()` 是 LangGraph 的核心入口。DeerFlow 使用它创建 agent graph。以下是它内部的完整流程：
 
@@ -2352,11 +2354,11 @@ def _make_agent_node(model, tools, middleware, system_prompt, name):
 
 ---
 
-## 27. Checkpoint 磁盘膨胀问题：原因与解决方案
+### 27. Checkpoint 磁盘膨胀问题：原因与解决方案
 
 > 这是我们遇到的**真实生产问题**——80GB 磁盘被 checkpoint.db 填满。原因不是 SQLite 本身，而是 base64 图片数据被**双重存储**在 checkpoint 中且从未清理。
 
-### 27.1 根因分析：图片数据的完整生命周期
+#### 27.1 根因分析：图片数据的完整生命周期
 
 图片从上传到 checkpoint 的完整数据流：
 
@@ -2387,7 +2389,7 @@ def _make_agent_node(model, tools, middleware, system_prompt, name):
 
 **核心问题**：同一份 base64 数据在 checkpoint 中存储了**两次**——一次在 `messages` 的 HumanMessage 中，一次在 `viewed_images` 字典中。加上 base64 本身的 ~33% 膨胀，一张 1MB 的图片最终占用 checkpoint 约 **2.7MB** 磁盘空间。
 
-### 27.2 确认问题
+#### 27.2 确认问题
 
 在 SQLite 中可以验证这个问题：
 
@@ -2408,9 +2410,9 @@ ORDER BY MB DESC LIMIT 10;
 # 结论：messages 和 viewed_images 中的 base64 图片是磁盘占用的主要来源
 ```
 
-### 27.3 解决方案
+#### 27.3 解决方案
 
-#### 方案 A：立即见效 — 注入后清除 viewed_images（改动 3 行）
+##### 方案 A：立即见效 — 注入后清除 viewed_images（改动 3 行）
 
 `ViewImageMiddleware` 在注入完图片后，返回 `{"viewed_images": {}}` 来清除已注入的图片数据。`merge_viewed_images` reducer 已经支持空字典清空：
 
@@ -2432,7 +2434,7 @@ def _inject_image_message(self, state):
 
 **效果**：消除 double storage，图片数据只存在 messages 中。一张 1MB 图片从 2.7MB 降到 ~1.33MB。
 
-#### 方案 B：图片外存 — messages 中只存文件引用（更具侵入性）
+##### 方案 B：图片外存 — messages 中只存文件引用（更具侵入性）
 
 不在 messages 中嵌入 base64，而是存文件路径，前端通过 API 加载：
 
@@ -2450,7 +2452,7 @@ content_blocks.append({
 
 **代价**：图片历史在 LLM 上下文中不可见（LLM 只能看到文本描述，不能"看图"）。适用于只关注分析结论、不关注原图的场景。
 
-#### 方案 C：定期 Checkpoint 裁剪
+##### 方案 C：定期 Checkpoint 裁剪
 
 LangGraph 的 checkpointer 支持按 thread 列出和删除 checkpoint：
 
@@ -2479,7 +2481,7 @@ sqlite3 .deer-flow/checkpoints.db "VACUUM;"
 
 **效果**：限制 checkpoint 历史深度，定期回收磁盘空间。
 
-#### 方案 D：Postgres 的 TOAST 自动压缩
+##### 方案 D：Postgres 的 TOAST 自动压缩
 
 Postgres 的 TOAST（The Oversized-Attribute Storage Technique）**自动**将大字段压缩后存储：
 
@@ -2490,7 +2492,7 @@ Postgres 的 TOAST（The Oversized-Attribute Storage Technique）**自动**将�
 
 **效果**：迁移到 Postgres 后，同样数据占用的磁盘空间可减少 **50-70%**。
 
-#### 方案 E：Thread 级磁盘配额
+##### 方案 E：Thread 级磁盘配额
 
 在文件系统层面限制每个 thread 的存储：
 
@@ -2503,7 +2505,7 @@ def check_thread_quota(thread_id, max_mb=500):
         raise QuotaExceededError(f"Thread uploads exceed {max_mb}MB")
 ```
 
-### 27.4 综合建议
+#### 27.4 综合建议
 
 按实施难度和效果排序：
 

@@ -10,6 +10,10 @@ tags:
 
 <KnowledgeMap current-module="ontology" current-article="Cruxible YAML 可执行本体论" />
 
+# Cruxible：用 YAML 写一份可执行的本体论（entity / relationship / named_query / guards）
+
+> 本文结合 Cruxible 的历史版本解释建模思路，YAML 为概念示意，并未逐段验证为可运行配置。项目接口可能变化；实践时请以[当前项目文档](https://github.com/cruxible-ai/cruxible/tree/main/docs)和所用版本为准。
+
 <ArticleHeader
   module="本体论与知识表示"
   :tags="['进阶', '建模', '案例']"
@@ -33,7 +37,7 @@ tags:
 
 ## 最小 Crux 的 YAML 骨架
 
-Cruxible 推荐先写 Compact 格式（deterministically 展开成 core schema。配置顶层结构如下：
+Cruxible 的历史版本支持先写 Compact 格式，再展开成 core schema。下面是配置结构示意：
 
 ```yaml
 version: "1.0"
@@ -152,11 +156,11 @@ Named query 的价值：
 - Query 执行后带 receipt：`receipt_id`、`state revision`、`graph path used`、`truncation/pagination 显式不静默；
 - 后续 guards/gates/workflows 都可以引用 named query 的结果计数做规则。
 
-Cruxible 还支持 inline queries（一次性查询，但不写回 config）。你应该把高频使用、影响业务动作的** promote 进 named_queries，让团队有一个一致查询面。
+Cruxible 还支持 inline queries（一次性查询，但不写回 config）。可以把高频使用、影响业务动作的查询整理进 named_queries，让团队有一个一致查询面。
 
 ## 4. Tags / Gates / Flags：建模三角色
 
-Cruxible 在 [modeling-state.md](file:///tmp/cruxible/docs/modeling-state.md) 里给了非常好用的三分法。这部分非常适合写进你自己的"建模手册"。
+Cruxible 在[历史版本的建模文档](https://github.com/cruxible-ai/cruxible/blob/c1a04da4466234e3312e26117757d6927f655101/docs/modeling-state.md)中给出了这三种角色的区分。链接固定到具体提交；当前版本的文档结构可能不同。
 
 | 角色 | 作用 | 什么时候做 | 是否阻止写入 |
 | --- | --- | --- | --- |
