@@ -97,6 +97,19 @@ class Service:
             raise LookupError("document not found")
         return dict(row)
 
+    def sources_are_current(self, identity: Identity, versions) -> bool:
+        """Check all retrieved versions against one database read snapshot."""
+        if not versions:
+            return False
+        with closing(self.connect()) as db:
+            db.execute("BEGIN")
+            for document_id, revision in versions:
+                row = db.execute("""SELECT revision, active FROM documents
+                    WHERE id = ? AND tenant = ?""", (document_id, identity.tenant)).fetchone()
+                if not row or not row["active"] or row["revision"] != revision:
+                    return False
+        return True
+
     def change_document(self, identity: Identity, document_id: str, expected_revision: int,
                         text: str = "", withdraw: bool = False) -> dict:
         if identity.role != "reviewer":

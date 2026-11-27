@@ -46,6 +46,7 @@ def run_agent(service, identity, question, provider, max_rounds=3):
     history = [{"role": "user", "content": question}]
     sources = set()
     source_versions = set()
+    incomplete_versions = False
     for _ in range(max_rounds):
         items = provider.respond(history)
         if not isinstance(items, list) or not items or not all(isinstance(item, dict) for item in items):
@@ -66,9 +67,12 @@ def run_agent(service, identity, question, provider, max_rounds=3):
                 raise AgentError("invalid tool arguments")
             # Identity comes from the trusted caller, never from model-supplied arguments.
             result = service.ask(identity, arguments["query"])
-            sources.update(result["sources"])
-            source_versions.update((source["id"], source["revision"])
-                                   for source in result.get("source_versions", []))
+            retrieved_sources = set(result["sources"])
+            retrieved_versions = {(source["id"], source["revision"])
+                                  for source in result.get("source_versions", [])}
+            incomplete_versions |= {key for key, _ in retrieved_versions} != retrieved_sources
+            sources.update(retrieved_sources)
+            source_versions.update(retrieved_versions)
             history.extend(items)
             history.append({"type": "function_call_output", "call_id": call["call_id"],
                             "output": json.dumps(result, ensure_ascii=False)})
@@ -77,6 +81,9 @@ def run_agent(service, identity, question, provider, max_rounds=3):
                     for part in item.get("content", []) if part.get("type") == "output_text"]
         if not sources:
             return {"status": "insufficient_evidence", "answer": "现有授权资料不足，无法确认。", "sources": [], "source_versions": []}
+        if (incomplete_versions or {document_id for document_id, _ in source_versions} != sources
+                or not service.sources_are_current(identity, source_versions)):
+            return {"status": "stale_evidence", "answer": "资料可能已变更，请重新查询。", "sources": [], "source_versions": []}
         answer = "\n".join(text for text in messages if isinstance(text, str)).strip()
         if not answer:
             raise AgentError("model returned no text")
