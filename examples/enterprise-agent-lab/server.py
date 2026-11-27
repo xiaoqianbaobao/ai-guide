@@ -48,6 +48,8 @@ class Handler(BaseHTTPRequestHandler):
             return service.change_document(identity, data.get("document_id"), data.get("expected_revision"), withdraw=True)
         if self.path == "/api/drafts":
             return service.create_draft(identity, data.get("text"))
+        if self.path == "/api/draft-update":
+            return service.update_draft(identity, data.get("draft_id"), data.get("expected_version"), data.get("text"))
         if self.path == "/api/approve":
             return service.approve(identity, data.get("draft_id"), data.get("reviewed_version"))
         if self.path == "/api/revoke":

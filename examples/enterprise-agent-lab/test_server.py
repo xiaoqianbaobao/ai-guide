@@ -1,6 +1,7 @@
 from contextlib import closing
 from concurrent.futures import ThreadPoolExecutor
 import json
+import hashlib
 from pathlib import Path
 import sqlite3
 import tempfile
@@ -9,7 +10,7 @@ import unittest
 from urllib.error import HTTPError
 from urllib.request import Request, urlopen
 from server import make_server
-from service import IDENTITIES, Service, digest
+from service import IDENTITIES, Identity, Service, digest
 
 
 class ApiTests(unittest.TestCase):
@@ -160,6 +161,56 @@ class ApiTests(unittest.TestCase):
             db.execute('UPDATE drafts SET creator = ? WHERE id = ?', ('other-user', draft['draft_id']))
         self.assertEqual(self.request('/api/submit', 'demo-support',
                          {'draft_id': draft['draft_id'], 'operation_id': 'changed-creator'})[0], 403)
+
+    def test_edit_invalidates_approval_even_if_text_is_restored(self):
+        _, draft = self.request('/api/drafts', 'demo-support', {'text': '原始文本'})
+        draft_id = draft['draft_id']
+        _, original = self.request('/api/drafts/' + draft_id, 'demo-support-reviewer')
+        self.assertEqual(self.approve(draft_id)[0], 200)
+        status, changed = self.request('/api/draft-update', 'demo-support',
+            {'draft_id': draft_id, 'expected_version': original['version'], 'text': '修改文本'})
+        self.assertEqual(status, 200)
+        self.assertEqual(self.request('/api/submit', 'demo-support',
+            {'draft_id': draft_id, 'operation_id': 'edit-op'})[0], 403)
+        status, restored = self.request('/api/draft-update', 'demo-support',
+            {'draft_id': draft_id, 'expected_version': changed['version'], 'text': '原始文本'})
+        self.assertEqual(status, 200)
+        self.assertNotEqual(restored['version'], original['version'])
+        self.assertEqual(self.request('/api/approve', 'demo-support-reviewer',
+            {'draft_id': draft_id, 'reviewed_version': original['version']})[0], 409)
+        self.assertEqual(self.approve(draft_id)[0], 200)
+        self.assertEqual(self.request('/api/submit', 'demo-support',
+            {'draft_id': draft_id, 'operation_id': 'edit-op'})[0], 200)
+        self.assertEqual(self.request('/api/draft-update', 'demo-support',
+            {'draft_id': draft_id, 'expected_version': restored['version'], 'text': '已提交后修改'})[0], 409)
+
+    def test_draft_update_concurrency_and_authorization(self):
+        _, draft = self.request('/api/drafts', 'demo-support', {'text': '并发修改'})
+        draft_id = draft['draft_id']
+        _, reviewed = self.request('/api/drafts/' + draft_id, 'demo-support-reviewer')
+        def update(token, text):
+            return self.request('/api/draft-update', token,
+                {'draft_id': draft_id, 'expected_version': reviewed['version'], 'text': text})[0]
+        self.assertEqual(update('demo-support-reviewer', '审核人修改'), 403)
+        self.assertEqual(update('demo-hr', '另一租户修改'), 404)
+        with self.assertRaises(PermissionError):
+            self.server.service.update_draft(Identity('other', 'support', 'operator'), draft_id,
+                                             reviewed['version'], '同租户其他人修改')
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            self.assertEqual(sorted(pool.map(lambda text: update('demo-support', text), ['修改一', '修改二'])), [200, 409])
+
+    def test_previous_draft_bound_approval_requires_reapproval(self):
+        _, draft = self.request('/api/drafts', 'demo-support', {'text': '旧版本审批'})
+        payload = json.dumps(['support', draft['draft_id'], 'alice', '旧版本审批'],
+                             ensure_ascii=False, separators=(',', ':')).encode('utf-8')
+        previous = hashlib.sha256(payload).hexdigest()
+        with closing(sqlite3.connect(self.db_path)) as db, db:
+            db.execute('UPDATE drafts SET approved_digest = ?, approved_by = ?, approved_until = ? WHERE id = ?',
+                       (previous, 'bob', self.now + 300, draft['draft_id']))
+        request = {'draft_id': draft['draft_id'], 'operation_id': 'previous-version'}
+        self.assertEqual(self.request('/api/submit', 'demo-support', request)[0], 403)
+        self.assertEqual(self.approve(draft['draft_id'])[0], 200)
+        self.assertEqual(self.request('/api/submit', 'demo-support', request)[0], 200)
 
     def test_old_unexpired_content_only_approval_requires_reapproval(self):
         _, draft = self.request('/api/drafts', 'demo-support', {'text': '旧版本已批准'})

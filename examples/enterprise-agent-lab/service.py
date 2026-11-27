@@ -31,9 +31,9 @@ def digest(tenant: str, text: str) -> str:
     return hashlib.sha256((tenant + "\0" + text).encode()).hexdigest()
 
 
-def approval_version(tenant: str, draft_id: str, creator: str, text: str) -> str:
+def approval_version(tenant: str, draft_id: str, creator: str, text: str, revision: int) -> str:
     # A version identifies the reviewed draft and its creator, not just its text.
-    payload = json.dumps([tenant, draft_id, creator, text], ensure_ascii=False, separators=(',', ':'))
+    payload = json.dumps([tenant, draft_id, creator, text, revision], ensure_ascii=False, separators=(',', ':'))
     return hashlib.sha256(payload.encode('utf-8')).hexdigest()
 
 
@@ -56,6 +56,8 @@ class Service:
             if "approved_until" not in columns:
                 # Existing demo approvals have no expiry and must be re-approved.
                 db.execute("ALTER TABLE drafts ADD COLUMN approved_until REAL")
+            if "revision" not in columns:
+                db.execute("ALTER TABLE drafts ADD COLUMN revision INTEGER NOT NULL DEFAULT 1")
             document_columns = {row["name"] for row in db.execute("PRAGMA table_info(documents)")}
             if "revision" not in document_columns:
                 db.execute("ALTER TABLE documents ADD COLUMN revision INTEGER NOT NULL DEFAULT 1")
@@ -158,13 +160,41 @@ class Service:
 
     def get_draft(self, identity: Identity, draft_id: str) -> dict:
         with closing(self.connect()) as db:
-            row = db.execute("SELECT id, tenant, text, creator, approved_by, approved_until FROM drafts WHERE id = ? AND tenant = ?",
+            row = db.execute("SELECT id, tenant, text, creator, revision, approved_by, approved_until FROM drafts WHERE id = ? AND tenant = ?",
                              (draft_id, identity.tenant)).fetchone()
         if not row:
             raise LookupError("draft not found")
         return {"id": row["id"], "text": row["text"], "creator": row["creator"],
                 "approved_by": row["approved_by"], "approved_until": row["approved_until"],
-                "version": approval_version(row["tenant"], row["id"], row["creator"], row["text"])}
+                "revision": row["revision"],
+                "version": approval_version(row["tenant"], row["id"], row["creator"], row["text"], row["revision"])}
+
+    def update_draft(self, identity: Identity, draft_id: str, expected_version: str, text: str) -> dict:
+        if identity.role != "operator":
+            raise PermissionError("operator required")
+        if (not isinstance(expected_version, str) or len(expected_version) != 64
+                or not isinstance(text, str) or not text.strip() or len(text) > 1000):
+            raise ValueError("version and text required")
+        with closing(self.connect()) as db, db:
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute("SELECT * FROM drafts WHERE id = ? AND tenant = ?", (draft_id, identity.tenant)).fetchone()
+            if not row:
+                raise LookupError("draft not found")
+            if row["creator"] != identity.user:
+                raise PermissionError("creator required")
+            if db.execute("SELECT 1 FROM tickets WHERE draft_id = ?", (draft_id,)).fetchone():
+                raise ConflictError("ticket already submitted")
+            current = approval_version(row["tenant"], row["id"], row["creator"], row["text"], row["revision"])
+            if current != expected_version:
+                raise ConflictError("draft changed")
+            revision = row["revision"] + 1
+            db.execute("""UPDATE drafts SET text = ?, digest = ?, revision = ?,
+                approved_digest = NULL, approved_by = NULL, approved_until = NULL WHERE id = ?""",
+                (text, digest(identity.tenant, text), revision, draft_id))
+            self.audit(db, identity, "draft_updated", draft_id)
+        return {"draft_id": draft_id, "revision": revision,
+                "version": approval_version(identity.tenant, draft_id, identity.user, text, revision),
+                "status": "awaiting_approval"}
 
     def approve(self, identity: Identity, draft_id: str, reviewed_version: str) -> dict:
         if identity.role != "reviewer":
@@ -178,7 +208,7 @@ class Service:
                 raise LookupError("draft not found")
             if db.execute("SELECT 1 FROM tickets WHERE draft_id = ?", (draft_id,)).fetchone():
                 raise ConflictError("ticket already submitted")
-            current = approval_version(row["tenant"], row["id"], row["creator"], row["text"])
+            current = approval_version(row["tenant"], row["id"], row["creator"], row["text"], row["revision"])
             if reviewed_version != current:
                 raise ConflictError("draft changed after review")
             expires = self.clock() + self.approval_ttl
@@ -218,7 +248,7 @@ class Service:
                 if existing["operation_id"] != operation_id or existing["draft_id"] != draft_id or existing["tenant"] != identity.tenant:
                     raise ValueError("operation ID or draft already used")
                 return {"ticket_id": existing["operation_id"], "status": "submitted", "replayed": True}
-            if (not row["approved_digest"] or row["approved_digest"] != approval_version(row["tenant"], row["id"], row["creator"], row["text"])
+            if (not row["approved_digest"] or row["approved_digest"] != approval_version(row["tenant"], row["id"], row["creator"], row["text"], row["revision"])
                     or row["approved_until"] is None or self.clock() >= row["approved_until"]):
                 raise PermissionError("current draft requires unexpired approval")
             db.execute("INSERT INTO tickets VALUES (?, ?, ?, ?)", (operation_id, draft_id, identity.tenant, row["text"]))
