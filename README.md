@@ -87,6 +87,7 @@ npm run check:examples
 - 仓库仍保留 GitHub Pages 自动构建和发布工作流
 - 生产环境使用 `/ai-guide/` 作为基础路径
 - GitHub Pages 工作流位于 [deploy.yml](.github/workflows/deploy.yml)
+- 发布验证、服务器切换与回滚步骤见 [DEPLOYMENT.md](DEPLOYMENT.md)
 
 ## 如何参与
 
