@@ -216,7 +216,7 @@ Anthropic 在 2025 年关于 eval 和 harness 的工程文章里也强调，Agen
 
 一个真正有用的 Eval，不是单纯打分，而是能支持下面这些动作：找到失败模式、指导下一轮优化、比较不同版本效果、防止系统回归。如果一套评估只能告诉你"这次好像差不多"，那它很难支撑真正的系统迭代。
 
-OpenAI 在 2025 年关于 AgentKit 和 eval 平台的资料里，也把 dataset、trace grading、自动优化和版本比较放在同一条链路里，本质上就是把 Eval 当作持续优化基础设施，而不是验收表单。[Introducing AgentKit](https://openai.com/index/introducing-agentkit/) [Agents SDK](https://www.openai.com/agent-platform/)
+OpenAI 在 2025 年关于 AgentKit 和 eval 平台的资料里，也把 dataset、trace grading、自动优化和版本比较放在同一条链路里，本质上就是把 Eval 当作持续优化基础设施，而不是验收表单。[Introducing AgentKit](https://openai.com/index/introducing-agentkit/) [Agents SDK](https://openai.github.io/openai-agents-python/)
 
 ::: warning 产品状态核验（2026-11-16）
 上述 2025 年资料仅作设计背景。OpenAI 官方列明，Evals dashboard、API 与 eval 工作流 graders 已转为只读，并计划于 2026-11-30 停止；Agent Builder 也计划同日停止。迁移前请核对[官方停用表](https://developers.openai.com/api/docs/deprecations)，并保留数据集、评分标准和版本信息。评估方法并不依赖特定产品。

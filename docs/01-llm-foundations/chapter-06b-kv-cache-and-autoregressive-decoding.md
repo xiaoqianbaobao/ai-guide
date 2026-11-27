@@ -440,7 +440,6 @@ Agent 系统经常会：
   https://huggingface.co/docs/transformers/main/en/llm_tutorial
 - vLLM 官方文档，Paged Attention 与推理优化相关资料  
   https://docs.vllm.ai/
-- Kipply, Transformers Key Value Caching Explained  
-  https://kipp.ly/transformer-inference-arithmetic/
+- Kipply, [Transformer Inference Arithmetic](https://kipp.ly/p/transformer-inference-arithmetic)
 - Vaswani et al. (2017), *Attention Is All You Need*  
   https://arxiv.org/abs/1706.03762
