@@ -1,6 +1,6 @@
 ---
-title: Ontology vs Taxonomy vs Knowledge Graph vs RAG：四条边界怎么画
-description: 分类树、知识图谱、RAG 向量库、本体论经常被混为一谈，但它们解决的是完全不同的四层问题。把它们分清楚，能帮你决定"什么时候该上什么、什么不要做。
+title: Ontology、Taxonomy、Knowledge Graph 与 RAG：如何区分和组合
+description: 分类、本体、知识图谱和检索增强生成分别解决什么问题，以及如何在 Agent 系统中组合。
 module: ontology
 tags:
   - 进阶
@@ -9,132 +9,123 @@ tags:
 
 <KnowledgeMap current-module="ontology" current-article="Ontology vs Taxonomy vs Knowledge Graph vs RAG：四条边界怎么画" />
 
-# Ontology vs Taxonomy vs Knowledge Graph vs RAG：四条边界怎么画
+# Ontology、Taxonomy、Knowledge Graph 与 RAG：如何区分和组合
 
-<ArticleHeader
-  module="本体论与知识表示"
-  :tags="['进阶', '建模']"
-  reading-time="11 分钟"
-  prerequisite="已读为什么 Agent 系统需要本体论"
-  summary='Taxonomy 管分类、Knowledge Graph 管连接、RAG 管召回、Ontology 管世界的运行规则（写规则、权限、审批）。四层可以叠加，但不要用某一层硬做另一层的事。'
-/>
+<ArticleHeader module="本体论与知识表示" :tags="['进阶', '建模']" reading-time="12 分钟" prerequisite="了解知识检索与 Agent 工具调用" summary="从退款规则案例出发，分清分类体系、概念约束、知识图谱与检索增强生成；再把授权和审批放到真正执行它们的服务端。" />
 
-<div class="key-insight">
-  <div class="key-insight-label">核心洞察</div>
-  <p class="key-insight-text">
-    一个典型失败模式是：用标签分类树（Taxonomy）去表达关系，再把关系写进字符串里，用向量召回（RAG）去"理解语义，最后在业务动作上再用散落在各处的权限 if/else 去审批。结果是每次加一个新关系，全链路都要改。
-  </p>
-</div>
+用户询问“这笔订单能否退款？”系统可能需要找到相关规则、确定订单和规则的关系、生成解释，最后由有权的人或服务执行退款。一个技术名词无法自动完成所有步骤：**分类、概念定义、事实关系、检索生成和业务授权是不同的问题**。
 
-## 四条能力，四层问题
+<span id="四条能力-四层问题"></span>
 
-| 层级 | 你解决的问题 | 典型输出 | 是否执行动作与治理 |
+## 四种概念，关注点可以重叠
+
+| 概念 | 主要关注点 | 退款案例中的例子 | 不应自动假设 |
 | --- | --- | --- | --- |
-| **Taxonomy** | 这个东西属于哪一类？便于找人、过滤、分组 | 标签、目录树、层级分类 | 否 |
-| **Knowledge Graph (属性图)** | A 和 B 有什么关系？能不能连通？ | 节点、边、属性 | 半（约束有，但通常不负责动作与审批 |
-| **RAG / 向量库** | 哪些文档片段可能相关？把原文片段召回给上下文 | 文本 chunk、embedding、索引 | 否 |
-| **Ontology（可执行本体）** | 世界有什么、关系是什么、谁能做什么、改了怎么算合规、做完什么是真实世界成功 | Object/Link/Action/Function/Roles/Workflows/Approvals/Outcomes | **是** |
+| Taxonomy，分类体系 | 用类别、层级和受控词汇组织内容 | “售后 → 退款规则” | 分类标签本身已经决定谁能退款 |
+| Ontology，本体 | 定义领域中的概念、关系及其语义和约束 | `订单`、`退款规则`、`适用`的定义 | 一份本体文件天然执行权限、审批或资金操作 |
+| Knowledge Graph，知识图谱 | 用实体与关系组织可查询的知识 | “规则 R1 适用于订单类型 A” | 图中的每条关系都真实、最新或经过审批 |
+| RAG，检索增强生成 | 先检索外部信息，再让生成模型利用检索结果 | 检索 R1 的原文，让模型解释 | 一定使用向量库，或检索到就意味着答案正确 |
 
-你会看到，这四层之间是"叠加关系"——不是谁替代谁。
+这不是四个互斥的数据库产品，也不是必须依次采购的四层。本体可以为知识图谱提供语义；图谱可以参与检索；检索可以采用关键词、向量、图查询或组合方式。一个简单应用也可能只需要分类、全文搜索和服务端规则，不必一开始引入全部组件。
 
-## 1. Taxonomy：只管"属于哪里，不管"是谁与谁之间是什么关系
+<span id="_1-taxonomy-只管-属于哪里-不管-是谁与谁之间是什么关系"></span>
+<span id="它擅长"></span>
+<span id="它不擅长"></span>
 
-### 它擅长
-- 把 Work Item 按 ProductArea 分组；
-- 把 Vulnerability 按严重性打标签；
-- 把 Incident 按业务域过滤。
+## 1. Taxonomy：先把东西组织起来
 
-Cruxible 把这类"组织信息"叫 Tags，它的设计哲学是：**绝大多数信息都应该是 tag。** 因为 tag 不增加摩擦——它只改变阅读时看到什么，不会在写时拦你。
+分类体系帮助人们用一致的类别查找、浏览和过滤。例如把规则分为“退款”“换货”和“配送”，再把“退款”细分为“未发货退款”和“已发货退款”。分类标签可以是内容的一部分，也可以用于缩小搜索范围。
 
-### 它不擅长
-- "Work Item 必须挂到 Owner 才能关闭"——这是 Gate（规则，不是 Tag。
-- "Incident 影响 Supplier"这类判断性边必须要证据 + 审批——这是 Ontology 的写策略。
-- "谁审批谁不审批"——这是 Role/Tier/Write Policy。
+分类体系并不总是只有一棵简单的树。[W3C 的 SKOS 指南](https://www.w3.org/TR/skos-primer/)描述了较宽泛、较狭窄和关联等概念关系。无论采用哪种结构，都需要有人维护类别的定义和版本；“标记为退款规则”本身不等于该规则适用于当前订单。
 
-**一句话判断**：如果你只用来组织，不强制规则，用 Taxonomy / Tags 就够了。
+<span id="_4-ontology-可执行本体-把-世界怎么运行-写进运行时"></span>
 
-## 2. Knowledge Graph：只管连接，不管"这条边怎么进来的"
+## 2. Ontology：明确词语与关系的含义
 
-### 它擅长
-- 从 Incident → Supplier → Product → Shipment 的 blast radius 分析；
-- 依赖图、血缘图、归属图；
-- 把多源数据连接起来后做路径查询、邻居查询、子图过滤。
+当不同团队都说“有效订单”却指代不同状态，系统即使检索很快，也可能把不相干的数据连在一起。本体可以明确：有哪些类、哪些关系、它们的含义与某些可形式化的约束。具体表达能力取决于所用语言和系统；[W3C 的 OWL 2 Primer](https://www.w3.org/TR/owl-primer/)介绍了类、属性与公理等基本元素。
 
-Foundry 的 Link types 和 Cruxible 的 named traversals / graph queries 都在这一层价值最大：查询。
+例如，“退款规则适用于订单类型”定义了一个关系的**语义**；“只有授权审核人可批准具体退款”则是业务控制，需要由身份、权限和执行服务落实。某些产品会把对象模型、动作、权限和工作流组织在同一个平台里，但不能由此推断一般的本体语言或本体文件会自动完成这些控制。
 
-### 它不擅长
-- 这条边怎么写进来、要不要审、谁有权写、写完矛盾怎么办——这是写治理；
-- 边代表的"业务动作为什么动作不能做；
-- 做完动作后是否真实成功——这是 outcome。
+形式化约束、推理与数据库校验也不是同一件事：例如某条知识缺失，在不同语义和系统中不一定等价于“确定为假”。在业务写入口仍应明确校验条件、失败行为和测试。
 
-很多团队把知识图谱做到最后会发现：**图很全，但图里一半边没 provenance。** 你不知道哪条是 pipeline 的事实、哪条是 Agent 拍脑袋写的、哪条是审批过的人审过的。这个问题根本不在图存储，而在写治理机制（Ontology 层）。
+<span id="_2-knowledge-graph-只管连接-不管-这条边怎么进来的"></span>
+<span id="它擅长-1"></span>
+<span id="它不擅长-1"></span>
 
-**一句话判断**：如果你只需要"谁连谁，不需要"这条边的写入规则与治理，就用知识图谱。
+## 3. Knowledge Graph：记录和查询实体关系
 
-## 3. RAG / 向量库：只管"可能相关的文本片段"，不管"事实是否成立"
+知识图谱可以记录“规则 R1 适用于订单类型 A”“订单 O1 属于类型 A”。它可以采用 RDF 三元组、属性图或其他实现，**不等同于某一种图数据库**。关系与节点也可以连接来源、时间和版本；是否保存以及如何验证这些信息，取决于数据管道与治理设计。
 
-### 它擅长
-- 从 10 万份政策文档里召回和"供应商合规"相关的段落；
-- 给 Agent 喂上下文原文；
-- 辅助 proposal 的证据检索。
+例如，用图查询可以找到适用于某类订单的规则候选；但如果 R1 已经过期，或者用户无权读取它，图中存在一条边仍不足以授权系统执行退款。应在写入、更新和读取时明确来源、有效期与访问控制，而不是期待图结构替代这些机制。
 
-Cruxible 自己就把 Source Artifacts 做 source artifact registration，并在 proposal 里引用 `source_evidence: source_artifact_id + chunk_id` / `heading_path + block_selector`。向量 + 检索是提供证据的好方式，但**不负责证据被接受为事实**。
+<span id="_3-rag-向量库-只管-可能相关的文本片段-不管-事实是否成立"></span>
+<span id="它擅长-2"></span>
+<span id="它不擅长-2"></span>
 
-### 它不擅长
-- "证据到事实之间是否成立"——这是 review / approval 的判断；
-- "两个 Agent 对同一个词的定义是否一致"——这是实体/关系的本体约束；
-- "A 影响 B 这条边真不真、权不权威"——这是 attestation + feedback。
+## 4. RAG：检索和生成组成一条链
 
-**一个典型误区**：很多团队误以为"RAG 召回相关了 = 语义一致 = 事实成立了"。实际上这三步是三件完全不同的事。
+RAG 的核心是让生成过程使用检索到的外部信息。原始 [RAG 论文](https://arxiv.org/abs/2005.11401)使用了稠密向量检索；这不意味着所有后续 RAG 实现都必须只用向量。实践中可以结合关键词、语义检索与其他数据源；[OpenAI 的检索文档](https://developers.openai.com/api/docs/guides/retrieval)提供了语义匹配与关键词匹配的混合示例。
 
-## 4. Ontology（可执行本体）：把"世界怎么运行"写进运行时
+一次可解释的知识问答至少要区分：用户是否有权访问资料、检索结果是否相关且有效、回答是否得到引用支持。检索命中只回答“找到了候选材料”，不能单独证明规则适用、答案正确或用户有权触发动作。检索、引用核验与授权可以分别失败，也需要分别评估。
 
-Foundry 的 Ontology 同时定义：
-- Object/Link（世界长什么样）
-- Action types / Functions（动作与业务逻辑）
-- Roles / Security（谁能看、谁能做）
-- Ontology Edit Approvals（改本体自身也要审）
-- Workflows（改世界的流程）
+## 5. 动手：同一个问题经过哪些判断
 
-Cruxible 的 Ontology config 同时定义：
-- entity_types / relationships / named_queries / enums / contracts
-- mutation_guards / write_policy / write_tier
-- feedback_profiles / outcome_profiles / decision_policies
-- providers / workflows / artifacts / tests
-- gates / quality_checks / snapshots
+以下纯 Python 示例用虚构数据展示**分类、关系、关键词候选和服务端门禁**的位置；它不调用模型，也不是一个完整的 RAG 系统。保存为 `layers.py` 后运行 `python3 layers.py`：
 
-注意最后几项：**连测试、快照、质量检查、门禁、结果合约全部进 config。** 这是"可执行本体"与"概念 Ontology 文档"的本质差别。
+```python
+# 虚构数据：标签、关系和原文分别回答不同问题。
+categories = {"R1": "退款"}
+relations = [("R1", "适用订单类型", "A")]
+documents = {"R1": "A 类订单退款需审核。"}
 
-## 5. 推荐的组合方式
+# 一个极简关键词检索；不是向量检索，也不做语义理解。
+candidates = [doc_id for doc_id, text in documents.items() if "退款" in text]
+applicable = [doc_id for doc_id, relation, target in relations
+              if doc_id in candidates and relation == "适用订单类型" and target == "A"]
+print("分类:", categories["R1"])
+print("候选规则:", applicable)
 
-对真实 Agent 系统，一条很稳的组合是：
+# 这是服务端业务规则的演示，不是本体或模型自动执行的权限控制。
+def may_refund(role, approved):
+    return role == "reviewer" and approved is True
+
+print("普通客服能执行退款:", may_refund("support", False))
+assert applicable == ["R1"]
+assert not may_refund("support", False)
+```
+
+预期输出包括“分类: 退款”“候选规则: ['R1']”以及 `False`。`may_refund` 中的角色和批准值只是调用者传入的教学数据；真实服务必须从可信身份和持久化审批记录获取它们，还要检查订单、租户、金额、审批版本和有效期。该例也没有检测规则过期或验证用户是否有权读取资料。
+
+<span id="_5-推荐的组合方式"></span>
+
+## 6. 组合时先画清边界
 
 ```mermaid
 flowchart LR
-  RAG[RAG / 向量库<br/>召回证据片段] --> PROPOSAL[Proposal / 判断生成]
-  PROPOSAL --> ONTO[Ontology 层<br/>写入卡口 / 权限 / 审批 / 证据规则]
-  ONTO --> KG[Knowledge Graph<br/>存 live state + 查询]
-  KG --> QUERY[Named Queries / Tags / Taxonomy<br/>读时组织与过滤]
+  USER[用户与可信身份] --> RETRIEVE[授权范围内检索]
+  TAX[分类与词汇] --> RETRIEVE
+  GRAPH[实体与关系] --> RETRIEVE
+  RETRIEVE --> GENERATE[模型生成待核对回答]
+  GENERATE --> ACTION[可选的业务动作请求]
+  ACTION --> GATE[服务端鉴权与审批]
+  GATE --> SYSTEM[业务系统]
 ```
 
-- **证据**：RAG 召回原文
-- **判断**：Agent/人提出判断（Proposal）
-- **治理**：Ontology 卡口决定这判断能不能 live
-- **连接**：Knowledge Graph 承载 live state
-- **组织**：Tags/Taxonomy 在查询时分组和过滤
+图中箭头是一个**示意流程**，不是所有应用的唯一架构。业务对象和关系的语义可以由本体或其他模式定义；数据来源、版本、授权和审批由具体组件共同维护。对写操作，模型只能提出请求，执行端必须独立确认身份、目标、参数和授权。
 
-再叠 Cruxible 的 Gates / Flags / Tags 角色分工：
+要验证这条边界，可运行本站[企业知识助手本地实验](../agent/cases/enterprise-agent-local-lab)：它演示同租户查询、文档版本、人工审批和模拟工单，但仍不具备生产级身份认证、完整检索或真实外部系统。
 
-| Cruxible 角色 | 作用时 | 是否拦截 | 推荐占比 |
-| --- | --- | --- | --- |
-| Tags | 读时 | 否 | 大多数 |
-| Gates | 写时 | 是（只用于真实风险） | 极少数 |
-| Flags | 维护时 | 否，仅报出 | 中间层 |
+<span id="本节总结"></span>
+<span id="下一步"></span>
 
-## 本节总结
-- Taxonomy 管分类组织、Knowledge Graph 管连接与查询、RAG 管证据召回、Ontology 管动作与治理与审批；
-- 四层应叠加使用，不要某一层硬做另一层；
-- 本体论不是替代图谱/向量，而是在写入口和权限入口的运行时语义契约。
+## 练习与延伸阅读
 
-## 下一步
-下两篇分别看 [Palantir Foundry 的语义六件套](./foundry-object-link-action-function) 与 [Cruxible 的 YAML 可执行本体论](./cruxible-yaml-ontology)。
+1. 为你的场景列出三个类别、两个实体类型和一种关系；分别说明它们在哪里维护。
+2. 设计一道“召回了过期规则”的测试，写出检索结果、模型回答和执行端各自应如何处理。
+3. 决定一项敏感操作由哪个可信服务检查权限；不要把批准状态作为模型可自行填写的参数。
+
+- [W3C：SKOS Primer](https://www.w3.org/TR/skos-primer/) 与 [OWL 2 Primer](https://www.w3.org/TR/owl-primer/)：查看知识组织和本体语言的概念与边界。
+- [Lewis 等：Retrieval-Augmented Generation](https://arxiv.org/abs/2005.11401)：了解原始 RAG 模型的检索与生成设计。
+- 站内继续阅读 [Foundry 语义与动作](./foundry-object-link-action-function)、[Cruxible 历史版本建模](./cruxible-yaml-ontology)和 [多方关系与超图](./hypergraph-enterprise-multi-agent)。
+
+资料核验日期：2026-11-27。
