@@ -1,4 +1,5 @@
 import type { Theme } from 'vitepress'
+import { defineAsyncComponent } from 'vue'
 import Layout from './next/NextLayout.vue'
 import './styles/vars.css'
 import './styles/custom.css'
@@ -23,5 +24,6 @@ export default {
     app.component('KnowledgeMap', KnowledgeMap)
     app.component('Quiz', Quiz)
     app.component('ResourceCard', ResourceCard)
+    app.component('Mermaid', defineAsyncComponent(() => import('vitepress-plugin-mermaid/Mermaid.vue')))
   }
 } satisfies Theme

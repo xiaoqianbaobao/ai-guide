@@ -1,5 +1,4 @@
 import { defineConfig } from 'vitepress'
-import { withMermaid } from 'vitepress-plugin-mermaid'
 import mathjax3 from 'markdown-it-mathjax3'
 import { lessonNeighbors } from './theme/navigation'
 import path from 'node:path'
@@ -10,7 +9,18 @@ const repositoryBase = '/ai-guide/'
 const publishedOrigin = process.env.VITEPRESS_CANONICAL_ORIGIN || 'https://aiguide.org.cn'
 const isProduction = process.env.NODE_ENV === 'production'
 
-export default withMermaid(defineConfig({
+const mermaidSettings = {
+  securityLevel: 'loose',
+  startOnLoad: false,
+  theme: 'base',
+  themeVariables: {
+    primaryColor: '#f1ece2', primaryTextColor: '#2b3440', primaryBorderColor: '#8c785d',
+    lineColor: '#7a7f87', secondaryColor: '#f7f5f1', tertiaryColor: '#ffffff',
+    fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
+  }
+}
+
+export default defineConfig({
   lang: 'zh-CN',
   title: '造与见',
   titleTemplate: ':title | 造与见',
@@ -30,22 +40,26 @@ export default withMermaid(defineConfig({
   ],
   markdown: {
     lineNumbers: true,
-    config(md) { md.use(mathjax3) }
+    config(md) {
+      md.use(mathjax3)
+      const fence = md.renderer.rules.fence!
+      md.renderer.rules.fence = (tokens, index, options, env, renderer) => {
+        const token = tokens[index]
+        if (token.info.trim() !== 'mermaid') return fence(tokens, index, options, env, renderer)
+        return `<Suspense><template #default><Mermaid id="mermaid-${index}" class="mermaid" graph="${encodeURIComponent(token.content)}"></Mermaid></template><template #fallback>正在加载图表…</template></Suspense>`
+      }
+    }
   },
   vue: {
     template: { compilerOptions: { isCustomElement: tag => tag.startsWith('mjx-') } }
   },
-  mermaid: {
-    theme: 'base',
-    themeVariables: {
-      primaryColor: '#f1ece2',
-      primaryTextColor: '#2b3440',
-      primaryBorderColor: '#8c785d',
-      lineColor: '#7a7f87',
-      secondaryColor: '#f7f5f1',
-      tertiaryColor: '#ffffff',
-      fontFamily: 'Inter, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif'
-    }
+  vite: {
+    resolve: { alias: { '@': './docs/.vitepress' } },
+    plugins: [{
+      name: 'lazy-mermaid-config',
+      resolveId(id) { if (id === 'virtual:mermaid-config') return '\0virtual:mermaid-config' },
+      load(id) { if (id === '\0virtual:mermaid-config') return `export default ${JSON.stringify(mermaidSettings)}` }
+    }]
   },
   themeConfig: {
     logo: '/logo.svg',
@@ -113,13 +127,6 @@ export default withMermaid(defineConfig({
       copyright: 'Copyright © 2026 造与见 Contributors'
     }
   },
-  vite: {
-    resolve: {
-      alias: {
-        '@': './docs/.vitepress'
-      }
-    }
-  },
   transformPageData(pageData) {
     const adjacent = lessonNeighbors(buildSidebar(), pageData.relativePath)
     pageData.frontmatter.prev = adjacent.prev
@@ -136,7 +143,7 @@ export default withMermaid(defineConfig({
       { rel: 'canonical', href: canonicalUrl }
     ])
   }
-}))
+})
 
 function buildSidebar() {
   return {
