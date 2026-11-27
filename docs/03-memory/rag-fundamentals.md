@@ -347,21 +347,29 @@ def answer_with_rag(question, retriever, llm):
 - 检索结果需要被组织进上下文
 - 模型的回答要受到外部材料约束
 
-## RAG 不只是“检索前增强”，还是“生成前约束”
+<span id="rag-不只是-检索前增强-还是-生成前约束"></span>
+## 提示约束有用，但不会自动保证答案可靠
 
-这一点很关键。  
-真正成熟的 RAG 系统，除了补材料，还会补约束：
+除了给模型补充材料，应用通常还会在提示中提出要求，例如：
 
 - 只能基于给定材料回答
 - 材料不足时要明确说不知道
 - 尽量给出引用来源
 - 不要把常识臆测混进材料结论
 
-OpenAI 和 Anthropic 在近年的 agent / eval / tool 公开资料里都反复强调一个共识：系统质量不只取决于模型，而取决于输入材料、结构化约束和评估闭环。RAG 正是这条链路在“外部知识注入”问题上的具体体现。[Introducing AgentKit](https://openai.com/index/introducing-agentkit/) [Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents)
+这些是**希望模型遵守的要求，不是 RAG 自带的强制保证**。例如，检索出的退款规则只允许“符合条件的订单退款”，模型却回答“所有订单均可退款”，即使附上正确文档链接，结论仍不受来源支持。提示词可以降低某些错误，但不能证明每句话都正确，也不能替代服务端权限检查。
+
+需要把验证拆开：检索前按身份限制可见范围；检索后检查来源是否存在、有效且适用于问题；生成后抽查关键结论是否得到引用支持；无证据时明确拒答或转人工。每一步都需要测试，尤其要分别检查漏答、无依据回答、错误引用与过度拒答。涉及外发或写操作时，另由服务端对实际动作授权，不把检索命中当作操作许可。可以运行[企业助手的来源与注入测试](../agent/cases/enterprise-agent-model-tool-loop)，观察“有来源但回答仍可能被污染”的具体例子。
+
+模型和工具之间的数据也可能包含恶意指令。不要把检索文本拼进高优先级指令；结构化输出有助于约束数据流，但自由文本字段仍可能携带攻击内容，必须结合工具权限和评估。[OpenAI：Agent 安全指南](https://developers.openai.com/api/docs/guides/agent-builder-safety) [Anthropic：编写有效的 Agent 工具](https://www.anthropic.com/engineering/writing-tools-for-agents)
+
+::: tip 产品状态（2026-11-27 核验）
+上面的 OpenAI 指南包含 Agent Builder 产品说明；官方公告该产品计划于 2026-11-30 停止。此处引用的是不可信输入、数据流和权限隔离的通用方法，不要求使用该产品。具体迁移请查看[官方公告](https://openai.com/index/introducing-agentkit/)和[停用表](https://developers.openai.com/api/docs/deprecations)。
+:::
 
 ## 你应该把 RAG 放在系统里的什么位置
 
-更好的理解方式是：RAG 不是一个独立产品名词，而是一种 Memory 能力。
+RAG 是检索外部信息并用于生成的模式，可以作为记忆系统的读取方式，也可以用于查询没有长期用户记忆的资料库。反过来，记忆系统还要决定写入、更新、遗忘与权限，不能只靠一次检索完成。两者可以组合，但并不等同。
 
 它通常和下面这些能力一起工作：
 

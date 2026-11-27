@@ -107,7 +107,9 @@ python3 -m unittest \
   test_agent_loop.AgentTests.test_injection_can_still_contaminate_answer_marked_for_review -v
 ```
 
-这里的模型行为由测试预设，不能用来计算真实模型的攻击成功率；写工具被拦截也不能证明不会发生信息泄露或回答污染。要上线时，还需限制检索范围和出站能力，把审批绑定到具体操作、参数与执行主体，对来源支持度做评估，并对越权、误导回答等不同后果分别建立回归集。[OpenAI 的安全指南](https://developers.openai.com/api/docs/guides/agent-builder-safety)与 [Anthropic 的安全实践](https://www.anthropic.com/research/trustworthy-agents)都强调分层防护；结构化输出和模型指令都不能独自消除提示注入风险。前者涉及 Agent Builder 的产品说明，使用前还需核对其当前可用状态；这里借鉴的是通用的数据流和权限边界设计。
+这里的模型行为由测试预设，不能用来计算真实模型的攻击成功率；写工具被拦截也不能证明不会发生信息泄露或回答污染。要上线时，还需限制检索范围和出站能力，把审批绑定到具体操作、参数与执行主体，对来源支持度做评估，并对越权、误导回答等不同后果分别建立回归集。[OpenAI 的安全指南](https://developers.openai.com/api/docs/guides/agent-builder-safety)与 [Anthropic 的安全实践](https://www.anthropic.com/research/trustworthy-agents)都强调分层防护；结构化输出和模型指令都不能独自消除提示注入风险。
+
+> 产品状态（2026-11-27 核验）：OpenAI 安全指南涉及 Agent Builder，官方计划于 2026-11-30 停止该产品；本例使用独立的 Python 代码，不依赖 Agent Builder。这里借鉴的是通用的数据流和权限边界设计，具体安排请核对[官方公告](https://openai.com/index/introducing-agentkit/)及[停用表](https://developers.openai.com/api/docs/deprecations)。
 
 不要将本例直接对接企业资料，也不要把模型生成的文本自动传给工单提交接口。后续如需写操作，先回到[审批与幂等实验](./ticket-approval-and-retry)，设计明确的用户授权、可信审核和跨服务对账。
 
@@ -127,4 +129,4 @@ python3 -m unittest \
 - [Anthropic：Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)：从简单、可组合的工作流逐步验证复杂度。
 - [OpenAI：Designing AI agents to resist prompt injection](https://openai.com/index/designing-agents-to-resist-prompt-injection/)：从不可信内容和操作权限组合分析注入风险。
 
-资料核验日期：2026-11-26。
+资料核验日期：2026-11-27。
