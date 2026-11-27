@@ -141,13 +141,27 @@ const group = computed(() => {
   return key ? sidebar.value[key] : []
 })
 const links = computed(() => group.value.flatMap(item => item.items ?? []))
+const searchTerms = computed(() => query.value.trim().toLowerCase().split(/\s+/).filter(Boolean))
 const searchResults = computed(() => {
-  const term = query.value.trim().toLowerCase()
-  if (!term) return []
-  return documents.value.filter(item => (item.title + ' ' + item.text).toLowerCase().includes(term)).slice(0, 20)
+  const terms = searchTerms.value
+  if (!terms.length) return []
+  const phrase = terms.join(' ')
+  return documents.value.map((item, index) => {
+    const title = item.title.toLowerCase()
+    const text = item.text.toLowerCase()
+    if (!terms.every(term => title.includes(term) || text.includes(term))) return null
+    // Prefer exact title phrases, then title matches; keep source order for ties.
+    const score = (title.includes(phrase) ? 100 : 0) +
+      terms.filter(term => title.includes(term)).length * 10 + (text.includes(phrase) ? 1 : 0)
+    return { item, index, score }
+  }).filter((match): match is { item: SearchDocument; index: number; score: number } => match !== null)
+    .sort((a, b) => b.score - a.score || a.index - b.index)
+    .slice(0, 20).map(match => match.item)
 })
 function excerpt(item: SearchDocument) {
-  const i = item.text.toLowerCase().indexOf(query.value.trim().toLowerCase())
+  const text = item.text.toLowerCase()
+  const positions = searchTerms.value.map(term => text.indexOf(term)).filter(index => index >= 0)
+  const i = positions.length ? Math.min(...positions) : -1
   return i < 0 ? item.text.slice(0, 100) : item.text.slice(Math.max(0, i - 30), i + 90)
 }
 function href(path: string) { return withBase(path) }
@@ -173,7 +187,7 @@ watch(() => route.path, () => { menuOpen.value = false; sidebarOpen.value = fals
       </nav>
       <div class="next-header-actions"><button ref="searchButton" type="button" @click="toggleSearch" :aria-expanded="searchOpen" aria-keyshortcuts="Control+K Meta+K">搜索</button><button type="button" @click="isDark = !isDark" :aria-label="isDark ? '切换浅色模式' : '切换深色模式'">{{ isDark ? '☼' : '☾' }}</button><button class="next-mobile-menu" type="button" :aria-expanded="menuOpen" aria-controls="site-navigation" @click="menuOpen = !menuOpen; sidebarOpen = false; openDropdown = null; searchOpen = false">导航</button><button v-if="!home && group.length" class="next-mobile-lessons" type="button" :aria-expanded="sidebarOpen" aria-controls="lesson-navigation" @click="sidebarOpen = !sidebarOpen; focus = false; menuOpen = false; openDropdown = null; searchOpen = false">课程</button></div>
     </header>
-    <div v-if="searchOpen" class="next-search" role="search"><label for="next-search-input">搜索文章全文</label><input id="next-search-input" ref="searchInput" v-model="query" type="search" placeholder="输入关键词"><p v-if="!query">输入关键词查找文章</p><p v-else-if="searchLoading">正在加载搜索索引…</p><p v-else-if="searchError">搜索索引加载失败，请关闭后重试。</p><p v-else-if="!searchResults.length">没有找到匹配的文章</p><a v-for="item in searchResults" :key="item.url" :href="href(item.url)"><strong>{{ item.title }}</strong><small>{{ excerpt(item) }}</small></a></div>
+    <div v-if="searchOpen" class="next-search" role="search"><label for="next-search-input">搜索文章全文</label><input id="next-search-input" ref="searchInput" v-model="query" type="search" placeholder="输入关键词，用空格分隔"><p v-if="!query.trim()">输入关键词查找文章</p><p v-else-if="searchLoading">正在加载搜索索引…</p><p v-else-if="searchError">搜索索引加载失败，请关闭后重试。</p><p v-else-if="!searchResults.length">没有找到匹配的文章</p><a v-for="item in searchResults" :key="item.url" :href="href(item.url)"><strong>{{ item.title }}</strong><small>{{ excerpt(item) }}</small></a></div>
     <main v-if="home" id="main" class="next-home"><Content /></main>
     <div v-else class="next-layout" :class="{ 'is-focus': focus, 'is-menu-open': sidebarOpen }">
       <aside id="lesson-navigation" class="next-sidebar" aria-label="课程目录"><section v-for="part in group" :key="part.text"><h2>{{ part.text }}</h2><a v-for="item in part.items" :key="item.link" :href="href(item.link)" :aria-current="active(item.link) ? 'page' : undefined">{{ item.text }}</a></section></aside>
