@@ -49,6 +49,53 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(denied["status"], "insufficient_evidence")
         self.assertNotIn("薪酬调整", json.dumps(denied, ensure_ascii=False))
 
+    def test_document_update_withdrawal_and_history(self):
+        document = "/api/documents/refund-v1"
+        update = {"document_id": "refund-v1", "expected_revision": 1,
+                  "text": "退款需要核对发票与订单。"}
+        self.assertEqual(self.request(document, "demo-support")[0], 403)
+        self.assertEqual(self.request(document, "demo-hr-reviewer")[0], 404)
+        self.assertEqual(self.request("/api/document-update", "demo-support", update)[0], 403)
+        self.assertEqual(self.request("/api/document-update", "demo-hr-reviewer", update)[0], 404)
+        self.assertEqual(self.request(document, "demo-support-reviewer")[1]["revision"], 1)
+        self.assertEqual(self.request("/api/document-update", "demo-support-reviewer", update)[1]["revision"], 2)
+        self.assertEqual(self.request("/api/document-update", "demo-support-reviewer", update)[0], 409)
+        status, result = self.request("/api/ask", "demo-support", {"question": "发票"})
+        self.assertEqual((status, result["source_versions"]), (200, [{"id": "refund-v1", "revision": 2}]))
+        self.assertEqual(self.request("/api/ask", "demo-support", {"question": "付款状态"})[1]["status"], "insufficient_evidence")
+        withdraw = {"document_id": "refund-v1", "expected_revision": 2}
+        self.assertEqual(self.request("/api/document-withdraw", "demo-support-reviewer", withdraw)[1]["revision"], 3)
+        self.assertEqual(self.request("/api/ask", "demo-support", {"question": "发票"})[1]["status"], "insufficient_evidence")
+        self.assertEqual(self.request("/api/document-update", "demo-support-reviewer", {**update, "expected_revision": 3})[0], 409)
+        Service(self.db_path)  # Restart must not reactivate the seeded document.
+        self.assertEqual(self.request("/api/ask", "demo-support", {"question": "发票"})[1]["status"], "insufficient_evidence")
+        with closing(sqlite3.connect(self.db_path)) as db:
+            history = db.execute("SELECT revision, text, active FROM document_history WHERE document_id = ? ORDER BY revision", ("refund-v1",)).fetchall()
+            self.assertEqual(history, [(1, "退款申请需要核对订单和付款状态。", 1),
+                                       (2, "退款需要核对发票与订单。", 1),
+                                       (3, "退款需要核对发票与订单。", 0)])
+
+    def test_concurrent_document_updates_reject_stale_revision(self):
+        def update(text):
+            return self.request("/api/document-update", "demo-support-reviewer",
+                                {"document_id": "refund-v1", "expected_revision": 1, "text": text})[0]
+        with ThreadPoolExecutor(max_workers=2) as pool:
+            statuses = list(pool.map(update, ["第一条更新", "第二条更新"]))
+        self.assertEqual(sorted(statuses), [200, 409])
+        with closing(sqlite3.connect(self.db_path)) as db:
+            self.assertEqual(db.execute("SELECT count(*) FROM document_history WHERE document_id = ?", ("refund-v1",)).fetchone()[0], 2)
+
+    def test_existing_documents_migrate_with_revision_history(self):
+        legacy = str(Path(self.tmp.name) / "legacy-docs.sqlite3")
+        with closing(sqlite3.connect(legacy)) as db, db:
+            db.execute("CREATE TABLE documents(id TEXT PRIMARY KEY, tenant TEXT NOT NULL, text TEXT NOT NULL)")
+            db.execute("INSERT INTO documents VALUES (?, ?, ?)", ("refund-v1", "support", "旧版退款规则"))
+        service = Service(legacy)
+        result = service.ask(IDENTITIES["demo-support"], "旧版")
+        self.assertEqual(result["source_versions"], [{"id": "refund-v1", "revision": 1}])
+        with closing(sqlite3.connect(legacy)) as db:
+            self.assertEqual(db.execute("SELECT text FROM document_history WHERE document_id = ? AND revision = 1", ("refund-v1",)).fetchone()[0], "旧版退款规则")
+
     def test_approval_and_replay_do_not_duplicate_ticket(self):
         _, draft = self.request("/api/drafts", "demo-support", {"text": "请核实退款"})
         draft_id = draft["draft_id"]

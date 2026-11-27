@@ -45,6 +45,7 @@ def run_agent(service, identity, question, provider, max_rounds=3):
         raise ValueError("max_rounds must be between 1 and 5")
     history = [{"role": "user", "content": question}]
     sources = set()
+    source_versions = set()
     for _ in range(max_rounds):
         items = provider.respond(history)
         if not isinstance(items, list) or not items or not all(isinstance(item, dict) for item in items):
@@ -66,6 +67,8 @@ def run_agent(service, identity, question, provider, max_rounds=3):
             # Identity comes from the trusted caller, never from model-supplied arguments.
             result = service.ask(identity, arguments["query"])
             sources.update(result["sources"])
+            source_versions.update((source["id"], source["revision"])
+                                   for source in result.get("source_versions", []))
             history.extend(items)
             history.append({"type": "function_call_output", "call_id": call["call_id"],
                             "output": json.dumps(result, ensure_ascii=False)})
@@ -73,11 +76,12 @@ def run_agent(service, identity, question, provider, max_rounds=3):
         messages = [part.get("text", "") for item in items if item.get("type") == "message"
                     for part in item.get("content", []) if part.get("type") == "output_text"]
         if not sources:
-            return {"status": "insufficient_evidence", "answer": "现有授权资料不足，无法确认。", "sources": []}
+            return {"status": "insufficient_evidence", "answer": "现有授权资料不足，无法确认。", "sources": [], "source_versions": []}
         answer = "\n".join(text for text in messages if isinstance(text, str)).strip()
         if not answer:
             raise AgentError("model returned no text")
-        return {"status": "needs_review", "answer": answer, "sources": sorted(sources)}
+        return {"status": "needs_review", "answer": answer, "sources": sorted(sources),
+                "source_versions": [{"id": key, "revision": revision} for key, revision in sorted(source_versions)]}
     raise AgentError("tool-call round limit reached")
 
 

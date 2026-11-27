@@ -30,6 +30,8 @@ class Handler(BaseHTTPRequestHandler):
         service = self.server.service
         if self.command == "GET" and self.path.startswith("/api/drafts/"):
             return service.get_draft(identity, self.path.rsplit("/", 1)[-1])
+        if self.command == "GET" and self.path.startswith("/api/documents/"):
+            return service.get_document(identity, self.path.rsplit("/", 1)[-1])
         if self.command != "POST":
             raise LookupError("route not found")
         length = int(self.headers.get("Content-Length", "0"))
@@ -40,6 +42,10 @@ class Handler(BaseHTTPRequestHandler):
             raise ValueError("JSON object required")
         if self.path == "/api/ask":
             return service.ask(identity, data.get("question"))
+        if self.path == "/api/document-update":
+            return service.change_document(identity, data.get("document_id"), data.get("expected_revision"), data.get("text"))
+        if self.path == "/api/document-withdraw":
+            return service.change_document(identity, data.get("document_id"), data.get("expected_revision"), withdraw=True)
         if self.path == "/api/drafts":
             return service.create_draft(identity, data.get("text"))
         if self.path == "/api/approve":
@@ -71,7 +77,7 @@ class Handler(BaseHTTPRequestHandler):
         except LookupError:
             self.respond(404, {"error": "not found"})
         except ConflictError:
-            self.respond(409, {"error": "draft changed; review again"})
+            self.respond(409, {"error": "resource changed; review again"})
         except (ValueError, TypeError, json.JSONDecodeError):
             self.respond(400, {"error": "invalid request"})
 

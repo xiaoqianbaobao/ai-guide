@@ -18,11 +18,12 @@ IDENTITIES = {
     "demo-support": Identity("alice", "support", "operator"),
     "demo-support-reviewer": Identity("bob", "support", "reviewer"),
     "demo-hr": Identity("chen", "hr", "operator"),
+    "demo-hr-reviewer": Identity("dana", "hr", "reviewer"),
 }
 
 
 class ConflictError(Exception):
-    """The draft changed after the reviewer fetched it."""
+    """A reviewed resource changed or was withdrawn before a write."""
 
 
 def digest(tenant: str, text: str) -> str:
@@ -48,10 +49,21 @@ class Service:
             if "approved_until" not in columns:
                 # Existing demo approvals have no expiry and must be re-approved.
                 db.execute("ALTER TABLE drafts ADD COLUMN approved_until REAL")
-            db.executemany("INSERT OR IGNORE INTO documents VALUES (?, ?, ?)", [
+            document_columns = {row["name"] for row in db.execute("PRAGMA table_info(documents)")}
+            if "revision" not in document_columns:
+                db.execute("ALTER TABLE documents ADD COLUMN revision INTEGER NOT NULL DEFAULT 1")
+            if "active" not in document_columns:
+                db.execute("ALTER TABLE documents ADD COLUMN active INTEGER NOT NULL DEFAULT 1")
+            db.execute("""CREATE TABLE IF NOT EXISTS document_history(
+                document_id TEXT NOT NULL, tenant TEXT NOT NULL, revision INTEGER NOT NULL,
+                text TEXT NOT NULL, active INTEGER NOT NULL,
+                PRIMARY KEY(document_id, revision))""")
+            db.executemany("INSERT OR IGNORE INTO documents(id, tenant, text) VALUES (?, ?, ?)", [
                 ("refund-v1", "support", "退款申请需要核对订单和付款状态。"),
                 ("payroll-v1", "hr", "薪酬调整需要人事负责人审批。"),
             ])
+            db.execute("""INSERT OR IGNORE INTO document_history
+                SELECT id, tenant, revision, text, active FROM documents""")
 
     def connect(self):
         db = sqlite3.connect(self.path, timeout=5)
@@ -67,12 +79,50 @@ class Service:
         if not isinstance(question, str) or not question.strip() or len(question) > 500:
             raise ValueError("question must be 1–500 characters")
         with closing(self.connect()) as db, db:
-            rows = db.execute("SELECT id, text FROM documents WHERE tenant = ?", (identity.tenant,)).fetchall()
+            rows = db.execute("SELECT id, text, revision FROM documents WHERE tenant = ? AND active = 1", (identity.tenant,)).fetchall()
             matches = [row for row in rows if question.strip() in row["text"]]
             self.audit(db, identity, "ask", "knowledge")
         if not matches:
             return {"status": "insufficient_evidence", "answer": "现有授权资料不足，无法确认。", "sources": []}
-        return {"status": "answered", "answer": matches[0]["text"], "sources": [matches[0]["id"]]}
+        return {"status": "answered", "answer": matches[0]["text"], "sources": [matches[0]["id"]],
+                "source_versions": [{"id": matches[0]["id"], "revision": matches[0]["revision"]}]}
+
+    def get_document(self, identity: Identity, document_id: str) -> dict:
+        if identity.role != "reviewer":
+            raise PermissionError("reviewer required")
+        with closing(self.connect()) as db:
+            row = db.execute("SELECT id, text, revision, active FROM documents WHERE id = ? AND tenant = ?",
+                             (document_id, identity.tenant)).fetchone()
+        if not row:
+            raise LookupError("document not found")
+        return dict(row)
+
+    def change_document(self, identity: Identity, document_id: str, expected_revision: int,
+                        text: str = "", withdraw: bool = False) -> dict:
+        if identity.role != "reviewer":
+            raise PermissionError("reviewer required")
+        if (not isinstance(document_id, str) or not document_id.strip()
+                or type(expected_revision) is not int or expected_revision < 1
+                or not isinstance(withdraw, bool)):
+            raise ValueError("document and revision required")
+        if not withdraw and (not isinstance(text, str) or not text.strip() or len(text) > 1000):
+            raise ValueError("document text must be 1–1000 characters")
+        with closing(self.connect()) as db, db:
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute("SELECT * FROM documents WHERE id = ? AND tenant = ?",
+                             (document_id, identity.tenant)).fetchone()
+            if not row:
+                raise LookupError("document not found")
+            if not row["active"] or row["revision"] != expected_revision:
+                raise ConflictError("document changed or withdrawn")
+            revision, active = row["revision"] + 1, 0 if withdraw else 1
+            new_text = row["text"] if withdraw else text
+            db.execute("UPDATE documents SET text = ?, revision = ?, active = ? WHERE id = ? AND tenant = ?",
+                       (new_text, revision, active, document_id, identity.tenant))
+            db.execute("INSERT INTO document_history VALUES (?, ?, ?, ?, ?)",
+                       (document_id, identity.tenant, revision, new_text, active))
+            self.audit(db, identity, "document_withdrawn" if withdraw else "document_updated", document_id)
+        return {"id": document_id, "revision": revision, "active": bool(active)}
 
     def create_draft(self, identity: Identity, text: str) -> dict:
         if identity.role != "operator":

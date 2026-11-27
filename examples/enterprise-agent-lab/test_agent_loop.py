@@ -42,6 +42,7 @@ class AgentTests(unittest.TestCase):
         result = run_agent(self.service, self.identity, "退款怎么处理", provider)
         self.assertEqual(result["status"], "needs_review")
         self.assertEqual(result["sources"], ["refund-v1"])
+        self.assertEqual(result["source_versions"], [{"id": "refund-v1", "revision": 1}])
         output = provider.histories[1][-1]
         self.assertEqual(output["type"], "function_call_output")
         self.assertEqual(output["call_id"], "call-1")

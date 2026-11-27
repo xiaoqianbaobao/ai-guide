@@ -41,7 +41,7 @@ python3 -m unittest -v
 
 也可以在本机浏览器打开 [http://127.0.0.1:8765](http://127.0.0.1:8765)，依次点击“查询”“创建草稿”“读取草稿”“批准已查看版本”和“提交工单”；再点一次提交，观察重放结果。这个地址只在你的本地服务启动后有效。
 
-需要 Python 3.10 或更新版本。命令行演示应输出“知识查询”“待审草稿”“审批结果”“首次提交”和“重复提交”：前者的 `replayed` 为 `False`，后者为 `True`，两次工单 ID 相同。ID 每次运行不同；11 条自动化测试还会验证跨租户读取、审批过期与撤销、并发重试及旧数据库升级。
+需要 Python 3.10 或更新版本。命令行演示应输出“知识查询”“待审草稿”“审批结果”“首次提交”和“重复提交”：前者的 `replayed` 为 `False`，后者为 `True`，两次工单 ID 相同。ID 每次运行不同；本地 HTTP 测试还会验证跨租户读取、审批过期与撤销、并发重试、文档版本及旧数据库升级。可选 SDK 测试缺少依赖时会跳过。
 
 完整代码见 [enterprise-agent-lab](https://github.com/xiaoqianbaobao/ai-guide/tree/main/examples/enterprise-agent-lab)。按 `Ctrl+C` 停止服务；演示数据保存在该目录的 `lab.sqlite3`，文件已加入忽略列表。仅使用教学数据时，可以停止服务后删除这个文件重新开始。
 
@@ -50,6 +50,9 @@ python3 -m unittest -v
 | 请求 | 示例身份 | 服务端处理 | 预期结果 |
 | --- | --- | --- | --- |
 | `POST /api/ask` | 客服 | 根据服务端身份选择租户文档，再做字面匹配 | 返回 `refund-v1`，或资料不足 |
+| `GET /api/documents/{id}` | 同租户审核人 | 获取当前文档与版本 | 为更新或撤回提供待核对的版本 |
+| `POST /api/document-update` | 同租户审核人 | 在事务内检查预期版本，保存新版本与历史 | 成功递增版本；旧版本请求返回 409 |
+| `POST /api/document-withdraw` | 同租户审核人 | 在事务内标记撤回并保存历史 | 后续查询不再命中撤回文档 |
 | `POST /api/drafts` | 客服 | 创建同租户草稿，记录创建者和内容摘要 | 返回待审批的草稿 ID |
 | `GET /api/drafts/{id}` | 审核人 | 按服务端租户读取草稿 | 审核人能看到实际内容 |
 | `POST /api/approve` | 审核人 | 提交查看时获得的版本；事务中比对并保存审核人 | 草稿变化时返回 409，要求重新查看 |
@@ -67,6 +70,38 @@ curl -s http://127.0.0.1:8765/api/ask \
 
 你应看到 `answered`、退款规则片段和 `refund-v1`。将问题改为“薪酬”，客服身份会得到 `insufficient_evidence` 与空引用。示例按原文子串查找，“退钱”未必匹配“退款”；这正是需要用任务集测量的检索缺陷。
 
+### 演练知识更新和撤回
+
+下面使用**独立临时数据库和 8766 端口**，不会修改上面 8765 服务的数据库。在 `examples/enterprise-agent-lab` 的一个新终端运行，保持该终端打开：
+
+```bash
+LAB_DIR="$(mktemp -d)"
+python3 -c 'import sys; from server import make_server; make_server(sys.argv[1], 8766).serve_forever()' "$LAB_DIR/lab.sqlite3"
+```
+
+在另一个终端依次执行以下请求。第一次查询文档获取 `revision`；示例假设临时数据库是新建的，版本为 1。更新成功返回版本 2，使用旧版本再次更新会得到 HTTP 409。
+
+```bash
+curl -s http://127.0.0.1:8766/api/documents/refund-v1 \
+  -H 'X-Demo-Token: demo-support-reviewer'
+curl -s http://127.0.0.1:8766/api/document-update \
+  -H 'Content-Type: application/json' -H 'X-Demo-Token: demo-support-reviewer' \
+  -d '{"document_id":"refund-v1","expected_revision":1,"text":"退款需要核对发票与订单。"}'
+curl -s http://127.0.0.1:8766/api/ask \
+  -H 'Content-Type: application/json' -H 'X-Demo-Token: demo-support' \
+  -d '{"question":"发票"}'
+curl -s http://127.0.0.1:8766/api/document-withdraw \
+  -H 'Content-Type: application/json' -H 'X-Demo-Token: demo-support-reviewer' \
+  -d '{"document_id":"refund-v1","expected_revision":2}'
+curl -s http://127.0.0.1:8766/api/ask \
+  -H 'Content-Type: application/json' -H 'X-Demo-Token: demo-support' \
+  -d '{"question":"发票"}'
+```
+
+更新后的查询包含 `source_versions`，其中 `refund-v1` 的 `revision` 为 2；撤回后的查询返回 `insufficient_evidence`。`refund-v1` 是沿用的固定文档 ID，实际版本以独立的 `revision` 字段为准。完成后用 `Ctrl+C` 停止 8766 服务；临时目录只含虚构数据，可自行删除。教学页面目前没有文档管理界面，上述接口通过命令或测试演练。
+
+这里的检索直接读取数据库，没有向量索引或缓存，因此演示的是**源文档更新和撤回**，不是已经解决索引、缓存或已生成回答的失效问题。历史表保存完整旧文本供本地观察，旧数据库迁移只能保存迁移时的当前快照，无法恢复此前丢失的版本；真实系统需要单独设计历史版本的访问、保留、删除和审计。若文档在检索后、答案展示前撤回，本例也不会自动重新校验答案；版本号只是可追溯信息，不证明生成内容受来源支持。
+
 ## 4. 为什么同一条链路要测试失败
 
 `test_server.py` 启动一个随机端口的本地服务，真实发起 HTTP 请求并使用临时数据库，检查：
@@ -78,6 +113,7 @@ curl -s http://127.0.0.1:8765/api/ask \
 5. 多个客户端并发重试同一操作时，SQLite 事务与唯一约束使示例中只有一次创建。
 6. 审核人读取草稿后、批准前内容被修改，旧版本返回 409，提交仍被拒绝；重新查看后才能批准。
 7. 批准在服务端 5 分钟后过期，或审核人撤销批准后，新提交被拒绝；提交与撤销同时发生时，只有先完成的事务生效。
+8. 只有同租户审核人能修改文档；两个更新使用同一版本时一个成功、另一个返回 409。撤回后查询不再命中，重启也不会恢复已撤回文档；旧数据库迁移保留迁移时的内容。
 
 ### 过期与重试为什么需要分开处理
 
