@@ -1,5 +1,6 @@
 const $ = (selector) => document.querySelector(selector)
 const state = { reviewed: null, operationId: null, draftId: null }
+let generation = 0
 async function request(path, token, payload) {
   const options = { headers: { 'X-Demo-Token': token } }
   if (payload !== undefined) {
@@ -13,7 +14,7 @@ async function request(path, token, payload) {
   return data
 }
 function show(selector, value) { $(selector).textContent = typeof value === 'string' ? value : JSON.stringify(value, null, 2) }
-function resetReview() { state.reviewed = null; state.operationId = null; state.draftId = null; $('#approve').disabled = true; $('#revoke').disabled = true; $('#submit').disabled = true }
+function resetReview() { generation++; state.reviewed = null; state.operationId = null; state.draftId = null; $('#approve').disabled = true; $('#revoke').disabled = true; $('#submit').disabled = true; $('#edit-text').disabled = true; $('#update-draft').disabled = true }
 
 $('#ask-form').addEventListener('submit', async (event) => {
   event.preventDefault()
@@ -31,18 +32,37 @@ $('#draft-form').addEventListener('submit', async (event) => {
 $('#draft-id').addEventListener('input', resetReview)
 $('#review-form').addEventListener('submit', async (event) => {
   event.preventDefault(); resetReview()
+  const requestGeneration = generation
   try {
-    state.reviewed = await request('/api/drafts/' + encodeURIComponent($('#draft-id').value.trim()), 'demo-support-reviewer')
+    const reviewed = await request('/api/drafts/' + encodeURIComponent($('#draft-id').value.trim()), 'demo-support-reviewer')
+    if (generation !== requestGeneration) return
+    state.reviewed = reviewed
     show('#review-result', state.reviewed); $('#approve').disabled = false
-  } catch (error) { show('#review-result', error.message) }
+    $('#edit-text').value = state.reviewed.text; $('#edit-text').disabled = false; $('#update-draft').disabled = false
+  } catch (error) { if (generation === requestGeneration) show('#review-result', error.message) }
+})
+$('#edit-form').addEventListener('submit', async (event) => {
+  event.preventDefault()
+  if (!state.reviewed) return
+  const payload = { draft_id: state.reviewed.id, expected_version: state.reviewed.version, text: $('#edit-text').value }
+  resetReview()
+  const requestGeneration = generation
+  try {
+    const result = await request('/api/draft-update', 'demo-support', payload)
+    if (generation !== requestGeneration) return
+    show('#review-result', result); show('#submit-result', '草稿已修改，请重新读取并批准。')
+  } catch (error) { if (generation === requestGeneration) show('#review-result', error.message + '；请重新读取草稿。') }
 })
 $('#approve').addEventListener('click', async () => {
   if (!state.reviewed) return
+  const requestGeneration = generation
+  const reviewed = state.reviewed
   try {
-    const result = await request('/api/approve', 'demo-support-reviewer', { draft_id: state.reviewed.id, reviewed_version: state.reviewed.version })
-    state.draftId = state.reviewed.id; state.operationId = crypto.randomUUID(); $('#submit').disabled = false; $('#revoke').disabled = false
+    const result = await request('/api/approve', 'demo-support-reviewer', { draft_id: reviewed.id, reviewed_version: reviewed.version })
+    if (generation !== requestGeneration) return
+    state.draftId = reviewed.id; state.operationId = crypto.randomUUID(); $('#submit').disabled = false; $('#revoke').disabled = false
     show('#review-result', result)
-  } catch (error) { resetReview(); show('#review-result', error.message + '；请重新读取草稿。') }
+  } catch (error) { if (generation === requestGeneration) { resetReview(); show('#review-result', error.message + '；请重新读取草稿。') } }
 })
 $('#revoke').addEventListener('click', async () => {
   try {
