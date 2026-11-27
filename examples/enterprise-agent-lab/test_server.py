@@ -143,6 +143,34 @@ class ApiTests(unittest.TestCase):
         self.assertEqual(self.request("/api/submit", "demo-support", {"draft_id": draft_id, "operation_id": "op"})[0], 403)
         self.assertEqual(self.approve(draft_id)[0], 200)
 
+    def test_review_of_one_draft_cannot_approve_another_with_same_text(self):
+        _, first = self.request('/api/drafts', 'demo-support', {'text': '相同的工单内容'})
+        _, second = self.request('/api/drafts', 'demo-support', {'text': '相同的工单内容'})
+        _, reviewed = self.request('/api/drafts/' + first['draft_id'], 'demo-support-reviewer')
+        status, _ = self.request('/api/approve', 'demo-support-reviewer',
+                                 {'draft_id': second['draft_id'], 'reviewed_version': reviewed['version']})
+        self.assertEqual(status, 409)
+        self.assertEqual(self.request('/api/submit', 'demo-support',
+                         {'draft_id': second['draft_id'], 'operation_id': 'different-draft'})[0], 403)
+
+    def test_creator_change_invalidates_approval(self):
+        _, draft = self.request('/api/drafts', 'demo-support', {'text': '待审批内容'})
+        self.assertEqual(self.approve(draft['draft_id'])[0], 200)
+        with closing(sqlite3.connect(self.db_path)) as db, db:
+            db.execute('UPDATE drafts SET creator = ? WHERE id = ?', ('other-user', draft['draft_id']))
+        self.assertEqual(self.request('/api/submit', 'demo-support',
+                         {'draft_id': draft['draft_id'], 'operation_id': 'changed-creator'})[0], 403)
+
+    def test_old_unexpired_content_only_approval_requires_reapproval(self):
+        _, draft = self.request('/api/drafts', 'demo-support', {'text': '旧版本已批准'})
+        with closing(sqlite3.connect(self.db_path)) as db, db:
+            db.execute('UPDATE drafts SET approved_digest = ?, approved_by = ?, approved_until = ? WHERE id = ?',
+                       (digest('support', '旧版本已批准'), 'bob', self.now + 300, draft['draft_id']))
+        payload = {'draft_id': draft['draft_id'], 'operation_id': 'old-approval'}
+        self.assertEqual(self.request('/api/submit', 'demo-support', payload)[0], 403)
+        self.assertEqual(self.approve(draft['draft_id'])[0], 200)
+        self.assertEqual(self.request('/api/submit', 'demo-support', payload)[0], 200)
+
     def test_expiry_rejects_new_write_but_not_replay_of_completed_write(self):
         _, first = self.request("/api/drafts", "demo-support", {"text": "已提交"})
         _, second = self.request("/api/drafts", "demo-support", {"text": "未提交"})

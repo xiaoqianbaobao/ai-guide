@@ -2,6 +2,7 @@
 from dataclasses import dataclass
 from contextlib import closing
 import hashlib
+import json
 import sqlite3
 import time
 import uuid
@@ -28,6 +29,12 @@ class ConflictError(Exception):
 
 def digest(tenant: str, text: str) -> str:
     return hashlib.sha256((tenant + "\0" + text).encode()).hexdigest()
+
+
+def approval_version(tenant: str, draft_id: str, creator: str, text: str) -> str:
+    # A version identifies the reviewed draft and its creator, not just its text.
+    payload = json.dumps([tenant, draft_id, creator, text], ensure_ascii=False, separators=(',', ':'))
+    return hashlib.sha256(payload.encode('utf-8')).hexdigest()
 
 
 class Service:
@@ -157,7 +164,7 @@ class Service:
             raise LookupError("draft not found")
         return {"id": row["id"], "text": row["text"], "creator": row["creator"],
                 "approved_by": row["approved_by"], "approved_until": row["approved_until"],
-                "version": digest(row["tenant"], row["text"])}
+                "version": approval_version(row["tenant"], row["id"], row["creator"], row["text"])}
 
     def approve(self, identity: Identity, draft_id: str, reviewed_version: str) -> dict:
         if identity.role != "reviewer":
@@ -171,7 +178,7 @@ class Service:
                 raise LookupError("draft not found")
             if db.execute("SELECT 1 FROM tickets WHERE draft_id = ?", (draft_id,)).fetchone():
                 raise ConflictError("ticket already submitted")
-            current = digest(row["tenant"], row["text"])
+            current = approval_version(row["tenant"], row["id"], row["creator"], row["text"])
             if reviewed_version != current:
                 raise ConflictError("draft changed after review")
             expires = self.clock() + self.approval_ttl
@@ -211,7 +218,7 @@ class Service:
                 if existing["operation_id"] != operation_id or existing["draft_id"] != draft_id or existing["tenant"] != identity.tenant:
                     raise ValueError("operation ID or draft already used")
                 return {"ticket_id": existing["operation_id"], "status": "submitted", "replayed": True}
-            if (not row["approved_digest"] or row["approved_digest"] != digest(row["tenant"], row["text"])
+            if (not row["approved_digest"] or row["approved_digest"] != approval_version(row["tenant"], row["id"], row["creator"], row["text"])
                     or row["approved_until"] is None or self.clock() >= row["approved_until"]):
                 raise PermissionError("current draft requires unexpired approval")
             db.execute("INSERT INTO tickets VALUES (?, ?, ?, ?)", (operation_id, draft_id, identity.tenant, row["text"]))
