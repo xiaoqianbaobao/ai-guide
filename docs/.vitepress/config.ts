@@ -31,6 +31,7 @@ export default defineConfig({
   lastUpdated: true,
   ignoreDeadLinks: false,
   base: isProduction ? repositoryBase : '/',
+  sitemap: { hostname: new URL(isProduction ? repositoryBase : '/', publishedOrigin).toString() },
   head: [
     ['meta', { name: 'theme-color', content: '#f7f5f1' }],
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${isProduction ? repositoryBase : '/'}logo.svg` }],
