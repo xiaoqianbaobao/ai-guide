@@ -49,6 +49,10 @@ class Service:
                 text TEXT NOT NULL, digest TEXT NOT NULL, approved_digest TEXT, approved_by TEXT);
             CREATE TABLE IF NOT EXISTS tickets(operation_id TEXT PRIMARY KEY, draft_id TEXT NOT NULL UNIQUE,
                 tenant TEXT NOT NULL, text TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS external_operations(operation_id TEXT PRIMARY KEY,
+                draft_id TEXT NOT NULL UNIQUE, tenant TEXT NOT NULL, text TEXT NOT NULL,
+                approved_version TEXT NOT NULL, approved_by TEXT NOT NULL,
+                approved_until REAL NOT NULL, state TEXT NOT NULL);
             CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, tenant TEXT NOT NULL,
                 actor TEXT NOT NULL, action TEXT NOT NULL, object_id TEXT NOT NULL);
             """)
@@ -83,6 +87,11 @@ class Service:
     def audit(db, identity: Identity, action: str, object_id: str):
         db.execute("INSERT INTO audit(tenant, actor, action, object_id) VALUES (?, ?, ?, ?)",
                    (identity.tenant, identity.user, action, object_id))
+
+    @staticmethod
+    def ensure_no_external_operation(db, draft_id):
+        if db.execute("SELECT 1 FROM external_operations WHERE draft_id = ?", (draft_id,)).fetchone():
+            raise ConflictError("external submission already prepared")
 
     def ask(self, identity: Identity, question: str) -> dict:
         if not isinstance(question, str) or not question.strip() or len(question) > 500:
@@ -182,6 +191,7 @@ class Service:
                 raise LookupError("draft not found")
             if row["creator"] != identity.user:
                 raise PermissionError("creator required")
+            self.ensure_no_external_operation(db, draft_id)
             if db.execute("SELECT 1 FROM tickets WHERE draft_id = ?", (draft_id,)).fetchone():
                 raise ConflictError("ticket already submitted")
             current = approval_version(row["tenant"], row["id"], row["creator"], row["text"], row["revision"])
@@ -206,6 +216,7 @@ class Service:
             row = db.execute("SELECT * FROM drafts WHERE id = ? AND tenant = ?", (draft_id, identity.tenant)).fetchone()
             if not row:
                 raise LookupError("draft not found")
+            self.ensure_no_external_operation(db, draft_id)
             if db.execute("SELECT 1 FROM tickets WHERE draft_id = ?", (draft_id,)).fetchone():
                 raise ConflictError("ticket already submitted")
             current = approval_version(row["tenant"], row["id"], row["creator"], row["text"], row["revision"])
@@ -226,6 +237,7 @@ class Service:
                              (draft_id, identity.tenant)).fetchone()
             if not row:
                 raise LookupError("draft not found")
+            self.ensure_no_external_operation(db, draft_id)
             if db.execute("SELECT 1 FROM tickets WHERE draft_id = ?", (draft_id,)).fetchone():
                 raise ConflictError("ticket already submitted")
             if row["approved_digest"]:
@@ -243,6 +255,9 @@ class Service:
             row = db.execute("SELECT * FROM drafts WHERE id = ? AND tenant = ?", (draft_id, identity.tenant)).fetchone()
             if not row:
                 raise LookupError("draft not found")
+            self.ensure_no_external_operation(db, draft_id)
+            if db.execute("SELECT 1 FROM external_operations WHERE operation_id = ?", (operation_id,)).fetchone():
+                raise ConflictError("operation ID already reserved")
             existing = db.execute("SELECT * FROM tickets WHERE operation_id = ? OR draft_id = ?", (operation_id, draft_id)).fetchone()
             if existing:
                 if existing["operation_id"] != operation_id or existing["draft_id"] != draft_id or existing["tenant"] != identity.tenant:
@@ -254,3 +269,32 @@ class Service:
             db.execute("INSERT INTO tickets VALUES (?, ?, ?, ?)", (operation_id, draft_id, identity.tenant, row["text"]))
             self.audit(db, identity, "ticket_submitted", operation_id)
             return {"ticket_id": operation_id, "status": "submitted", "replayed": False}
+
+    def prepare_external_submission(self, identity: Identity, draft_id: str, operation_id: str) -> dict:
+        """Reserve an approved draft and its immutable intent; no external write occurs here."""
+        if identity.role != "operator":
+            raise PermissionError("operator required")
+        if not isinstance(operation_id, str) or not operation_id.strip() or len(operation_id) > 128:
+            raise ValueError("operation_id must be 1–128 characters")
+        with closing(self.connect()) as db, db:
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute("SELECT * FROM drafts WHERE id = ? AND tenant = ?", (draft_id, identity.tenant)).fetchone()
+            if not row:
+                raise LookupError("draft not found")
+            existing = db.execute("SELECT * FROM external_operations WHERE operation_id = ? OR draft_id = ?", (operation_id, draft_id)).fetchone()
+            if existing:
+                if (existing["operation_id"] != operation_id or existing["draft_id"] != draft_id
+                        or existing["tenant"] != identity.tenant):
+                    raise ConflictError("operation ID or draft already reserved")
+                return {"operation_id": operation_id, "state": existing["state"], "replayed": True}
+            if db.execute("SELECT 1 FROM tickets WHERE draft_id = ? OR operation_id = ?", (draft_id, operation_id)).fetchone():
+                raise ConflictError("operation ID or draft already submitted")
+            version = approval_version(row["tenant"], row["id"], row["creator"], row["text"], row["revision"])
+            if (not row["approved_by"] or row["approved_digest"] != version
+                    or row["approved_until"] is None or self.clock() >= row["approved_until"]):
+                raise PermissionError("current draft requires unexpired approval")
+            db.execute("INSERT INTO external_operations VALUES (?, ?, ?, ?, ?, ?, ?, 'prepared')",
+                       (operation_id, draft_id, identity.tenant, row["text"], version,
+                        row["approved_by"], row["approved_until"]))
+            self.audit(db, identity, "external_submission_prepared", operation_id)
+            return {"operation_id": operation_id, "state": "prepared", "replayed": False}

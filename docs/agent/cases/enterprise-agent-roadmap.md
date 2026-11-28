@@ -64,13 +64,14 @@ module: agent
 | 注入内容要求写操作 | `test_injected_document_cannot_authorize_write_tool`：模拟模型请求未开放的写工具，被拒绝 | 不能由此推断不会泄露或污染回答；同一测试文件还演示回答仍可能被污染 |
 | 批准与重复提交 | `test_approval_and_replay_do_not_duplicate_ticket`：未批准不能提交，相同操作重试只创建一条模拟工单 | 接入真实审批、调用主体、目标系统及可审计授权 |
 | 草稿修改或批准过期 | `test_modified_draft_cannot_use_old_approval`、`test_expiry_rejects_new_write_but_not_replay_of_completed_write` | 跨服务部署时验证审批与实际操作参数的绑定 |
-| 下游写入后响应丢失 | 独立练习 `test_connection_dropped_after_commit_then_reconciled`：用同一 ID 对账且只有一条工单 | 该对账练习尚未与上面的审批服务集成，真实下游合同与故障行为也需要验证 |
+| 外部提交准备 | `test_external_prepare`：在同一事务固定已批准版本和操作 ID，并检查撤销竞争 | 只保存意图，无发送、取消或解锁；重放不会延长审批 |
+| 下游写入后响应丢失 | 独立练习 `test_connection_dropped_after_commit_then_reconciled`：用同一 ID 对账且只有一条工单 | 该对账练习尚未与上述准备步骤接通，真实下游合同与故障行为也需要验证 |
 
 在仓库根目录分别运行两组离线测试；每组使用独立临时数据库，不连接真实业务服务：
 
 ```bash
 cd examples/enterprise-agent-lab
-python3 -m unittest test_server test_agent_loop -v
+python3 -m unittest test_server test_agent_loop test_external_prepare -v
 cd ../cross-service-recovery
 python3 -m unittest test_http_recovery -v
 ```
@@ -79,4 +80,4 @@ python3 -m unittest test_http_recovery -v
 
 ## 实施顺序
 
-先运行已有的本地闭环和独立恢复练习，再为两者的集成补测试：批准版本、操作 ID 与下游目标如何绑定，响应丢失后如何恢复，以及重复提交时哪些状态不可回退。随后在隔离环境逐步引入真实身份和可控的外部依赖，每一步记录尚未覆盖的权限、运行和故障边界。不要为了展示多 Agent 而先引入多角色编排：先用任务集测出单 Agent 的瓶颈，再判断额外协调成本是否值得。参考 [OpenAI 的 Agent 评估建议](https://developers.openai.com/api/docs/guides/evaluation-best-practices)及 [Anthropic 的 Agent 评估实践](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)。
+先运行已有的本地闭环、外部提交准备和独立恢复练习，再为两者接通补测试：发送时批准是否有效、操作 ID 与下游目标如何绑定，响应丢失后如何恢复，以及重复提交时哪些状态不可回退。随后在隔离环境逐步引入真实身份和可控的外部依赖，每一步记录尚未覆盖的权限、运行和故障边界。不要为了展示多 Agent 而先引入多角色编排：先用任务集测出单 Agent 的瓶颈，再判断额外协调成本是否值得。参考 [OpenAI 的 Agent 评估建议](https://developers.openai.com/api/docs/guides/evaluation-best-practices)及 [Anthropic 的 Agent 评估实践](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)。
