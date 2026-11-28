@@ -211,6 +211,42 @@ python3 -m unittest test_external_delivery -v
 
 例如测试先让模拟服务提交工单后主动断开连接，再重建本地服务对象、查询下游，确认只有一条工单。另一个测试在发送资格取得后模拟进程中断：下游没有记录，但本地仍为 `unknown`，不会自动重发。这些是隔离环境测试，不是外部业务系统的运行结果。源码见 [external_delivery.py](https://github.com/xiaoqianbaobao/ai-guide/blob/main/examples/enterprise-agent-lab/external_delivery.py) 和 [test_external_delivery.py](https://github.com/xiaoqianbaobao/ai-guide/blob/main/examples/enterprise-agent-lab/test_external_delivery.py)。
 
+想亲自观察一次状态变化，可以在 `examples/enterprise-agent-lab` 目录把下面代码保存为 `try_delivery.py`，然后执行 `python3 try_delivery.py`。它使用临时数据库和仅监听本机的模拟服务，退出时关闭服务并清理数据：
+
+```python
+from pathlib import Path
+from tempfile import TemporaryDirectory
+from threading import Thread
+import sys
+
+sys.path.insert(0, str(Path.cwd().parent / "cross-service-recovery"))
+from http_downstream import HttpDownstream, make_server
+from external_delivery import dispatch, reconcile
+from service import IDENTITIES, Service
+
+with TemporaryDirectory() as tmp:
+    local = Service(str(Path(tmp) / "local.sqlite3"))
+    server = make_server(str(Path(tmp) / "downstream.sqlite3"))
+    thread = Thread(target=server.serve_forever, daemon=True)
+    thread.start()
+    try:
+        operator = IDENTITIES["demo-support"]
+        reviewer = IDENTITIES["demo-support-reviewer"]
+        draft_id = local.create_draft(operator, "请人工核实退款")['draft_id']
+        version = local.get_draft(reviewer, draft_id)['version']
+        local.approve(reviewer, draft_id, version)
+        local.prepare_external_submission(operator, draft_id, "demo-op")
+        downstream = HttpDownstream(server.server_port)
+        print("首次发送：", dispatch(local, operator, "demo-op", downstream, lose_response=True)['state'])
+        print("对账结果：", reconcile(local, operator, "demo-op", downstream)['state'])
+    finally:
+        server.shutdown()
+        server.server_close()
+        thread.join()
+```
+
+预期依次输出 `unknown` 和 `confirmed`。把 `lose_response=True` 改成 `False`，第一次调用就会在收到回执后返回 `confirmed`；这时不需要对账即可知道模拟写入已确认。
+
 **时效边界：**本例在领取发送资格时检查批准有效期；进程可能在事务提交后暂停很久，实际网络发送时批准已过期。SQLite 无法约束另一台机器何时执行。真实系统需要结合下游可验证的授权和截止时间、可靠任务租约与短时凭证等机制，定义并验证业务允许的发送时点；如果下游不能强制执行该约束，就不能声称本例实现了严格的发送时授权。模拟下游还假设可信回执、持久幂等和可查询；没有真实认证、生产权限、自动重试预算或人工对账界面。`unknown` 查不到时仍需人工处理，不能无限冻结或擅自解锁。
 
 下一篇[接入模型：只读工具调用链](./enterprise-agent-model-tool-loop)会用离线模拟测试模型如何请求查询；真实 API 调用需要自行配置且尚未在本课程中实测。
