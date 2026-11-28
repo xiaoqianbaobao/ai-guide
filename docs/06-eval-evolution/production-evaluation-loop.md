@@ -98,6 +98,49 @@ limits:
 
 保留开发集供定位与迭代，留出不参与调参的测试集做最终检查；对重复使用的测试集持续关注污染。成本和延迟也要一起报告：一次成功若需要过高成本或很长等待，未必满足业务目标。[OpenAI 的评估有效性指南](https://openai.com/index/trustworthy-third-party-evaluations-foundations/)讨论了 Harness、奖励投机、污染与无效任务对评估结论的影响。
 
+## 历史故障回放：不要让 Agent 看到事后答案
+
+> 资料核验：2026-11-28。[OpenAI 的 Performance Factory 工程文章](https://openai.com/index/how-openai-performance-factory-keeps-chatgpt-fast/)发表于 2026-11-19，介绍了其内部性能调查工作流和评估方法。下方回放设计是基于文章的教学示例，并非该团队的实现或结果。
+
+假设线上在 10:00 收到延迟告警，工程师到 11:00 才确认某次配置变更是原因。团队希望用这次事故评估调查 Agent。如果直接把事故目录全部交给 Agent，目录中的复盘文档可能写着“根因是配置 X”。Agent 即使正确复述了原因，也没有证明它能从告警和证据推导出来。
+
+OpenAI 文章介绍，他们用历史性能事故回测调查过程，让新的调查 Agent 从原始信号出发，限制其读取先前的调查记录和其他可能泄露答案的资料，并检查轨迹中是否出现泄题。文章还把**调查质量**与**交给工程师的摘要质量**分开评估：判断时间、影响范围和候选原因是一类任务，摘要是否足够清楚、建议是否有证据支撑是另一类任务。历史指标可能过期，故障恢复后的资料也可能暴露答案；没有保存当时可用的证据时，应标记回放不完整，而不是假装环境可复现。
+
+可以把一个用例分成三个边界：
+
+| 区域 | 教学示例 | 谁可以看 |
+| --- | --- | --- |
+| 调查输入 | 告警、事故开始时已采集且获授权的指标快照、对应版本的代码 | 调查 Agent 与评分人员 |
+| 参考答案 | 事后复盘、人工确认的原因与时间范围 | 仅评分人员或隔离的评分程序 |
+| 运行结果 | Agent 的工具轨迹、结论、引用和不确定事项 | 评分人员；脱敏后按权限供复盘 |
+
+下面的 Python 3 例子只演示**一个事前检查**：阻止采集时间晚于回放截止点的资料，以及明确标记为参考答案的文件进入输入清单。它不访问真实日志，也不调用模型。
+
+```python
+from datetime import datetime, timezone
+
+cutoff = datetime(2026, 11, 1, 10, 5, tzinfo=timezone.utc)
+artifacts = [
+    {"name": "alert.json", "kind": "input", "captured_at": "2026-11-01T10:01:00+00:00"},
+    {"name": "metrics.json", "kind": "input", "captured_at": "2026-11-01T10:04:00+00:00"},
+    {"name": "resolution.md", "kind": "reference", "captured_at": "2026-11-01T11:00:00+00:00"},
+]
+
+def permitted(item):
+    captured = datetime.fromisoformat(item["captured_at"])
+    if captured.utcoffset() is None:
+        raise ValueError("时间必须带时区")
+    return item["kind"] == "input" and captured <= cutoff
+
+visible = [item["name"] for item in artifacts if permitted(item)]
+assert visible == ["alert.json", "metrics.json"]
+print("可交给调查 Agent：", visible)
+```
+
+保存为 `snapshot_filter.py` 后运行 `python3 snapshot_filter.py`。修改第一份指标的采集时间至 10:06，会看到断言失败；这说明清单变了，需要检查该资料是否仍应作为输入。**这个脚本不是隔离机制**：文件标签和采集时间可能填错，文件内容也可能包含事后结论；事件发生时间、采集时间与最后修改时间不是一回事。真实回放还要隔离存储与工具权限、固定资料版本、检查引用内容和 Agent 实际访问轨迹，并把缺失的遥测单独标记。
+
+评分时，分别记录调查是否找对开始时间、影响范围、候选原因及其证据，和交接摘要是否说明不确定性与下一步。根因猜对但引用不支持，不能记作完整成功；同样，缺少必要历史指标的任务不应简单计为 Agent 能力失败。用未参与调参的事故保留集检查回归，并在任务规模不足时避免对线上效果作精确推断。
+
 ## 一次客服 Agent 成本优化：先过质量门槛
 
 > 核验日期：2026-11-18。下例是独立教学模拟，数据和阈值均为假设，不是任何模型的实测结果或价格。
