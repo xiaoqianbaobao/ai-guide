@@ -73,11 +73,11 @@ async function copyCode(event: MouseEvent) {
   }
   window.setTimeout(() => { delete button.dataset.copyState; button.setAttribute('aria-label', '复制代码') }, 2000)
 }
-function scrollCodeWithKeyboard(event: KeyboardEvent) {
-  const pre = event.target instanceof HTMLElement ? event.target : null
-  if (!pre?.matches('div[class*="language-"] > pre[tabindex="0"]')) return
+function scrollContentWithKeyboard(event: KeyboardEvent) {
+  const target = event.target instanceof HTMLElement ? event.target : null
+  if (!target?.matches('div[class*="language-"] > pre[tabindex="0"], table[tabindex="0"]')) return
   if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return
-  pre.scrollLeft += event.key === 'ArrowRight' ? 48 : -48
+  target.scrollLeft += event.key === 'ArrowRight' ? 48 : -48
   event.preventDefault()
 }
 const focus = ref(false)
@@ -92,6 +92,21 @@ function updateCodeScrollability() {
     } else {
       pre.removeAttribute('tabindex')
       pre.removeAttribute('aria-label')
+    }
+  })
+  document.querySelectorAll<HTMLElement>('.next-article table').forEach(table => {
+    if (table.scrollWidth > table.clientWidth + 1) {
+      table.tabIndex = 0
+      if (!table.hasAttribute('aria-label')) {
+        table.setAttribute('aria-label', '表格，可使用方向键水平滚动')
+        table.dataset.scrollLabel = 'true'
+      }
+    } else {
+      table.removeAttribute('tabindex')
+      if (table.dataset.scrollLabel) {
+        table.removeAttribute('aria-label')
+        delete table.dataset.scrollLabel
+      }
     }
   })
 }
@@ -191,7 +206,7 @@ watch(() => route.path, () => { menuOpen.value = false; sidebarOpen.value = fals
     <main v-if="home" id="main" class="next-home"><Content /></main>
     <div v-else class="next-layout" :class="{ 'is-focus': focus, 'is-menu-open': sidebarOpen }">
       <aside id="lesson-navigation" class="next-sidebar" aria-label="课程目录"><section v-for="part in group" :key="part.text"><h2>{{ part.text }}</h2><a v-for="item in part.items" :key="item.link" :href="href(item.link)" :aria-current="active(item.link) ? 'page' : undefined">{{ item.text }}</a></section></aside>
-      <main id="main" class="next-main"><article class="next-article vp-doc" @click="copyCode" @keydown="scrollCodeWithKeyboard"><button type="button" class="next-focus" :aria-pressed="focus" @click="focus = !focus">{{ focus ? '退出专注' : '专注阅读' }}</button><Content /><nav v-if="prev || next" class="prev-next" aria-label="课程分页"><a v-if="prev" class="pager-link prev" :href="href(prev.link)"><small>本专题上一篇</small><strong>{{ prev.text }}</strong></a><a v-if="next" class="pager-link next" :href="href(next.link)"><small>本专题下一篇</small><strong>{{ next.text }}</strong></a></nav></article></main>
+      <main id="main" class="next-main"><article class="next-article vp-doc" @click="copyCode" @keydown="scrollContentWithKeyboard"><button type="button" class="next-focus" :aria-pressed="focus" @click="focus = !focus">{{ focus ? '退出专注' : '专注阅读' }}</button><Content /><nav v-if="prev || next" class="prev-next" aria-label="课程分页"><a v-if="prev" class="pager-link prev" :href="href(prev.link)"><small>本专题上一篇</small><strong>{{ prev.text }}</strong></a><a v-if="next" class="pager-link next" :href="href(next.link)"><small>本专题下一篇</small><strong>{{ next.text }}</strong></a></nav></article></main>
       <aside v-if="headings.length" class="next-outline" aria-label="本文目录"><strong>本文目录</strong><a v-for="heading in headings" :key="heading.id" :class="{ sub: heading.level > 2 }" :href="'#' + encodeURIComponent(heading.id)">{{ heading.title }}</a></aside>
     </div>
     <footer class="next-footer">造与见 · 从想法到第一个真实客户</footer><WechatRail v-if="!home" />
