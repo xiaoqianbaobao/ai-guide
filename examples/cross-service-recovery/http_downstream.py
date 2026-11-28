@@ -81,7 +81,8 @@ class HttpDownstream:
         try:
             with urlopen(request, timeout=self.timeout) as response:
                 payload = json.load(response)
-                if not isinstance(payload, dict) or not isinstance(payload.get("receipt"), str) or not payload["receipt"].strip():
+                # This mock's contract defines receipt as the original operation ID.
+                if not isinstance(payload, dict) or payload.get("receipt") != operation_id:
                     raise ValueError("invalid receipt")
                 return payload["receipt"]
         except HTTPError as error:
@@ -98,7 +99,7 @@ class HttpDownstream:
             with urlopen(self.base + "/tickets/" + quote(operation_id, safe=""), timeout=self.timeout) as response:
                 payload = json.load(response)
                 if (not isinstance(payload, dict) or not isinstance(payload.get("receipt"), str)
-                        or not payload["receipt"].strip() or not isinstance(payload.get("digest"), str)
+                        or payload["receipt"] != operation_id or not isinstance(payload.get("digest"), str)
                         or not re.fullmatch(r"[0-9a-f]{64}", payload["digest"])):
                     raise ValueError("invalid lookup response")
                 return payload

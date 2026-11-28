@@ -47,7 +47,7 @@ python3 recovery.py
 python3 -m unittest -v
 ```
 
-预期演示输出“响应丢失后: unknown”和“重启并对账后: confirmed”。12 条测试覆盖：响应丢失、下游写入后调用方崩溃、查询无结果、沿用相同 ID 重试、同 ID 不同内容的冲突、本机 HTTP 连接中断、服务不可用和响应格式异常。[完整源码](https://github.com/xiaoqianbaobao/ai-guide/tree/main/examples/cross-service-recovery)在临时目录创建两个数据库，退出后自动清理。
+预期演示输出“响应丢失后: unknown”和“重启并对账后: confirmed”。14 条测试覆盖：响应丢失、下游写入后调用方崩溃、查询无结果、沿用相同 ID 重试、同 ID 不同内容的冲突、本机 HTTP 连接中断、服务不可用、响应格式异常和回执关联错误。[完整源码](https://github.com/xiaoqianbaobao/ai-guide/tree/main/examples/cross-service-recovery)在临时目录创建两个数据库，退出后自动清理。
 
 只运行跨进程 HTTP 演练：
 
@@ -62,6 +62,8 @@ python3 -m unittest test_http_recovery -v
 ### HTTP 成功也需要可用的回执
 
 HTTP 200 只说明收到成功状态码，不保证响应体是可用的业务回执。如果响应内容不是合法 JSON、缺少回执或回执为空，调用方无法据此确认写入，应保留 `unknown` 并按原操作 ID 对账，而不是保存 `confirmed`。查询返回的数据同样需要校验回执和摘要的格式；**格式正确但摘要不一致**是内容冲突，需要单独报错，不能当作查询暂时不可用。
+
+本模拟服务约定回执就是原操作 ID，因此创建和查询响应还必须与请求 ID 相等；如果返回了另一操作的非空回执，调用方保留 `unknown`，不能确认成功。测试以模拟 HTTP 响应分别覆盖创建和查询时的错误关联。真实系统的工单 ID 可能与操作 ID 不同，不能照搬相等判断；应按照下游协议验证回执与请求之间可信的关联字段。
 
 新增测试先通过本机 HTTP 创建工单，再用模拟响应对象分别注入损坏 JSON、缺字段和空回执，确认状态保持 `unknown`；移除模拟后通过实际本机 HTTP 查询恢复为 `confirmed`，并检查工单仍只有一条。查询格式异常也有单独测试。这里模拟的是客户端收到异常响应，不是网络层原样重放；生产实现仍需按真实服务合同处理状态码、响应大小限制、幂等键和超时。
 

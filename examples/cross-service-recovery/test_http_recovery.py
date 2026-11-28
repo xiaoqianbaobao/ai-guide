@@ -84,6 +84,22 @@ class HttpRecoveryTests(unittest.TestCase):
             with self.subTest(body=body), patch("http_downstream.urlopen", return_value=BytesIO(body)):
                 self.assertEqual(self.coordinator.reconcile("http-operation")["state"], "unknown")
 
+    def test_receipt_for_another_operation_cannot_confirm_write(self):
+        body = b'{"receipt":"wrong-operation"}'
+        with patch("http_downstream.urlopen", return_value=BytesIO(body)):
+            state = self.coordinator.dispatch("http-operation")
+        self.assertEqual(state["state"], "unknown")
+        self.assertIsNone(state["receipt"])
+
+    def test_receipt_for_another_operation_cannot_confirm_lookup(self):
+        from recovery import fingerprint
+        import json
+        body = json.dumps({"receipt": "wrong-operation", "digest": fingerprint("请人工核实退款")}).encode()
+        with patch("http_downstream.urlopen", return_value=BytesIO(body)):
+            state = self.coordinator.reconcile("http-operation")
+        self.assertEqual(state["state"], "unknown")
+        self.assertIsNone(state["receipt"])
+
     def test_conflicting_payload_is_rejected(self):
         self.remote.create("http-operation", "第一份内容")
         with self.assertRaises(ValueError):
