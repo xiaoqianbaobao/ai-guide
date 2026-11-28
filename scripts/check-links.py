@@ -29,8 +29,9 @@ class Page(HTMLParser):
             self.share_meta.setdefault(attributes["property"], []).append(attributes.get("content", ""))
         if "id" in attributes:
             self.ids.add(attributes["id"])
-        if tag == "a" and "href" in attributes:
-            self.links.append(attributes["href"])
+        if tag == "a":
+            # Missing href is also an unusable link, not just href="" or href="#".
+            self.links.append(attributes.get("href") or "")
 
 
 def main():
