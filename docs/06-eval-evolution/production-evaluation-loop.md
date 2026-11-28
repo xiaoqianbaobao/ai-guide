@@ -69,6 +69,31 @@ OpenAI 比较了六个模型在一种安全评估和近似匹配的部署决策�
 
 先固定评分定义，例如“提出外发调用即记为一次越权尝试”，再按权限、任务和工具条件匹配案例；同时记录无法匹配、资料不足、拒答和人工接管的情况。若线上只保留授权网关的最终结果，而没有模型调用意图，就无法完整计算“尝试率”。在实际观察前确认用户授权、隐私处理和数据留存要求；不能为了制造对照而关闭生产安全防线。
 
+#### 动手：别把缺失记录算成没有越权
+
+下面的 Python 示例使用三条**虚构记录**。`None` 表示未采集到对应字段；尝试、网关拦截和实际副作用分别计数，并分别显示已观测条数：
+
+```python
+records = [
+    {"attempt": True,  "blocked": True,  "effect": False},
+    {"attempt": False, "blocked": None,  "effect": False},
+    {"attempt": None,  "blocked": True,  "effect": None},
+]
+
+def count_observed(rows, field):
+    values = [row[field] for row in rows if row[field] is not None]
+    if any(type(value) is not bool for value in values):
+        raise ValueError("字段只能是 True、False 或 None")
+    return {"yes": sum(values), "observed": len(values),
+            "missing": len(rows) - len(values)}
+
+for field in ("attempt", "blocked", "effect"):
+    print(field, count_observed(records, field))
+assert count_observed(records, "attempt") == {"yes": 1, "observed": 2, "missing": 1}
+```
+
+保存为 `count_observed.py` 并运行 `python3 count_observed.py`。尝试字段输出 `yes=1、observed=2、missing=1`；不能把未记录的第三条当成“没有尝试”，也不能据此声称真实越权尝试率是 1/3。实际系统还需要明确“无调用”和“日志丢失”的区别、数据采集覆盖率与样本选择规则；缺失数据可能并非随机，单纯使用已观测样本也可能有偏差。
+
 比较结果出现差异时，先逐项检查样本选择、上下文、工具响应和评分口径，再设计有控制的离线实验；不要立即归因于模型“知道自己在考试”。同时保留服务端权限控制：即使离线和线上行为相似，模型的判断也不能代替对每次操作的授权。可结合[本地企业助手的注入测试](../agent/cases/enterprise-agent-model-tool-loop)练习区分模型请求与实际写入。
 
 ## 把“效果不好”拆成可测的失败
