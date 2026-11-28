@@ -59,6 +59,30 @@ rows = db.execute(
 
 假设搜索引擎先在所有租户文档中取最相似的 10 条，再从中删去无权限内容。即使最后没有直接显示其他租户的正文，也可能出现两个问题：授权文档被挤出前 10 条而漏召回；不同的耗时、分数或结果数量可能暴露额外信息。后者是否可利用取决于具体实现与攻击条件，不能仅凭架构图断言发生了泄露。
 
+### 动手：同一排名，不同过滤顺序
+
+下面是预先排好顺序的**虚构数据**，不是向量数据库或性能测试。把代码保存为 `filter_order.py`，用 `python3 filter_order.py` 运行：
+
+```python
+# 分数和权限仅用于说明，真实授权应由可信服务端身份决定。
+ranked = [
+    {"id": "hr-1", "tenant": "hr", "score": 0.99},
+    {"id": "hr-2", "tenant": "hr", "score": 0.95},
+    {"id": "support-1", "tenant": "support", "score": 0.90},
+]
+tenant, limit = "support", 2
+
+# 两个方法都不向客服返回人事正文；差异在于候选截断顺序。
+post_filter = [d["id"] for d in ranked[:limit] if d["tenant"] == tenant]
+pre_filter = [d["id"] for d in ranked if d["tenant"] == tenant][:limit]
+print("截断后过滤:", post_filter)
+print("授权范围内取前两条:", pre_filter)
+assert post_filter == []
+assert pre_filter == ["support-1"]
+```
+
+这里两条人事记录先占满了候选名额，因此后过滤得到空结果；先限定可见范围再取前两条，则保留客服记录。实验只说明这个排序例子里的召回差异，**不证明某个真实引擎采用哪种算法，也不证明侧信道泄露存在**。生产实现还需确认过滤在引擎内部如何执行、候选池如何选择，并在权限变更后重新验证缓存。
+
 设计时应检查搜索服务的过滤位置、向量索引隔离、结果及错误返回、权限更新延迟，以及缓存键是否绑定用户或授权范围。[Microsoft 的 RAG 文档](https://learn.microsoft.com/en-us/azure/foundry/concepts/retrieval-augmented-generation)建议在检索阶段实施访问控制；[OWASP 对向量与嵌入风险的讨论](https://genai.owasp.org/llm2026/llm092026-vector-and-embedding-weaknesses/)也提醒评估检索链路中的访问边界。不同搜索产品的过滤语义不同，必须查对应版本文档并用真实配置验证。
 
 ## 4. 撤回后如何验收
