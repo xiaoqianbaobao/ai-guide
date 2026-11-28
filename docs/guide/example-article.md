@@ -1,29 +1,16 @@
 ---
-title: 示例文章
+title: 文章示例说明
+description: 早期示例页面与正式课程入口。
+head:
+  - - meta
+    - name: robots
+      content: noindex, follow
 ---
 
-# 示例文章
+# 文章示例说明
 
-这是一篇示例文章，用于演示如何推送文章到 AI Guide 项目。
+<span id="示例文章"></span>
 
-## 介绍
+这个地址曾用于文章格式演示。现在可以从[学习指南](./)选择学习路线，或直接进入[企业级 Agent 实战](../agent/)开始动手。
 
-AI Guide 是一个专注于人工智能工程实践的中文知识体系，致力于为开发者提供系统、实战的 AI 学习资源。
-
-## 内容
-
-### 章节一
-
-这是文章的第一个章节。
-
-### 章节二
-
-这是文章的第二个章节。
-
-## 总结
-
-通过这篇文章，我们了解了如何在 AI Guide 项目中添加新内容。
-
----
-
-*作者：iFlow CLI*
+<span id="介绍"></span><span id="内容"></span><span id="章节一"></span><span id="章节二"></span><span id="总结"></span>

@@ -31,7 +31,10 @@ export default defineConfig({
   lastUpdated: true,
   ignoreDeadLinks: false,
   base: isProduction ? repositoryBase : '/',
-  sitemap: { hostname: new URL(isProduction ? repositoryBase : '/', publishedOrigin).toString() },
+  sitemap: {
+    hostname: new URL(isProduction ? repositoryBase : '/', publishedOrigin).toString(),
+    transformItems: items => items.filter(item => !['models/python-basics/README', 'guide/example-article'].includes(item.url))
+  },
   head: [
     ['meta', { name: 'theme-color', content: '#f7f5f1' }],
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${isProduction ? repositoryBase : '/'}logo.svg` }],
