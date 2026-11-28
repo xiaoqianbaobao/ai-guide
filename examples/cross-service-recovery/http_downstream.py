@@ -1,5 +1,5 @@
 """Loopback-only mock downstream and HTTP client for failure-injection exercises."""
-from http.client import RemoteDisconnected
+from http.client import HTTPException
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import json
 import re
@@ -89,7 +89,7 @@ class HttpDownstream:
             if error.code in (400, 409):
                 raise ValueError("downstream rejected request") from error
             raise TimeoutError("downstream outcome unknown") from error
-        except (URLError, TimeoutError, RemoteDisconnected, ConnectionResetError) as error:
+        except (URLError, OSError, HTTPException) as error:
             raise TimeoutError("downstream outcome unknown") from error
         except (ValueError, TypeError) as error:
             raise TimeoutError("invalid response; downstream outcome unknown") from error
@@ -107,7 +107,7 @@ class HttpDownstream:
             if error.code == 404:
                 return None
             raise TimeoutError("lookup unavailable") from error
-        except (URLError, TimeoutError, RemoteDisconnected, ConnectionResetError) as error:
+        except (URLError, OSError, HTTPException) as error:
             raise TimeoutError("lookup unavailable") from error
         except (ValueError, TypeError) as error:
             raise TimeoutError("invalid lookup response") from error

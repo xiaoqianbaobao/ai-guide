@@ -69,6 +69,20 @@ HTTP 200 只说明收到成功状态码，不保证响应体是可用的业务�
 
 新增测试先通过本机 HTTP 创建工单，再用模拟响应对象分别注入损坏 JSON、缺字段和空回执，确认状态保持 `unknown`；移除模拟后通过实际本机 HTTP 查询恢复为 `confirmed`，并检查工单仍只有一条。查询格式异常也有单独测试。这里模拟的是客户端收到异常响应，不是网络层原样重放；生产实现仍需按真实服务合同处理状态码、响应大小限制、幂等键和超时。
 
+### 收到一半响应就断开
+
+还有一种情况：下游已经提交，调用方也开始读取响应，但响应体没有收完整。Python HTTP 客户端可能抛出 `IncompleteRead`，这和收到一份不合法 JSON 不完全一样：后者是解析失败，前者发生在读取阶段。无论哪种，调用方都没有拿到完整回执，不能确认写入失败，也不能盲目用新操作 ID 再提交。
+
+下面的离线测试先通过本机服务提交，再让模拟的响应对象在读取时抛出 `IncompleteRead`；随后恢复正常查询，验证对账能确认原操作，并且下游仍只有一条工单。另一项测试覆盖查询响应被截断时保持 `unknown`：
+
+```bash
+python3 -m unittest \
+  test_http_recovery.HttpRecoveryTests.test_truncated_response_remains_unknown_then_reconciles \
+  test_http_recovery.HttpRecoveryTests.test_truncated_lookup_response_keeps_unknown -v
+```
+
+适配器将这类 HTTP 协议或连接读取异常转换为“结果未知”，协调器保留已记录的操作 ID 和内容；它不自动重发。测试注入的是客户端异常，不能代表所有代理、网络或下游系统的失败行为。实际对接仍要结合具体客户端、下游合同及观测数据扩充故障注入。
+
 关键逻辑是先查询已知操作，再判断能否确认：
 
 ```python

@@ -1,5 +1,6 @@
 from contextlib import closing
 from io import BytesIO
+from http.client import IncompleteRead
 from multiprocessing import Process, Queue
 from pathlib import Path
 import sqlite3
@@ -83,6 +84,28 @@ class HttpRecoveryTests(unittest.TestCase):
         for body in (b'{broken', b'{}', b'{"receipt": null, "digest": "bad"}'):
             with self.subTest(body=body), patch("http_downstream.urlopen", return_value=BytesIO(body)):
                 self.assertEqual(self.coordinator.reconcile("http-operation")["state"], "unknown")
+
+    def test_truncated_response_remains_unknown_then_reconciles(self):
+        class TruncatedResponse(BytesIO):
+            def read(self, *args):
+                raise IncompleteRead(b'{"receipt":', 12)
+
+        # The external write already committed; the client receives only part of its response.
+        self.remote.create("http-operation", "请人工核实退款")
+        with patch("http_downstream.urlopen", return_value=TruncatedResponse()):
+            state = self.coordinator.dispatch("http-operation")
+        self.assertEqual(state["state"], "unknown")
+        self.assertIsNone(state["receipt"])
+        self.assertEqual(self.coordinator.reconcile("http-operation")["state"], "confirmed")
+        self.assertEqual(self.count_external(), 1)
+
+    def test_truncated_lookup_response_keeps_unknown(self):
+        class TruncatedResponse(BytesIO):
+            def read(self, *args):
+                raise IncompleteRead(b'{"receipt":', 12)
+
+        with patch("http_downstream.urlopen", return_value=TruncatedResponse()):
+            self.assertEqual(self.coordinator.reconcile("http-operation")["state"], "unknown")
 
     def test_receipt_for_another_operation_cannot_confirm_write(self):
         body = b'{"receipt":"wrong-operation"}'
