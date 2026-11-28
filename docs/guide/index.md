@@ -78,7 +78,7 @@ description: AI Agent 全栈知识体系的学习入口与使用方式
 - [评估与进化](/06-eval-evolution/)：建立评估和优化方法
 - [本体论与知识表示](/07-ontology/)：从哲学概念落到实体建模与语义对齐
 - [自进化 Skills](/08-self-evolving-skills/)：Agent 如何自动长出新能力、自我修正
-- [数据治理](/09-data-governance/)：强监管场景下的血缘、脱敏、审计与合规
+- [数据治理](/09-data-governance/)：从[企业知识的权限与撤回](/09-data-governance/knowledge-access-lifecycle)入手，理解文档版本、授权检索与副本生命周期
 
 ## 实战入口
 
