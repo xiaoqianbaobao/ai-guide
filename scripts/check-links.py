@@ -14,6 +14,8 @@ class Page(HTMLParser):
         self.ids = set()
         self.has_article = False
         self.h1_count = 0
+        self.canonical = []
+        self.share_meta = {}
 
     def handle_starttag(self, tag, attrs):
         attributes = dict(attrs)
@@ -21,6 +23,10 @@ class Page(HTMLParser):
             self.has_article = True
         if tag == "h1":
             self.h1_count += 1
+        if tag == "link" and attributes.get("rel") == "canonical":
+            self.canonical.append(attributes.get("href", ""))
+        if tag == "meta" and attributes.get("property", "").startswith("og:"):
+            self.share_meta.setdefault(attributes["property"], []).append(attributes.get("content", ""))
         if "id" in attributes:
             self.ids.add(attributes["id"])
         if tag == "a" and "href" in attributes:
@@ -38,6 +44,13 @@ def main():
     errors = []
     count = 0
     for file, page in pages.items():
+        if file.name != "404.html":
+            for key in ("og:title", "og:description", "og:url"):
+                values = page.share_meta.get(key, [])
+                if len(values) != 1 or not values[0].strip():
+                    errors.append((file.relative_to(ROOT), key, "分享信息需要且只能有一个非空值"))
+            if len(page.canonical) != 1 or page.share_meta.get("og:url") != page.canonical:
+                errors.append((file.relative_to(ROOT), "canonical", "规范地址与分享地址不一致"))
         if page.has_article and page.h1_count != 1:
             errors.append((file.relative_to(ROOT), "h1", f"文章需要一个一级标题，实际为 {page.h1_count} 个"))
         for href in page.links:
