@@ -134,6 +134,6 @@ print("状态断言通过")
 
 - Anthropic，[The components of agent memory](https://www.anthropic.com/research/components-of-agent-memory)
 - Microsoft，[STATE-Bench 介绍](https://opensource.microsoft.com/blog/2026/05/19/introducing-state-bench-a-benchmark-for-ai-agent-memory/)和[官方视频讲解](https://www.youtube.com/watch?v=oFs9aU_T794)：了解有状态任务评估设计。
-- Tavakoli 等，[BEAM 论文（ICLR 2026）](https://openreview.net/pdf?id=y59hf5lrMn)：查看数据生成、能力分类与局限。
+- Tavakoli 等，BEAM 论文（ICLR 2026）：[OpenReview 会议版本](https://openreview.net/pdf?id=y59hf5lrMn)；如遇浏览器验证，可查看 [arXiv 版本](https://arxiv.org/abs/2510.27246)。阅读时关注数据生成、能力分类与局限，两个平台的版本可能不同。
 - Hu 等，[Memory in the Age of AI Agents](https://arxiv.org/abs/2512.13564)（含 benchmark 与开源框架汇总）
 - Mem0，[AI Memory Benchmarks in 2026](https://mem0.ai/library/agent-memory/ai-memory-benchmarks-in-2026)（厂商视角的 benchmark 综述，阅读时注意评测口径）
