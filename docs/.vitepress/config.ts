@@ -35,9 +35,7 @@ export default defineConfig({
   head: [
     ['meta', { name: 'theme-color', content: '#f7f5f1' }],
     ['link', { rel: 'icon', type: 'image/svg+xml', href: `${isProduction ? repositoryBase : '/'}logo.svg` }],
-    ['meta', { property: 'og:type', content: 'website' }],
-    ['meta', { property: 'og:title', content: '造与见｜从想法到第一个真实客户' }],
-    ['meta', { property: 'og:description', content: '从第一性原理到工程实战，系统掌握 AI Agent 开发' }]
+    ['meta', { property: 'og:type', content: 'website' }]
   ],
   markdown: {
     lineNumbers: true,
@@ -143,6 +141,11 @@ export default defineConfig({
       'link',
       { rel: 'canonical', href: canonicalUrl }
     ])
+    pageData.frontmatter.head.push(
+      ['meta', { property: 'og:title', content: `${pageData.title} | 造与见` }],
+      ['meta', { property: 'og:description', content: pageData.description || '从想法到第一个真实客户：融合 Builder 与 Seller 的 AI 学习体系' }],
+      ['meta', { property: 'og:url', content: canonicalUrl }]
+    )
   }
 })
 
