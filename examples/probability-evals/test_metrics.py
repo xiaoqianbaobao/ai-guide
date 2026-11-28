@@ -22,6 +22,11 @@ class MetricsTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             binomial_pmf(5, 6, .5)
 
+    def test_non_finite_confidence_parameter_is_rejected(self):
+        for z in (float('nan'), float('inf'), float('-inf')):
+            with self.subTest(z=z), self.assertRaises(ValueError):
+                wilson_interval(5, 100, z)
+
 
 if __name__ == "__main__":
     unittest.main()

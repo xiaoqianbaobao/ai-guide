@@ -67,7 +67,7 @@ python3 metrics.py
 python3 -m unittest -v
 ```
 
-预期分别看到约 `0.358` 和 `[0.022, 0.112]`；4 条测试检查二项概率归一、零失败时的区间上界、观测比例以及非法输入。[完整源码](https://github.com/xiaoqianbaobao/ai-guide/tree/main/examples/probability-evals)没有第三方依赖。
+预期分别看到约 `0.358` 和 `[0.022, 0.112]`；5 条测试检查二项概率归一、零失败时的区间上界、观测比例以及非法输入。区间计算会拒绝非有限的 `z` 值，避免把 `NaN` 或无穷大当成有效结果。[完整源码](https://github.com/xiaoqianbaobao/ai-guide/tree/main/examples/probability-evals)没有第三方依赖。
 
 下面是计算“20 次零失败”的核心逻辑：
 

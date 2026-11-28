@@ -9,8 +9,9 @@ def binomial_pmf(n: int, k: int, p: float) -> float:
 
 
 def wilson_interval(successes: int, trials: int, z: float = 1.959963984540054) -> tuple:
-    if not isinstance(trials, int) or not isinstance(successes, int) or trials <= 0 or not 0 <= successes <= trials or z <= 0:
-        raise ValueError("require 0 <= successes <= trials, trials > 0, z > 0")
+    if (not isinstance(trials, int) or not isinstance(successes, int) or trials <= 0
+            or not 0 <= successes <= trials or not math.isfinite(z) or z <= 0):
+        raise ValueError("require 0 <= successes <= trials, trials > 0, finite z > 0")
     p = successes / trials
     z2 = z * z
     denominator = 1 + z2 / trials
