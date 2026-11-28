@@ -119,7 +119,7 @@ flowchart LR
 
 MCP 的价值在于把“可被 AI 使用的外部能力”抽象成标准化接口，而不是每个客户端各做各的。
 
-Anthropic 在 2025 年关于工具设计和 context engineering 的文章里，反复强调 agent 系统真正难的是能力暴露、返回结构、评估和多角色协作，而不只是“让模型能发出函数调用”。MCP 正是在这条线上的基础设施化动作。[Writing effective tools for agents](https://www.anthropic.com/engineering/writing-tools-for-agents) [Effective context engineering for AI agents](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+Anthropic 在 2025 年关于工具设计和 context engineering 的文章里，反复强调 agent 系统真正难的是能力暴露、返回结构、评估和多角色协作，而不只是“让模型能发出函数调用”。MCP 正是在这条线上的基础设施化动作。[Writing effective tools for agents](https://www.anthropic.com/research/writing-tools-for-agents) [Effective context engineering for AI agents](https://www.anthropic.com/research/effective-context-engineering-for-ai-agents)
 
 ## 可以把 MCP 理解成什么
 

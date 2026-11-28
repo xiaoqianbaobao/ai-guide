@@ -1120,4 +1120,4 @@ Q6: 验证与分工如何压住模型不稳定性？
 - [Dive into Claude Code: The Design Space of AI Agent Systems (arxiv)](https://arxiv.org/html/2604.14228v1)
 - [Claude Code Agent Harness Architecture - WaveSpeed](https://wavespeed.ai/blog/posts/claude-code-agent-harness-architecture/)
 - [Harness Engineering for Coding Agents - HumanLayer](https://www.humanlayer.dev/blog/skill-issue-harness-engineering-for-coding-agents)
-- [Effective context engineering for AI agents - Anthropic](https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents)
+- [Effective context engineering for AI agents - Anthropic](https://www.anthropic.com/research/effective-context-engineering-for-ai-agents)

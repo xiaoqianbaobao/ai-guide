@@ -88,5 +88,5 @@ if __name__ == "__main__":
 
 ## 参考资料
 
-- [Anthropic：Building Effective Agents](https://www.anthropic.com/engineering/building-effective-agents)：从简单、可组合的方案出发，以评估决定是否引入更多复杂度。
+- [Anthropic：Building Effective Agents](https://www.anthropic.com/research/building-effective-agents)：从简单、可组合的方案出发，以评估决定是否引入更多复杂度。
 - [OpenAI：Evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices)：设计任务集并持续比较系统版本。

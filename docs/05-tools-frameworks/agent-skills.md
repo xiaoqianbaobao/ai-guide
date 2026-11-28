@@ -1152,7 +1152,7 @@ Harness（控制结构）
 ---
 
 **参考资料**：
-- [Equipping agents for the real world with Agent Skills - Anthropic Engineering](https://www.anthropic.com/engineering/equipping-agents-for-the-real-world-with-agent-skills)
+- [Equipping agents for the real world with Agent Skills - Anthropic Engineering](https://www.anthropic.com/research/equipping-agents-for-the-real-world-with-agent-skills)
 - [Extend Claude with skills - Claude Code Docs](https://code.claude.com/docs/en/skills)
 - [Agent Skills Overview - Claude API Docs](https://platform.claude.com/docs/en/agents-and-tools/agent-skills/overview)
 - [Agent Skills open standard - agentskills.io](https://agentskills.io)

@@ -163,7 +163,7 @@ Agent Eval 的另一个常见错误，是把测试样本设计成传统问答的
 
 很多团队刚做 Eval 时容易走两个极端：样本太少只能看热闹，样本太大但质量参差不齐、很难分析。更合理的方式通常是先做一小批高价值样本：高频真实任务、容易失败的边界任务、业务上后果较重的关键任务。这样即使数据集不大，也能更早暴露关键问题。
 
-Anthropic 在 2025 年关于 eval 和 harness 的工程文章里也强调，Agent 评估要尽量贴近真实任务，关注基础设施噪声、长任务表现和可复现失败模式，而不是只看一次性总分。[Demystifying evals for AI agents](https://www.anthropic.com/engineering/demystifying-evals-for-ai-agents) [Effective harnesses for long-running agents](https://www.anthropic.com/engineering/effective-harnesses-for-long-running-agents)
+Anthropic 在 2025 年关于 eval 和 harness 的工程文章里也强调，Agent 评估要尽量贴近真实任务，关注基础设施噪声、长任务表现和可复现失败模式，而不是只看一次性总分。[Demystifying evals for AI agents](https://www.anthropic.com/research/demystifying-evals-for-ai-agents) [Effective harnesses for long-running agents](https://www.anthropic.com/research/effective-harnesses-for-long-running-agents)
 
 ## 目标一旦被量化，就会被优化——也会被扭曲
 

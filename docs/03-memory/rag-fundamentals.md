@@ -361,7 +361,7 @@ def answer_with_rag(question, retriever, llm):
 
 需要把验证拆开：检索前按身份限制可见范围；检索后检查来源是否存在、有效且适用于问题；生成后抽查关键结论是否得到引用支持；无证据时明确拒答或转人工。每一步都需要测试，尤其要分别检查漏答、无依据回答、错误引用与过度拒答。涉及外发或写操作时，另由服务端对实际动作授权，不把检索命中当作操作许可。可以运行[企业助手的来源与注入测试](../agent/cases/enterprise-agent-model-tool-loop)，观察“有来源但回答仍可能被污染”的具体例子。
 
-模型和工具之间的数据也可能包含恶意指令。不要把检索文本拼进高优先级指令；结构化输出有助于约束数据流，但自由文本字段仍可能携带攻击内容，必须结合工具权限和评估。[OpenAI：Agent 安全指南](https://developers.openai.com/api/docs/guides/agent-builder-safety) [Anthropic：编写有效的 Agent 工具](https://www.anthropic.com/engineering/writing-tools-for-agents)
+模型和工具之间的数据也可能包含恶意指令。不要把检索文本拼进高优先级指令；结构化输出有助于约束数据流，但自由文本字段仍可能携带攻击内容，必须结合工具权限和评估。[OpenAI：Agent 安全指南](https://developers.openai.com/api/docs/guides/agent-builder-safety) [Anthropic：编写有效的 Agent 工具](https://www.anthropic.com/research/writing-tools-for-agents)
 
 ::: tip 产品状态（2026-11-27 核验）
 上面的 OpenAI 指南包含 Agent Builder 产品说明；官方公告该产品计划于 2026-11-30 停止。此处引用的是不可信输入、数据流和权限隔离的通用方法，不要求使用该产品。具体迁移请查看[官方公告](https://openai.com/index/introducing-agentkit/)和[停用表](https://developers.openai.com/api/docs/deprecations)。

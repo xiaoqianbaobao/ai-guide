@@ -139,7 +139,7 @@ python3 -m unittest \
 
 - [OpenAI：Function calling](https://developers.openai.com/api/docs/guides/function-calling)：核对 Responses API 的工具定义、调用项和结果回传格式。
 - [OpenAI：Evaluation best practices](https://developers.openai.com/api/docs/guides/evaluation-best-practices)：构造任务集并持续评估。
-- [Anthropic：Building effective agents](https://www.anthropic.com/engineering/building-effective-agents)：从简单、可组合的工作流逐步验证复杂度。
+- [Anthropic：Building effective agents](https://www.anthropic.com/research/building-effective-agents)：从简单、可组合的工作流逐步验证复杂度。
 - [OpenAI：Designing AI agents to resist prompt injection](https://openai.com/index/designing-agents-to-resist-prompt-injection/)：从不可信内容和操作权限组合分析注入风险。
 
 资料核验日期：2026-11-27。
