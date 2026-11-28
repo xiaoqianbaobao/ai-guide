@@ -49,7 +49,10 @@ def main():
                 values = page.share_meta.get(key, [])
                 if len(values) != 1 or not values[0].strip():
                     errors.append((file.relative_to(ROOT), key, "分享信息需要且只能有一个非空值"))
-            if len(page.canonical) != 1 or page.share_meta.get("og:url") != page.canonical:
+            if (len(page.canonical) != 1 or not page.canonical[0].strip()
+                    or urlsplit(page.canonical[0]).scheme not in {"http", "https"}
+                    or not urlsplit(page.canonical[0]).netloc
+                    or page.share_meta.get("og:url") != page.canonical):
                 errors.append((file.relative_to(ROOT), "canonical", "规范地址与分享地址不一致"))
         if page.has_article and page.h1_count != 1:
             errors.append((file.relative_to(ROOT), "h1", f"文章需要一个一级标题，实际为 {page.h1_count} 个"))
