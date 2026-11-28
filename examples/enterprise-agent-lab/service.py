@@ -65,6 +65,9 @@ class Service:
                 db.execute("ALTER TABLE drafts ADD COLUMN approved_until REAL")
             if "revision" not in columns:
                 db.execute("ALTER TABLE drafts ADD COLUMN revision INTEGER NOT NULL DEFAULT 1")
+            external_columns = {row["name"] for row in db.execute("PRAGMA table_info(external_operations)")}
+            if "receipt" not in external_columns:
+                db.execute("ALTER TABLE external_operations ADD COLUMN receipt TEXT")
             document_columns = {row["name"] for row in db.execute("PRAGMA table_info(documents)")}
             if "revision" not in document_columns:
                 db.execute("ALTER TABLE documents ADD COLUMN revision INTEGER NOT NULL DEFAULT 1")
@@ -300,7 +303,9 @@ class Service:
             if (not row["approved_by"] or row["approved_digest"] != version
                     or row["approved_until"] is None or self.clock() >= row["approved_until"]):
                 raise PermissionError("current draft requires unexpired approval")
-            db.execute("INSERT INTO external_operations VALUES (?, ?, ?, ?, ?, ?, ?, 'prepared')",
+            db.execute("""INSERT INTO external_operations
+                (operation_id, draft_id, tenant, text, approved_version, approved_by, approved_until, state)
+                VALUES (?, ?, ?, ?, ?, ?, ?, 'prepared')""",
                        (operation_id, draft_id, identity.tenant, row["text"], version,
                         row["approved_by"], row["approved_until"]))
             self.audit(db, identity, "external_submission_prepared", operation_id)
@@ -332,3 +337,64 @@ class Service:
                        (row["draft_id"], identity.tenant))
             self.audit(db, identity, "external_submission_cancelled", operation_id)
             return {"operation_id": operation_id, "state": "cancelled", "replayed": False}
+
+    @staticmethod
+    def external_payload(row):
+        # Bind the simulated downstream write to tenant, draft, reviewed version and text.
+        return json.dumps([row["tenant"], row["draft_id"], row["approved_version"], row["text"]],
+                          ensure_ascii=False, separators=(',', ':'))
+
+    def get_external_submission(self, identity: Identity, operation_id: str) -> dict:
+        if identity.role != "operator":
+            raise PermissionError("operator required")
+        with closing(self.connect()) as db:
+            row = db.execute("SELECT state, receipt FROM external_operations WHERE operation_id = ? AND tenant = ?",
+                             (operation_id, identity.tenant)).fetchone()
+        if not row:
+            raise LookupError("operation not found")
+        return dict(row)
+
+    def claim_external_submission(self, identity: Identity, operation_id: str) -> dict:
+        """Persist uncertainty before sending. Only one caller can claim a prepared intent."""
+        if identity.role != "operator":
+            raise PermissionError("operator required")
+        with closing(self.connect()) as db, db:
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute("SELECT * FROM external_operations WHERE operation_id = ? AND tenant = ?",
+                             (operation_id, identity.tenant)).fetchone()
+            if not row:
+                raise LookupError("operation not found")
+            if row["state"] in ("unknown", "confirmed"):
+                return {"state": row["state"], "claimed": False, "receipt": row["receipt"]}
+            if row["state"] != "prepared":
+                raise ConflictError("invalid operation state")
+            draft = db.execute("SELECT * FROM drafts WHERE id = ? AND tenant = ?", (row["draft_id"], identity.tenant)).fetchone()
+            if (not draft or self.clock() >= row["approved_until"] or draft["approved_until"] != row["approved_until"]
+                    or draft["approved_by"] != row["approved_by"] or draft["approved_digest"] != row["approved_version"]
+                    or approval_version(draft["tenant"], draft["id"], draft["creator"], draft["text"], draft["revision"]) != row["approved_version"]
+                    or draft["text"] != row["text"]):
+                raise PermissionError("approval expired or draft changed")
+            db.execute("UPDATE external_operations SET state = 'unknown' WHERE operation_id = ?", (operation_id,))
+            self.audit(db, identity, "external_submission_claimed", operation_id)
+            return {"state": "unknown", "claimed": True, "payload": self.external_payload(row)}
+
+    def confirm_external_submission(self, identity: Identity, operation_id: str, receipt: str, payload_digest: str) -> dict:
+        """Confirm only the matching downstream operation and exact bound intent."""
+        if identity.role != "operator":
+            raise PermissionError("operator required")
+        with closing(self.connect()) as db, db:
+            db.execute("BEGIN IMMEDIATE")
+            row = db.execute("SELECT * FROM external_operations WHERE operation_id = ? AND tenant = ?",
+                             (operation_id, identity.tenant)).fetchone()
+            if not row:
+                raise LookupError("operation not found")
+            expected = hashlib.sha256(self.external_payload(row).encode('utf-8')).hexdigest()
+            if receipt != operation_id or payload_digest != expected:
+                raise ConflictError("downstream receipt or intent mismatch")
+            if row["state"] == "confirmed":
+                return {"state": "confirmed", "receipt": row["receipt"]}
+            if row["state"] != "unknown":
+                raise ConflictError("operation has not crossed the boundary")
+            db.execute("UPDATE external_operations SET state = 'confirmed', receipt = ? WHERE operation_id = ?", (receipt, operation_id))
+            self.audit(db, identity, "external_submission_confirmed", operation_id)
+            return {"state": "confirmed", "receipt": receipt}
