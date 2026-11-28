@@ -34,10 +34,12 @@ module: data-governance
 - 已读 [评估与进化](../06-eval-evolution/)
 - 最好对 [自进化 Skills](../08-self-evolving-skills/) 的失控风险有概念
 
-## 本模块文章（待补充）
+<span id="本模块文章-待补充"></span>
+## 本模块文章
 
 | 文章 | 类型 | 简介 | 状态 |
 | --- | --- | --- | --- |
+| [企业知识的权限与撤回](./knowledge-access-lifecycle) | 工程 | 从本地测试到索引、缓存与撤回边界 | 可阅读 |
 | 待写 | 核心 | Agent 训练/记忆/RAG 语料的数据血缘 | 📝 待写 |
 | 待写 | 核心 | 敏感数据在 Memory 和 Tool 调用链路里的隔离设计 | 📝 待写 |
 | 待写 | 工程 | 强监管场景：数据留存周期、审计日志、PII 脱敏的 Agent pipeline 落地 | 📝 待写 |

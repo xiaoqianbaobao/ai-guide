@@ -369,7 +369,8 @@ function sidebarDataGovernance() {
       text: '数据治理',
       collapsed: false,
       items: [
-        { text: '模块概述', link: '/09-data-governance/' }
+        { text: '模块概述', link: '/09-data-governance/' },
+        { text: '企业知识的权限与撤回', link: '/09-data-governance/knowledge-access-lifecycle/' }
       ]
     }
   ]
