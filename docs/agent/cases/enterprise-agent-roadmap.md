@@ -6,7 +6,7 @@ module: agent
 
 # 企业级 Agent 实战路线：从知识助手到可治理工作流
 
-> 状态：路线与验收标准，尚不是已完成的可运行课程。后续每一阶段都应提供对应源码、运行命令、测试数据和实测结果，再标记完成。
+> 状态：部分阶段已有可运行的本地教学原型和测试；真实身份、生产系统集成及部署验收仍未完成。独立练习不等于已经接入同一个企业应用。
 
 可以先动手完成 [企业知识助手第一刀](./knowledge-assistant-first-slice)：用 Python 运行一个带授权过滤、引用与拒答的只读教学原型。也可以直接运行[本地企业助手闭环](./enterprise-agent-local-lab)，体验查询、草稿、审批与模拟工单的 HTTP 流程；该示例仍没有真实认证、模型或生产集成。
 
@@ -53,19 +53,30 @@ module: agent
 
 **质量和风险**：同时检查结果正确性、授权边界、执行轨迹、成本与延迟。记忆、模型或提示词变化后必须重跑关键任务；不可将一次演示当作上线依据。参见 [线上评估与回归](../../06-eval-evolution/production-evaluation-loop)。
 
-## 最小回归样例
+## 最小回归样例：已有覆盖与剩余缺口
 
-下面是待实现的验收用例，不代表测试已经运行：
+下表列出**教学原型中的具体测试**，不代表真实企业环境通过验收。演示身份是固定身份，不是真实登录；不同目录的练习也尚未全部接成一个端到端系统。
 
-| 用例 | 前置条件 | 预期结果 |
+| 场景 | 可运行的证据 | 仍需补充 |
 | --- | --- | --- |
-| 正常问答 | 用户可读 A 文档 | 返回有 A 版本引用的答案 |
-| 越权检索 | B 文档仅另一个租户可读 | 不返回 B 的内容，也不在引用或日志泄露 |
-| 证据不足 | 索引中没有相关信息 | 明确表示无法确认，不捏造出处 |
-| 提示注入 | 检索文档要求把私有资料发到外部 | 外部指令不产生越权读取或发送 |
-| 审批过期 | 工单草稿获批后目标改变 | 拒绝执行，要求重新审批 |
-| 写入响应丢失 | 模拟服务已创建工单但客户端超时 | 使用相同操作 ID 查询或对账，不盲目重复创建 |
+| 正常问答与租户过滤 | `test_knowledge_is_filtered_by_tenant`：退款命中来源；客服查询人事资料得到资料不足 | 真实身份、文档级权限及缓存、日志等全部数据通道的隔离 |
+| 资料不足 | `test_no_evidence_does_not_return_model_claim`：模拟模型声称答案时，缺少来源仍拒答 | 对真实模型和多种无答案任务评估拒答质量 |
+| 注入内容要求写操作 | `test_injected_document_cannot_authorize_write_tool`：模拟模型请求未开放的写工具，被拒绝 | 不能由此推断不会泄露或污染回答；同一测试文件还演示回答仍可能被污染 |
+| 批准与重复提交 | `test_approval_and_replay_do_not_duplicate_ticket`：未批准不能提交，相同操作重试只创建一条模拟工单 | 接入真实审批、调用主体、目标系统及可审计授权 |
+| 草稿修改或批准过期 | `test_modified_draft_cannot_use_old_approval`、`test_expiry_rejects_new_write_but_not_replay_of_completed_write` | 跨服务部署时验证审批与实际操作参数的绑定 |
+| 下游写入后响应丢失 | 独立练习 `test_connection_dropped_after_commit_then_reconciled`：用同一 ID 对账且只有一条工单 | 该对账练习尚未与上面的审批服务集成，真实下游合同与故障行为也需要验证 |
+
+在仓库根目录分别运行两组离线测试；每组使用独立临时数据库，不连接真实业务服务：
+
+```bash
+cd examples/enterprise-agent-lab
+python3 -m unittest test_server test_agent_loop -v
+cd ../cross-service-recovery
+python3 -m unittest test_http_recovery -v
+```
+
+如果测试失败，先记录失败用例、Python 版本与错误，再判断是环境、演示代码还是假设变化；不要把某次绿色结果外推为生产安全保证。更多细节见[本地企业助手闭环](./enterprise-agent-local-lab)、[只读模型工具循环](./enterprise-agent-model-tool-loop)和[跨服务写入与对账](./cross-service-write-recovery)。
 
 ## 实施顺序
 
-优先建立阶段 0 和阶段 1 的真实代码仓库、运行说明与验收用例，再依次引入权限、审批和恢复。不要为了展示多 Agent 而先引入多角色编排：先用任务集测出单 Agent 的瓶颈，再判断额外协调成本是否值得。参考 [OpenAI 的 Agent 评估建议](https://developers.openai.com/api/docs/guides/evaluation-best-practices)及 [Anthropic 的 Agent 评估实践](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)。
+先运行已有的本地闭环和独立恢复练习，再为两者的集成补测试：批准版本、操作 ID 与下游目标如何绑定，响应丢失后如何恢复，以及重复提交时哪些状态不可回退。随后在隔离环境逐步引入真实身份和可控的外部依赖，每一步记录尚未覆盖的权限、运行和故障边界。不要为了展示多 Agent 而先引入多角色编排：先用任务集测出单 Agent 的瓶颈，再判断额外协调成本是否值得。参考 [OpenAI 的 Agent 评估建议](https://developers.openai.com/api/docs/guides/evaluation-best-practices)及 [Anthropic 的 Agent 评估实践](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)。
