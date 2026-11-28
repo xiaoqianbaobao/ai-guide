@@ -27,13 +27,15 @@ description: 使用两个独立 SQLite 数据库模拟调用方与下游，动�
 
 ```text
 调用方数据库                         模拟下游数据库
-operation_id + 内容 + pending  ───→  operation_id + 内容摘要 + 工单
+operation_id + 内容 + pending → unknown  ───→  operation_id + 内容摘要 + 工单
                          响应丢失  ←── 写入已提交
-unknown / 旧的 pending
+unknown
        └─ 重启后按原 operation_id 查询 ─→ confirmed + 回执
 ```
 
 稳定的 `operation_id` 在首次写入前就必须保存，并且同一次业务意图的重试沿用同一个 ID 和内容。示例的下游为 ID 设置唯一约束；若相同 ID 携带不同内容，就拒绝。真实 ID 应由可信服务生成并避免包含敏感信息；在这里写死的 ID 只是便于观察。
+
+示例在首次跨边界调用**之前**持久化 `unknown`。这样即使下游提交后进程崩溃、来不及记录响应，重启时也会先对账。对已是 `unknown` 的操作再次调用 `dispatch`，示例只查询；查不到就继续保留 `unknown`，不会自动发起创建。代价是即使实际请求从未发出，也可能需要人工或更明确的重试策略来恢复；这个保守设计不等于完整的生产调度器。
 
 这个步骤不包含审批逻辑。真实系统在记录意图前和执行时仍要分别检查身份、租户、批准版本、有效期及撤销状态；不能把“有 operation ID”当成执行授权。
 
@@ -47,7 +49,7 @@ python3 recovery.py
 python3 -m unittest -v
 ```
 
-预期演示输出“响应丢失后: unknown”和“重启并对账后: confirmed”。14 条测试覆盖：响应丢失、下游写入后调用方崩溃、查询无结果、沿用相同 ID 重试、同 ID 不同内容的冲突、本机 HTTP 连接中断、服务不可用、响应格式异常和回执关联错误。[完整源码](https://github.com/xiaoqianbaobao/ai-guide/tree/main/examples/cross-service-recovery)在临时目录创建两个数据库，退出后自动清理。
+预期演示输出“响应丢失后: unknown”和“重启并对账后: confirmed”。15 条测试覆盖：响应丢失、下游写入后调用方崩溃、查询无结果时不盲目发送、同 ID 不同内容的冲突、本机 HTTP 连接中断、服务不可用、响应格式异常和回执关联错误。[完整源码](https://github.com/xiaoqianbaobao/ai-guide/tree/main/examples/cross-service-recovery)在临时目录创建两个数据库，退出后自动清理。
 
 只运行跨进程 HTTP 演练：
 
@@ -106,7 +108,7 @@ else:
 
 ## 6. 练习
 
-1. 在 `dispatch` 中启用 `crash_after_write=True`，观察重启后本地仍为 `pending`、下游已有记录；再运行 `reconcile`。
+1. 在 `dispatch` 中启用 `crash_after_write=True`，观察重启后本地为 `unknown`、下游已有记录；再运行 `reconcile`。
 2. 在查询返回空结果后说明为什么代码保留 `unknown`；设计一个人工对账记录，需要哪些证据和责任人？
 3. 将模拟下游改成不支持幂等键，验证盲目重试可能产生重复；写出禁止自动重试的策略。
 4. 为操作增加租户与目标字段，先写越权和内容不匹配测试，再决定摘要与数据库约束应该包含哪些字段。

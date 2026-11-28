@@ -51,7 +51,7 @@ class HttpRecoveryTests(unittest.TestCase):
     def test_crash_after_http_success_then_reconciled(self):
         with self.assertRaises(RuntimeError):
             self.coordinator.dispatch("http-operation", crash_after_write=True)
-        self.assertEqual(self.coordinator.state("http-operation")["state"], "pending")
+        self.assertEqual(self.coordinator.state("http-operation")["state"], "unknown")
         self.assertEqual(self.coordinator.reconcile("http-operation")["state"], "confirmed")
         self.assertEqual(self.count_external(), 1)
 

@@ -26,10 +26,10 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(restarted.dispatch("operation-1")["receipt"], "operation-1")
         self.assertEqual(self.count_external(), 1)
 
-    def test_crash_after_external_write_recovers_pending_operation(self):
+    def test_crash_after_external_write_recovers_unknown_operation(self):
         with self.assertRaises(RuntimeError):
             self.local.dispatch("operation-1", crash_after_write=True)
-        self.assertEqual(self.local.state("operation-1")["state"], "pending")
+        self.assertEqual(self.local.state("operation-1")["state"], "unknown")
         self.assertEqual(Coordinator(self.local.path, self.external).reconcile("operation-1")["state"], "confirmed")
         self.assertEqual(self.count_external(), 1)
 
@@ -37,10 +37,15 @@ class RecoveryTests(unittest.TestCase):
         self.assertEqual(self.local.reconcile("operation-1")["state"], "unknown")
         self.assertEqual(self.count_external(), 0)
 
-    def test_retry_with_same_id_does_not_duplicate(self):
+    def test_dispatch_unknown_reconciles_without_duplicate(self):
         self.local.dispatch("operation-1", lose_response=True)
         self.assertEqual(self.local.dispatch("operation-1")["state"], "confirmed")
         self.assertEqual(self.count_external(), 1)
+
+    def test_unknown_without_lookup_result_does_not_blindly_send(self):
+        self.assertEqual(self.local.reconcile("operation-1")["state"], "unknown")
+        self.assertEqual(self.local.dispatch("operation-1")["state"], "unknown")
+        self.assertEqual(self.count_external(), 0)
 
     def test_operation_id_reuse_with_changed_content_is_rejected(self):
         with self.assertRaises(ValueError):

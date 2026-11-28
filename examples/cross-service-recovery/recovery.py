@@ -64,6 +64,11 @@ class Coordinator:
         operation = self.state(operation_id)
         if operation["state"] == "confirmed":
             return operation
+        if operation["state"] == "unknown":
+            return self.reconcile(operation_id)
+        # Persist uncertainty before crossing the boundary: a crash can occur
+        # after the downstream commit but before any local response is saved.
+        self.mark(operation_id, "unknown")
         try:
             receipt = self.downstream.create(operation_id, operation["text"], lose_response=lose_response)
         except TimeoutError:
