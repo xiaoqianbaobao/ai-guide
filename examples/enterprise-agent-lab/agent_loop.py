@@ -35,6 +35,10 @@ class OpenAIResponsesProvider:
             model=self.model, input=history, instructions=INSTRUCTIONS, tools=TOOLS,
             parallel_tool_calls=False, max_output_tokens=400, store=False,
         )
+        # A truncated or failed response can contain partial text or tool calls.
+        # Do not execute or present any output until the entire response completed.
+        if response.status != "completed":
+            raise AgentError("model response did not complete")
         return [item.model_dump(exclude_none=True) for item in response.output]
 
 

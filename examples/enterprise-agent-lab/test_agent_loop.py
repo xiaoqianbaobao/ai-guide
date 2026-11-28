@@ -130,7 +130,7 @@ class AgentTests(unittest.TestCase):
         class Responses:
             def create(self, **kwargs):
                 self.kwargs = kwargs
-                return type("Response", (), {"output": [Item()]})()
+                return type("Response", (), {"status": "completed", "output": [Item()]})()
         responses = Responses()
         client = type("Client", (), {"responses": responses})()
         with patch.dict("sys.modules", {"openai": SimpleNamespace(OpenAI=lambda **kwargs: client)}):
@@ -139,6 +139,32 @@ class AgentTests(unittest.TestCase):
         self.assertEqual(responses.kwargs["tools"][0]["name"], "lookup_policy")
         self.assertFalse(responses.kwargs["store"])
         self.assertFalse(responses.kwargs["parallel_tool_calls"])
+
+    def test_incomplete_response_cannot_execute_a_partial_tool_call(self):
+        class Item:
+            def model_dump(self, **kwargs):
+                return call()
+        client = SimpleNamespace(responses=SimpleNamespace(create=lambda **kwargs:
+            SimpleNamespace(status="incomplete", output=[Item()])))
+        with patch.dict("sys.modules", {"openai": SimpleNamespace(OpenAI=lambda **kwargs: client)}):
+            provider = OpenAIResponsesProvider("test-model")
+            with patch.object(self.service, "ask") as ask, self.assertRaisesRegex(AgentError, "did not complete"):
+                run_agent(self.service, self.identity, "退款", provider)
+        ask.assert_not_called()
+
+    def test_incomplete_final_response_cannot_expose_partial_answer(self):
+        class Item:
+            def __init__(self, value):
+                self.value = value
+            def model_dump(self, **kwargs):
+                return self.value
+        responses = iter([SimpleNamespace(status="completed", output=[Item(call())]),
+                          SimpleNamespace(status="incomplete", output=[Item(message("部分答案"))])])
+        client = SimpleNamespace(responses=SimpleNamespace(create=lambda **kwargs: next(responses)))
+        with patch.dict("sys.modules", {"openai": SimpleNamespace(OpenAI=lambda **kwargs: client)}):
+            provider = OpenAIResponsesProvider("test-model")
+            with self.assertRaisesRegex(AgentError, "did not complete"):
+                run_agent(self.service, self.identity, "退款", provider)
 
     def test_missing_network_consent_never_constructs_provider(self):
         with patch.dict(os.environ, {"OPENAI_API_KEY": "fake", "OPENAI_MODEL": "fake"}, clear=True), \
