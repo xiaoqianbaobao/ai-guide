@@ -7,6 +7,8 @@ import type { SearchDocument } from './search.data'
 
 const { page, frontmatter, theme, isDark } = useData()
 const route = useRoute()
+// SSR cannot know a visitor's saved appearance. Update the label after hydration.
+const appearanceReady = ref(false)
 const menuOpen = ref(false)
 const sidebarOpen = ref(false)
 const openDropdown = ref<string | null>(null)
@@ -146,7 +148,7 @@ async function updateHeadings() {
     .map(heading => ({ id: heading.id, title: heading.textContent?.replace(/^#\s*/, '').trim() || '', level: Number(heading.tagName.slice(1)) }))
     .filter(heading => heading.title)
 }
-onMounted(() => { void updateHeadings(); window.addEventListener('keydown', handleShortcut); window.addEventListener('resize', updateCodeScrollability); document.addEventListener('pointerdown', handleOutsideClick) })
+onMounted(() => { appearanceReady.value = true; void updateHeadings(); window.addEventListener('keydown', handleShortcut); window.addEventListener('resize', updateCodeScrollability); document.addEventListener('pointerdown', handleOutsideClick) })
 onBeforeUnmount(() => { diagramObserver?.disconnect(); codeResizeObserver?.disconnect(); window.removeEventListener('keydown', handleShortcut); window.removeEventListener('resize', updateCodeScrollability); document.removeEventListener('pointerdown', handleOutsideClick) })
 const home = computed(() => frontmatter.value.layout === 'home')
 const sidebar = computed(() => (theme.value.sidebar ?? {}) as LessonSidebar)
@@ -200,7 +202,7 @@ watch(() => route.path, () => { menuOpen.value = false; sidebarOpen.value = fals
           <div v-else class="next-dropdown"><button type="button" class="next-dropdown-trigger" :aria-expanded="openDropdown === item.text" @click="openDropdown = openDropdown === item.text ? null : item.text">{{ item.text }} <span aria-hidden="true">⌄</span></button><div v-if="openDropdown === item.text" class="next-dropdown-panel"><a v-for="child in item.items" :key="child.link" :href="href(child.link)">{{ child.text }}</a></div></div>
         </template>
       </nav>
-      <div class="next-header-actions"><button ref="searchButton" type="button" @click="toggleSearch" :aria-expanded="searchOpen" aria-keyshortcuts="Control+K Meta+K">搜索</button><button type="button" @click="isDark = !isDark" :aria-label="isDark ? '切换浅色模式' : '切换深色模式'">{{ isDark ? '☼' : '☾' }}</button><button class="next-mobile-menu" type="button" :aria-expanded="menuOpen" aria-controls="site-navigation" @click="menuOpen = !menuOpen; sidebarOpen = false; openDropdown = null; searchOpen = false">导航</button><button v-if="!home && group.length" class="next-mobile-lessons" type="button" :aria-expanded="sidebarOpen" aria-controls="lesson-navigation" @click="sidebarOpen = !sidebarOpen; focus = false; menuOpen = false; openDropdown = null; searchOpen = false">课程</button></div>
+      <div class="next-header-actions"><button ref="searchButton" type="button" @click="toggleSearch" :aria-expanded="searchOpen" aria-keyshortcuts="Control+K Meta+K">搜索</button><button type="button" @click="isDark = !isDark" :aria-label="appearanceReady && isDark ? '切换浅色模式' : '切换深色模式'">{{ appearanceReady && isDark ? '☼' : '☾' }}</button><button class="next-mobile-menu" type="button" :aria-expanded="menuOpen" aria-controls="site-navigation" @click="menuOpen = !menuOpen; sidebarOpen = false; openDropdown = null; searchOpen = false">导航</button><button v-if="!home && group.length" class="next-mobile-lessons" type="button" :aria-expanded="sidebarOpen" aria-controls="lesson-navigation" @click="sidebarOpen = !sidebarOpen; focus = false; menuOpen = false; openDropdown = null; searchOpen = false">课程</button></div>
     </header>
     <div v-if="searchOpen" class="next-search" role="search"><label for="next-search-input">搜索文章全文</label><input id="next-search-input" ref="searchInput" v-model="query" type="search" placeholder="输入关键词，用空格分隔"><p v-if="!query.trim()">输入关键词查找文章</p><p v-else-if="searchLoading">正在加载搜索索引…</p><p v-else-if="searchError">搜索索引加载失败，请关闭后重试。</p><p v-else-if="!searchResults.length">没有找到匹配的文章</p><a v-for="item in searchResults" :key="item.url" :href="href(item.url)"><strong>{{ item.title }}</strong><small>{{ excerpt(item) }}</small></a></div>
     <main v-if="home" id="main" class="next-home"><Content /></main>
