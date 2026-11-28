@@ -109,6 +109,41 @@ class ExternalPreparationTests(unittest.TestCase):
         with closing(sqlite3.connect(self.service.path)) as db:
             self.assertEqual(db.execute('SELECT approved_until, state FROM external_operations').fetchone(), (1300, 'prepared'))
 
+    def test_cancel_unlocks_draft_but_requires_new_approval_and_id(self):
+        self.approve()
+        self.service.prepare_external_submission(self.operator, self.draft, 'old')
+        result = self.service.cancel_external_submission(self.reviewer, 'old')
+        self.assertFalse(result['replayed'])
+        self.assertTrue(self.service.cancel_external_submission(self.reviewer, 'old')['replayed'])
+        with self.assertRaises(PermissionError):
+            self.service.prepare_external_submission(self.operator, self.draft, 'new')
+        self.approve()
+        with self.assertRaises(ConflictError):
+            self.service.prepare_external_submission(self.operator, self.draft, 'old')
+        with self.assertRaises(ConflictError):
+            self.service.submit(self.operator, self.draft, 'old')
+        self.assertEqual(self.service.prepare_external_submission(self.operator, self.draft, 'new')['state'], 'prepared')
+        self.assertTrue(self.service.cancel_external_submission(self.reviewer, 'old')['replayed'])
+        with closing(sqlite3.connect(self.service.path)) as db:
+            self.assertEqual(db.execute("SELECT count(*) FROM audit WHERE action = 'external_submission_cancelled'").fetchone()[0], 1)
+            self.assertEqual(db.execute('SELECT operation_id, cancelled_by FROM cancelled_external_operations').fetchone(), ('old', 'bob'))
+            self.assertEqual(db.execute('SELECT operation_id FROM external_operations').fetchone()[0], 'new')
+
+    def test_cancel_requires_reviewer_same_tenant_and_unsent_state(self):
+        self.approve()
+        self.service.prepare_external_submission(self.operator, self.draft, 'op')
+        with self.assertRaises(PermissionError):
+            self.service.cancel_external_submission(self.operator, 'op')
+        with self.assertRaises(LookupError):
+            self.service.cancel_external_submission(IDENTITIES['demo-hr-reviewer'], 'op')
+        with closing(sqlite3.connect(self.service.path)) as db, db:
+            db.execute("UPDATE external_operations SET state = 'unknown' WHERE operation_id = 'op'")
+        with self.assertRaises(ConflictError):
+            self.service.cancel_external_submission(self.reviewer, 'op')
+        with closing(sqlite3.connect(self.service.path)) as db:
+            self.assertEqual(db.execute('SELECT state FROM external_operations').fetchone()[0], 'unknown')
+            self.assertEqual(db.execute('SELECT count(*) FROM cancelled_external_operations').fetchone()[0], 0)
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -64,7 +64,7 @@ module: agent
 | 注入内容要求写操作 | `test_injected_document_cannot_authorize_write_tool`：模拟模型请求未开放的写工具，被拒绝 | 不能由此推断不会泄露或污染回答；同一测试文件还演示回答仍可能被污染 |
 | 批准与重复提交 | `test_approval_and_replay_do_not_duplicate_ticket`：未批准不能提交，相同操作重试只创建一条模拟工单 | 接入真实审批、调用主体、目标系统及可审计授权 |
 | 草稿修改或批准过期 | `test_modified_draft_cannot_use_old_approval`、`test_expiry_rejects_new_write_but_not_replay_of_completed_write` | 跨服务部署时验证审批与实际操作参数的绑定 |
-| 外部提交准备 | `test_external_prepare`：在同一事务固定已批准版本和操作 ID，并检查撤销竞争 | 只保存意图，无发送、取消或解锁；重放不会延长审批 |
+| 外部提交准备与取消 | `test_external_prepare`：固定已批准版本和操作 ID；未发送的意图可由同租户审核人取消，旧 ID 不能复用 | 只保存意图，无发送器或 HTTP 入口；重放不会延长审批，未知状态不可当作未发送取消 |
 | 下游写入后响应丢失 | 独立练习 `test_connection_dropped_after_commit_then_reconciled`：用同一 ID 对账且只有一条工单 | 该对账练习尚未与上述准备步骤接通，真实下游合同与故障行为也需要验证 |
 
 在仓库根目录分别运行两组离线测试；每组使用独立临时数据库，不连接真实业务服务：

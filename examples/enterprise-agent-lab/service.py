@@ -53,6 +53,9 @@ class Service:
                 draft_id TEXT NOT NULL UNIQUE, tenant TEXT NOT NULL, text TEXT NOT NULL,
                 approved_version TEXT NOT NULL, approved_by TEXT NOT NULL,
                 approved_until REAL NOT NULL, state TEXT NOT NULL);
+            CREATE TABLE IF NOT EXISTS cancelled_external_operations(operation_id TEXT PRIMARY KEY,
+                draft_id TEXT NOT NULL, tenant TEXT NOT NULL, approved_version TEXT NOT NULL,
+                approved_by TEXT NOT NULL, cancelled_by TEXT NOT NULL, cancelled_at REAL NOT NULL);
             CREATE TABLE IF NOT EXISTS audit(id INTEGER PRIMARY KEY, tenant TEXT NOT NULL,
                 actor TEXT NOT NULL, action TEXT NOT NULL, object_id TEXT NOT NULL);
             """)
@@ -258,6 +261,8 @@ class Service:
             self.ensure_no_external_operation(db, draft_id)
             if db.execute("SELECT 1 FROM external_operations WHERE operation_id = ?", (operation_id,)).fetchone():
                 raise ConflictError("operation ID already reserved")
+            if db.execute("SELECT 1 FROM cancelled_external_operations WHERE operation_id = ?", (operation_id,)).fetchone():
+                raise ConflictError("operation ID already cancelled")
             existing = db.execute("SELECT * FROM tickets WHERE operation_id = ? OR draft_id = ?", (operation_id, draft_id)).fetchone()
             if existing:
                 if existing["operation_id"] != operation_id or existing["draft_id"] != draft_id or existing["tenant"] != identity.tenant:
@@ -281,6 +286,8 @@ class Service:
             row = db.execute("SELECT * FROM drafts WHERE id = ? AND tenant = ?", (draft_id, identity.tenant)).fetchone()
             if not row:
                 raise LookupError("draft not found")
+            if db.execute("SELECT 1 FROM cancelled_external_operations WHERE operation_id = ?", (operation_id,)).fetchone():
+                raise ConflictError("operation ID already cancelled")
             existing = db.execute("SELECT * FROM external_operations WHERE operation_id = ? OR draft_id = ?", (operation_id, draft_id)).fetchone()
             if existing:
                 if (existing["operation_id"] != operation_id or existing["draft_id"] != draft_id
@@ -298,3 +305,30 @@ class Service:
                         row["approved_by"], row["approved_until"]))
             self.audit(db, identity, "external_submission_prepared", operation_id)
             return {"operation_id": operation_id, "state": "prepared", "replayed": False}
+
+    def cancel_external_submission(self, identity: Identity, operation_id: str) -> dict:
+        """Cancel an unsent reservation; retain the ID and require a fresh approval."""
+        if identity.role != "reviewer":
+            raise PermissionError("reviewer required")
+        if not isinstance(operation_id, str) or not operation_id.strip() or len(operation_id) > 128:
+            raise ValueError("operation_id must be 1–128 characters")
+        with closing(self.connect()) as db, db:
+            db.execute("BEGIN IMMEDIATE")
+            previous = db.execute("SELECT 1 FROM cancelled_external_operations WHERE operation_id = ? AND tenant = ?",
+                                  (operation_id, identity.tenant)).fetchone()
+            if previous:
+                return {"operation_id": operation_id, "state": "cancelled", "replayed": True}
+            row = db.execute("SELECT * FROM external_operations WHERE operation_id = ? AND tenant = ?",
+                             (operation_id, identity.tenant)).fetchone()
+            if not row:
+                raise LookupError("operation not found")
+            if row["state"] != "prepared":
+                raise ConflictError("operation may have been sent; reconcile before any cancellation")
+            db.execute("INSERT INTO cancelled_external_operations VALUES (?, ?, ?, ?, ?, ?, ?)",
+                       (operation_id, row["draft_id"], row["tenant"], row["approved_version"],
+                        row["approved_by"], identity.user, self.clock()))
+            db.execute("DELETE FROM external_operations WHERE operation_id = ?", (operation_id,))
+            db.execute("UPDATE drafts SET approved_digest = NULL, approved_by = NULL, approved_until = NULL WHERE id = ? AND tenant = ?",
+                       (row["draft_id"], identity.tenant))
+            self.audit(db, identity, "external_submission_cancelled", operation_id)
+            return {"operation_id": operation_id, "state": "cancelled", "replayed": False}
