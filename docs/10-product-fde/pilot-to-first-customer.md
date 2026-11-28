@@ -103,6 +103,23 @@ python3 -m unittest -v
 
 “愿意参加下一次会议”是弱承诺；安排业务负责人、提供已授权样本、确认预算流程或签署合同，是不同强度的承诺。不要把口头兴趣记作收入，也不要把案例中的假设写成自己的业绩。
 
+### 一次试点结束会议：让双方做出可追踪的决定
+
+试点报告发出去后，销售与工程不要各自猜测客户的意思。安排业务负责人、使用者代表、资料维护人，以及需要参与采购或安全审查的人一起看结果；谁无法参加，就记录由谁确认其意见。下面是一份**虚构的会议记录**，不是实际项目结果：
+
+| 项目 | 会议记录示例 |
+| --- | --- |
+| 原先约定 | 只读回答退款规则；引用必须指向当时有效、允许该用户访问的资料 |
+| 观察到的结果 | 若干任务可完成；有一条引用过期后需人工纠正，样本规模不足以估计长期收益 |
+| 分歧或未知 | 业务负责人愿意继续观察；知识维护人尚未确认所有旧版资料的下架流程；采购预算未确认 |
+| 本次决定 | 暂不扩大到生产；先补齐资料版本和撤回流程，再复测同一失败类别 |
+| 负责人及时间 | 客户指定资料负责人核实来源；供应商负责改进引用检查；双方约定复盘日期 |
+| 下次决策材料 | 复测记录、未解决风险、费用范围和采购所需资料；由客户确认是否进入下一阶段 |
+
+这张表的价值在于让**兴趣、验收、采购**分别有证据。一个功能通过试点，不意味着安全审查完成；业务负责人愿意推进，也不意味着采购已经批准。若关键负责人未确认，不要替对方填“通过”。决策也可以是停止：例如无法取得合法授权资料、业务问题并不存在，或复核成本持续高于现有流程。保留未达标的结果和原因，供双方判断是否值得再试。
+
+Sierra 早期市场负责人在 [First Round 的访谈](https://review.firstround.com/sierra-design-partnership/)中介绍过他们选择设计合作伙伴的做法：要求双方投入时间，并围绕真实业务共同建设。这个案例说明，设计伙伴需要的不只是礼貌反馈；但 Sierra 的团队背景与客户条件不一定适合初创团队，访谈里的结果也不能作为你自己的转化率预测。你可以借鉴的是把合作投入写具体：客户能否安排领域负责人、提供获授权样本、参加定期复盘；你能否明确交付、反馈和退出方式。是否收费以及合同条款，应由双方结合试点成本和采购条件协商。
+
 ## 5. 把试点变成下一轮学习
 
 复盘时把任务分为成功、失败和不适用；记录证据来源、责任人与修复优先级。功能不足可以修，资料没有权威来源可能需要客户先治理知识；若试点无法达到安全边界，停止也是合理结果。经授权后，才能把客户反馈整理成公开案例。
@@ -118,4 +135,5 @@ python3 -m unittest -v
 - [OpenAI：A Practical Guide to Building AI Agents](https://openai.com/business/guides-and-resources/a-practical-guide-to-building-ai-agents/)：围绕工作流、工具和评估建立技术基线。
 - [Anthropic：Demystifying Evals for AI Agents](https://www.anthropic.com/research/demystifying-evals-for-ai-agents)：理解任务集、评估方式与持续改进。
 - [Microsoft Research：Patterns of Trustworthy Experimentation](https://www.microsoft.com/en-us/research/articles/patterns-of-trustworthy-experimentation-during-experiment-stage/)：参考实验过程中的数据质量、指标和新鲜感效应检查。
+- [First Round：Sierra 的设计合作伙伴实践](https://review.firstround.com/sierra-design-partnership/)：企业 AI 产品如何要求客户投入真实时间；阅读时留意其团队与客户背景，避免把个案当作普遍转化率。
 - Teresa Torres，《Continuous Discovery Habits》：可借鉴持续接触用户与检验假设的节奏；企业采购、隐私与安全约束仍需单独设计。
