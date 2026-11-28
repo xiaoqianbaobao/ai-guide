@@ -27,6 +27,7 @@ description: 精选课程、官方教程和书籍，为每一项资源给出学�
 ## 产品、用户与企业交付
 
 - [YC：Building Product, Talking to Users, and Growing](https://www.ycombinator.com/library/dS-how-to-start-a-startup-building-product-talking-to-users-and-growing)：创始人讲座，含视频与文字记录。练习区分用户提出的功能和背后的问题；企业客户还需额外考虑采购、权限与组织约束。
+- [YC Startup School：How to Get Your First 10 Customers](https://www.ycombinator.com/library/SF-how-to-get-your-first-10-customers)：视频及文字记录，讨论如何寻找首批目标客户和开始对话。看完后，为一个具体行业写下“目标角色在哪里开展工作、可能遇到什么问题、可以通过谁介绍”；再用本站[客户访谈实战](../10-product-fde/customer-discovery)中的问题卡验证，而不是把观看后的猜测当作客户需求。视频是创业者经验汇总，不保证任何渠道或转化率适用于你的行业。页面标题与文字记录核验于 2026-11-28；未逐段验证视频内容与字幕一致。
 - [YC Startup School 视频目录](https://www.ycombinator.com/blog/startup-school-videos)：按访谈、定价、最小可行产品和融资挑选主题；不要把早期创业建议机械套用到大型企业交付。
 - [Martin Fowler：Outcome Over Output](https://martinfowler.com/bliki/OutcomeOverOutput.html)：从交付物转向用户成效，并理解结果归因的困难；参见本站 [从功能交付到客户成效](../10-product-fde/outcome-over-output)。
 - [《Inspired》，Marty Cagan，第二版](https://www.oreilly.com/library/view/inspired-2nd-edition/9781119387503/)：根据公开目录，适合进一步学习产品团队与产品发现。完整内容可能需要订阅；本站尚未提供逐章读书笔记。
