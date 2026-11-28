@@ -1,6 +1,7 @@
 ---
 title: Python 基础课程说明
 description: Python 基础课程入口与学习建议。
+search: false
 head:
   - - meta
     - name: robots

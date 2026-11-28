@@ -18,7 +18,7 @@ function searchableText(source: string): string {
 export default createContentLoader('**/*.md', {
   includeSrc: true,
   transform(pages): SearchDocument[] {
-    return pages.filter(page => !page.url.endsWith('/README.html')).map(page => ({
+    return pages.filter(page => page.frontmatter.search !== false && !page.url.endsWith('/README.html')).map(page => ({
       title: String(page.frontmatter.title || page.src?.match(/^#\s+(.+)$/m)?.[1]?.replace(/\s+#+\s*$/, '').trim() || page.url),
       url: page.url.replace(/^\/ai-guide(?=\/)/, ''),
       text: searchableText(page.src || '')

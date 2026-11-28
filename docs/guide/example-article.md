@@ -1,6 +1,7 @@
 ---
 title: 文章示例说明
 description: 早期示例页面与正式课程入口。
+search: false
 head:
   - - meta
     - name: robots
