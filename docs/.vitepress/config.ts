@@ -42,6 +42,7 @@ export default defineConfig({
   ],
   markdown: {
     lineNumbers: true,
+    theme: { light: 'github-light', dark: 'github-dark-high-contrast' },
     config(md) {
       md.use(mathjax3)
       const fence = md.renderer.rules.fence!
