@@ -7,6 +7,7 @@ import sys
 import tempfile
 from threading import Thread
 import unittest
+from unittest.mock import patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent / 'cross-service-recovery'))
 from http_downstream import HttpDownstream, make_server
@@ -50,6 +51,21 @@ class ExternalDeliveryTests(unittest.TestCase):
         self.assertEqual(reconcile(restarted, self.op, 'op-1', self.remote), {'state': 'confirmed', 'receipt': 'op-1'})
         self.assertEqual(dispatch(restarted, self.op, 'op-1', self.remote)['state'], 'confirmed')
         self.assertEqual(self.count_external(), 1)
+
+    def test_lookup_outage_preserves_unknown_then_recovers(self):
+        self.assertEqual(dispatch(self.service, self.op, 'op-1', self.remote, lose_response=True)['state'], 'unknown')
+        with patch.object(self.remote, 'lookup', side_effect=TimeoutError('lookup unavailable')):
+            self.assertEqual(reconcile(self.service, self.op, 'op-1', self.remote), {'state': 'unknown', 'receipt': None})
+        restarted = Service(self.service.path, clock=lambda: self.now)
+        self.assertEqual(reconcile(restarted, self.op, 'op-1', self.remote), {'state': 'confirmed', 'receipt': 'op-1'})
+        self.assertEqual(self.count_external(), 1)
+
+    def test_confirmed_receipt_survives_lookup_outage(self):
+        expected = dispatch(self.service, self.op, 'op-1', self.remote)
+        self.assertEqual(expected, {'state': 'confirmed', 'receipt': 'op-1'})
+        with patch.object(self.remote, 'lookup', side_effect=TimeoutError('lookup unavailable')) as lookup:
+            self.assertEqual(reconcile(self.service, self.op, 'op-1', self.remote), expected)
+            lookup.assert_not_called()
 
     def test_expiry_prevents_first_send_but_allows_cancellation(self):
         self.now += 300

@@ -211,6 +211,8 @@ python3 -m unittest test_external_delivery -v
 
 例如测试先让模拟服务提交工单后主动断开连接，再重建本地服务对象、查询下游，确认只有一条工单。另一个测试在发送资格取得后模拟进程中断：下游没有记录，但本地仍为 `unknown`，不会自动重发。这些是隔离环境测试，不是外部业务系统的运行结果。源码见 [external_delivery.py](https://github.com/xiaoqianbaobao/ai-guide/blob/main/examples/enterprise-agent-lab/external_delivery.py) 和 [test_external_delivery.py](https://github.com/xiaoqianbaobao/ai-guide/blob/main/examples/enterprise-agent-lab/test_external_delivery.py)。
 
+对账服务也可能暂时不可用：测试先让下游实际提交并丢失响应，再模拟查询超时，确认本地仍是 `unknown`；恢复查询后确认原工单。已保存的 `confirmed` 回执则不因下游暂时不可用而降级。这两项测试的查询故障由模拟异常注入，不代表已经覆盖真实网络的所有故障。
+
 想亲自观察一次状态变化，可以在 `examples/enterprise-agent-lab` 目录把下面代码保存为 `try_delivery.py`，然后执行 `python3 try_delivery.py`。它使用临时数据库和仅监听本机的模拟服务，退出时关闭服务并清理数据：
 
 ```python
