@@ -24,7 +24,7 @@ export default defineConfig({
 
 - 生产环境通过仓库子路径发布，保证静态资源路径正确。
 - 本地开发仍使用根路径，方便 `vitepress dev` 调试。
-- 默认 canonical URL 指向服务器域名；如需覆盖，可在构建时设置 `VITEPRESS_CANONICAL_ORIGIN`。
+- 默认 canonical URL 指向服务器域名；GitHub Pages 工作流单独将 `VITEPRESS_CANONICAL_ORIGIN` 设为 `https://csqread.top`，使备用站在服务器域名不可访问期间指向自身。服务器域名恢复后应重新决定统一的规范域名，避免两个站点长期各自作为规范地址。
 
 ## 独立服务器部署
 
