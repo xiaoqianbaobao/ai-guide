@@ -25,7 +25,7 @@ export default defineConfig({
 - 生产环境通过仓库子路径发布，保证静态资源路径正确。
 - 本地开发仍使用根路径，方便 `vitepress dev` 调试。
 - 默认 canonical URL 指向服务器域名；GitHub Pages 工作流单独将 `VITEPRESS_CANONICAL_ORIGIN` 设为 `https://csqread.top`，使备用站在服务器域名不可访问期间指向自身。服务器域名恢复后应重新决定统一的规范域名，避免两个站点长期各自作为规范地址。
-- 构建会在 `/ai-guide/sitemap.xml` 生成对应域名的教程地图。`csqread.top` 根目录的 `robots.txt` 属于根站点，教程仓库不能直接修改它；如需通过根文件声明教程地图，请在根站点维护 `Sitemap: https://csqread.top/ai-guide/sitemap.xml`，或在搜索平台单独提交该地址。
+- 构建会在 `/ai-guide/sitemap.xml` 生成对应域名的教程地图。`csqread.top` 根目录的 `robots.txt` 属于独立 Hugo 根站，已声明教程地图；该文件及 Hugo 配置需在根站源码中维护，也可以在搜索平台单独提交地图地址。
 
 ## 独立服务器部署
 
